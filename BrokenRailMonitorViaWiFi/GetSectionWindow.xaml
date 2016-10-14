@@ -1,0 +1,26 @@
+﻿<Window x:Class="BrokenRailMonitorViaWiFi.GetSectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
+        mc:Ignorable="d"
+        Title="获取铁轨段" Height="176.705" Width="339.858" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <WrapPanel VerticalAlignment="Center">
+            <Label>获取从</Label>
+            <TextBox x:Name="txtTerminalSmall" VerticalContentAlignment="Center" Width="30" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+            <Label>号终端到</Label>
+            <TextBox x:Name="txtTerminalBig" VerticalContentAlignment="Center" Width="30" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+            <Label>号终端之间的铁轨通断信息</Label>
+        </WrapPanel>
+        <DockPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Height="24">
+            <Button x:Name="btnEnter" Width="70" Click="btnEnter_Click">确定</Button>
+            <Button x:Name="btnCancel" Width="70" Margin="30,0,0,0" Click="btnCancel_Click">取消</Button>
+        </DockPanel>
+    </Grid>
+</Window>

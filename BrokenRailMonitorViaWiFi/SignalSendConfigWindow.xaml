@@ -1,0 +1,38 @@
+﻿<Window x:Class="BrokenRailMonitorViaWiFi.SignalSendConfigWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
+        mc:Ignorable="d"
+        Title="超声信号发射配置" Height="250" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" VerticalAlignment="Center" Margin="30,0">
+            <Label>发射间隔:</Label>
+            <TextBox x:Name="txtSendInterval" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+        </DockPanel>
+        <DockPanel Grid.Row="1" VerticalAlignment="Center" Margin="30,0">
+            <Label>发射时机:</Label>
+            <TextBox x:Name="txtSendTimeOpportunity" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+        </DockPanel>
+        <DockPanel Grid.Row="2" VerticalAlignment="Center" Margin="30,0">
+            <Label>相邻小终端发射时机:</Label>
+            <TextBox x:Name="txtNeighbourSmallOpportunity" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+        </DockPanel>
+        <DockPanel Grid.Row="3" VerticalAlignment="Center" Margin="30,0">
+            <Label>相邻大终端发射时机:</Label>
+            <TextBox x:Name="txtNeighbourBigOpportunity" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+        </DockPanel>
+        <DockPanel Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Center" Height="24">
+            <Button x:Name="btnEnter" Width="70" Click="btnEnter_Click">确定</Button>
+            <Button x:Name="btnCancel" Width="70" Margin="30,0,0,0" Click="btnCancel_Click">取消</Button>
+        </DockPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,87 @@
+﻿<Window x:Class="BrokenRailMonitorViaWiFi.RailInfoResultWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
+        xmlns:chart="clr-namespace:Visifire.Charts;assembly=WPFVisifire.Charts"
+        mc:Ignorable="d"
+        Title="铁轨信息结果显示" Height="480" Width="800" Loaded="Window_Loaded" WindowState="Maximized">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="400*"/>
+        </Grid.RowDefinitions>
+        <StackPanel VerticalAlignment="Center">
+            <StackPanel x:Name="stpRail1" Height="36" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Padding="10" Width="50">轨1：</Label>
+                <local:Rail x:Name="rail1Left"/>
+                <local:Rail x:Name="rail1Right" Margin="2,0,50,0"/>
+            </StackPanel>
+            <StackPanel x:Name="stpDevices" Height="36" Orientation="Horizontal" HorizontalAlignment="Center">
+                <local:MasterControl x:Name="masterControl"/>
+            </StackPanel>
+            <StackPanel x:Name="stpRail2" Height="36" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Padding="10" Width="50">轨2：</Label>
+                <local:Rail x:Name="rail2Left" />
+                <local:Rail x:Name="rail2Right" Margin="2,0,50,0"/>
+            </StackPanel>
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <chart:Chart ScrollingEnabled="False" View3D="False"
+                         IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="All" ZoomOutText="Restore"
+                         x:Name="chartRail1Temprature" Grid.Row="0" Visibility="Visible"
+                         SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
+                         Rendered="lineChart_Rendered">
+                <chart:Chart.Titles>
+                    <chart:Title Text="轨1温度"/>
+                </chart:Chart.Titles>
+                <chart:Chart.AxesY>
+                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                </chart:Chart.AxesY>
+                <chart:Chart.AxesX>
+                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                </chart:Chart.AxesX>
+            </chart:Chart>
+            <chart:Chart ScrollingEnabled="False" View3D="False"
+                         IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="All" ZoomOutText="Restore"
+                         x:Name="chartTerminalTemprature" Grid.Row="0" Grid.Column="1" Visibility="Visible"
+                         SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
+                         Rendered="lineChart_Rendered">
+                <chart:Chart.Titles>
+                    <chart:Title Text="终端温度"/>
+                </chart:Chart.Titles>
+                <chart:Chart.AxesY>
+                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                </chart:Chart.AxesY>
+                <chart:Chart.AxesX>
+                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                </chart:Chart.AxesX>
+            </chart:Chart>
+            <chart:Chart ScrollingEnabled="False" View3D="False"
+                         IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="All" ZoomOutText="Restore"
+                         x:Name="chartRail2Temprature" Grid.Row="0" Grid.Column="2" Visibility="Visible"
+                         SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
+                         Rendered="lineChart_Rendered">
+                <chart:Chart.Titles>
+                    <chart:Title Text="轨2温度"/>
+                </chart:Chart.Titles>
+                <chart:Chart.AxesY>
+                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                </chart:Chart.AxesY>
+                <chart:Chart.AxesX>
+                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                </chart:Chart.AxesX>
+            </chart:Chart>
+        </Grid>
+    </Grid>
+</Window>

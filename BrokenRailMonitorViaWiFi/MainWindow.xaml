@@ -1,0 +1,61 @@
+﻿<Window x:Class="BrokenRailMonitorViaWiFi.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi" Closing="Window_Closing"
+        mc:Ignorable="d"
+        Title="断轨监测" Height="600" Width="1024" MinHeight="450" MinWidth="450">
+    <Window.Background>
+        <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+            <GradientStop Color="#FF00ccff" Offset="1"/>
+            <GradientStop Color="#FFFFF503"/>
+        </LinearGradientBrush>
+    </Window.Background>
+    <Grid x:Name="gridMain">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="100*"/>
+            <RowDefinition Height="100*"/>
+            <RowDefinition Height="120*"/>
+            <RowDefinition Height="120*"/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0">
+            <!--<Button x:Name="btnSet" HorizontalAlignment="Left" Width="70" Click="btnSet_Click" Height="30">设置</Button>-->
+            <Menu x:Name="menu" Height="25" Width="190" HorizontalAlignment="Left">
+                <MenuItem x:Name="miConnect" Header="连接" FontSize="15" Click="miConnect_Click"></MenuItem>
+                <MenuItem x:Name="miRefreshDevices" Header="刷新设备" FontSize="15" Click="miRefreshDevices_Click"></MenuItem>
+                <MenuItem Header="指令" FontSize="15">
+                    <!--<MenuItem x:Name="miRailInitial" Header="初始化" Click="miRailInitial_Click"></MenuItem>-->
+                    <!--<MenuItem x:Name="miTimeBaseCorrect" Header="发射时基校准" Click="miTimeBaseCorrect_Click"></MenuItem>-->
+                    <MenuItem x:Name="miGetAllRailInfo" Header="获取所有终端铁轨信息" Click="miGetAllRailInfo_Click"></MenuItem>
+                    <MenuItem x:Name="miGetOneSectionInfo" Header="获取某段铁轨信息" Click="miGetOneSectionInfo_Click"></MenuItem>
+                    <!--<MenuItem x:Name="miGetAllDevicesSignalAmplitude" Header="获取所有终端信号幅值" Click="miGetAllDevicesSignalAmplitude_Click"></MenuItem>-->
+                    <MenuItem x:Name="miRealTimeConfig" Header="实时时钟配置" Click="miRealTimeConfig_Click"></MenuItem>
+                </MenuItem>
+            </Menu>
+            <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                <Ellipse x:Name="elpIndicator" Fill="Green" Height="15" Width="15"></Ellipse>
+                <Label x:Name="lblPackageCount"></Label>
+            </StackPanel>
+        </DockPanel>
+        <ScrollViewer x:Name="svContainer" Grid.Row="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
+            <!--<StackPanel VerticalAlignment="Center" Height="36">-->
+            <StackPanel VerticalAlignment="Bottom">
+                <Canvas x:Name="cvsRail1" Height="36" Margin="20,0" HorizontalAlignment="Left">
+                </Canvas>
+                <Canvas x:Name="cvsDevices" Height="36" Margin="20,0">
+                </Canvas>
+                <Canvas x:Name="cvsRail2" Height="36" Margin="20,0">
+                </Canvas>
+            </StackPanel>
+            <!--</StackPanel>-->
+        </ScrollViewer>
+        <!--<TextBlock x:Name="txtReceive" Grid.Row="1"/>
+        <TextBox x:Name="txtSend" Grid.Row="2"></TextBox>
+        <Button x:Name="btnSend" Grid.Row="3" HorizontalAlignment="Right" Width="70" Height="30" Click="btnSend_Click">发送</Button>-->
+        <local:ModernProgressRing x:Name="modernProgressRing" Grid.RowSpan="5" IsActive="False" Width="100" Height="100" Style="{StaticResource CircleProgressRingStyle}" >
+        </local:ModernProgressRing>
+        <local:DataShowUserControl x:Name="dataShowUserCtrl" Grid.Row="4"></local:DataShowUserControl>
+    </Grid>
+</Window>
