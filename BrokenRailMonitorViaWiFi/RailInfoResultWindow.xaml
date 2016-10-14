@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
         xmlns:chart="clr-namespace:Visifire.Charts;assembly=WPFVisifire.Charts"
         mc:Ignorable="d"
-        Title="铁轨信息结果显示" Height="480" Width="800" Loaded="Window_Loaded" WindowState="Maximized">
+        Title="铁轨信息结果显示" Height="600" Width="800" Loaded="Window_Loaded" WindowState="Maximized">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
@@ -34,6 +34,7 @@
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
                 <RowDefinition Height="1*"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
@@ -74,6 +75,96 @@
                          Rendered="lineChart_Rendered">
                 <chart:Chart.Titles>
                     <chart:Title Text="轨2温度"/>
+                </chart:Chart.Titles>
+                <chart:Chart.AxesY>
+                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                </chart:Chart.AxesY>
+                <chart:Chart.AxesX>
+                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                </chart:Chart.AxesX>
+            </chart:Chart>
+            <chart:Chart ScrollingEnabled="False" View3D="False"
+                         IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="All" ZoomOutText="Restore"
+                         x:Name="chartRail1Stress" Grid.Row="1" Grid.Column="0" Visibility="Visible"
+                         SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
+                         Rendered="lineChart_Rendered">
+                <chart:Chart.Titles>
+                    <chart:Title Text="轨1应力"/>
+                </chart:Chart.Titles>
+                <chart:Chart.AxesY>
+                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                </chart:Chart.AxesY>
+                <chart:Chart.AxesX>
+                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                </chart:Chart.AxesX>
+            </chart:Chart>
+            <chart:Chart ScrollingEnabled="False" View3D="False"
+                         IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="All" ZoomOutText="Restore"
+                         x:Name="chartRail2Stress" Grid.Row="1" Grid.Column="1" Visibility="Visible"
+                         SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
+                         Rendered="lineChart_Rendered">
+                <chart:Chart.Titles>
+                    <chart:Title Text="轨2应力"/>
+                </chart:Chart.Titles>
+                <chart:Chart.AxesY>
+                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                </chart:Chart.AxesY>
+                <chart:Chart.AxesX>
+                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                </chart:Chart.AxesX>
+            </chart:Chart>
+            <chart:Chart ScrollingEnabled="False" View3D="False"
+                         IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="All" ZoomOutText="Restore"
+                         x:Name="chartRail1LeftSignalAmplitude" Grid.Row="1" Grid.Column="2" Visibility="Visible"
+                         SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
+                         Rendered="lineChart_Rendered">
+                <chart:Chart.Titles>
+                    <chart:Title Text="轨1左信号幅值"/>
+                </chart:Chart.Titles>
+                <chart:Chart.AxesY>
+                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                </chart:Chart.AxesY>
+                <chart:Chart.AxesX>
+                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                </chart:Chart.AxesX>
+            </chart:Chart>
+            <chart:Chart ScrollingEnabled="False" View3D="False"
+                         IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="All" ZoomOutText="Restore"
+                         x:Name="chartRail1RightSignalAmplitude" Grid.Row="2" Grid.Column="0" Visibility="Visible"
+                         SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
+                         Rendered="lineChart_Rendered">
+                <chart:Chart.Titles>
+                    <chart:Title Text="轨1右信号幅值"/>
+                </chart:Chart.Titles>
+                <chart:Chart.AxesY>
+                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                </chart:Chart.AxesY>
+                <chart:Chart.AxesX>
+                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                </chart:Chart.AxesX>
+            </chart:Chart>
+            <chart:Chart ScrollingEnabled="False" View3D="False"
+                         IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="All" ZoomOutText="Restore"
+                         x:Name="chartRail2LeftSignalAmplitude" Grid.Row="2" Grid.Column="1" Visibility="Visible"
+                         SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
+                         Rendered="lineChart_Rendered">
+                <chart:Chart.Titles>
+                    <chart:Title Text="轨2左信号幅值"/>
+                </chart:Chart.Titles>
+                <chart:Chart.AxesY>
+                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                </chart:Chart.AxesY>
+                <chart:Chart.AxesX>
+                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                </chart:Chart.AxesX>
+            </chart:Chart>
+            <chart:Chart ScrollingEnabled="False" View3D="False"
+                         IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="All" ZoomOutText="Restore"
+                         x:Name="chartRail2RightSignalAmplitude" Grid.Row="2" Grid.Column="2" Visibility="Visible"
+                         SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
+                         Rendered="lineChart_Rendered">
+                <chart:Chart.Titles>
+                    <chart:Title Text="轨2右信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
                     <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>

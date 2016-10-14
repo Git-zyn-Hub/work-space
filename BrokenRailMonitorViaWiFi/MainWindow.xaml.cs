@@ -297,6 +297,16 @@ namespace BrokenRailMonitorViaWiFi
                             actualReceive[i] = receivedBytes[i];
                         }
 
+                        StringBuilder sb = new StringBuilder(500);
+                        for (int i = 0; i < actualReceive.Length; i++)
+                        {
+                            sb.Append(actualReceive[i].ToString("x2"));
+                        }
+                        this.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            this.dataShowUserCtrl.AddShowData("收到数据  " + sb.ToString(), DataLevel.Default);
+                        }));
+
                         ASCIIEncoding encoding = new ASCIIEncoding();
                         string strReceive = encoding.GetString(actualReceive);
                         if (strReceive.Length > 2)
@@ -404,15 +414,6 @@ namespace BrokenRailMonitorViaWiFi
                                         MessageBox.Show("校验和出错");
                                         continue;
                                     }
-                                    StringBuilder sb = new StringBuilder(500);
-                                    for (int i = 0; i < actualReceive.Length; i++)
-                                    {
-                                        sb.Append(actualReceive[i].ToString("x2"));
-                                    }
-                                    this.Dispatcher.BeginInvoke(new Action(() =>
-                                    {
-                                        this.dataShowUserCtrl.AddShowData("收到数据  " + sb.ToString(), DataLevel.Default);
-                                    }));
                                 }
                                 else
                                 {
@@ -463,9 +464,10 @@ namespace BrokenRailMonitorViaWiFi
                                         break;
                                     case 0xf1:
                                         {
-                                            int terminalNo = actualReceive[5];
+                                            int terminalNo = actualReceive[7];
                                             int i = 0;
                                             int count = MasterControlList.Count;
+                                            bool isError = false;
                                             this.Dispatcher.Invoke(new Action(() =>
                                             {
                                                 foreach (var masterControl in MasterControlList)
@@ -475,18 +477,30 @@ namespace BrokenRailMonitorViaWiFi
                                                         if (masterControl.NeighbourSmall != actualReceive[8])
                                                         {
                                                             MessageBox.Show(terminalNo.ToString() + "号终端相邻小终端不匹配！");
+                                                            isError = true;
                                                         }
                                                         if (masterControl.NeighbourBig != actualReceive[9])
                                                         {
                                                             MessageBox.Show(terminalNo.ToString() + "号终端相邻大终端不匹配！");
+                                                            isError = true;
                                                         }
                                                         if (actualReceive[10] != (masterControl.Is4G ? 1 : 0))
                                                         {
                                                             MessageBox.Show(terminalNo.ToString() + "号终端Is4G不匹配！");
+                                                            isError = true;
                                                         }
                                                         if (actualReceive[11] != (masterControl.IsEnd ? 1 : 0))
                                                         {
                                                             MessageBox.Show(terminalNo.ToString() + "号终端IsEnd不匹配！");
+                                                            isError = true;
+                                                        }
+                                                        if (!isError)
+                                                        {
+                                                            PointInfoResultWindow onePIRWin = new PointInfoResultWindow(masterControl.TerminalNumber,
+                                                                masterControl.NeighbourSmall, masterControl.NeighbourBig,
+                                                                masterControl.Is4G, masterControl.IsEnd);
+                                                            onePIRWin.Owner = this;
+                                                            onePIRWin.ShowDialog();
                                                         }
                                                         break;
                                                     }
@@ -669,7 +683,8 @@ namespace BrokenRailMonitorViaWiFi
                                                             {
                                                                 errorTerminal = tNextNo.ToString() + "号终端接收异常";
                                                             }
-                                                            this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨通断信息矛盾！" + errorTerminal + "，请检查", DataLevel.Warning);
+                                                            this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨通断信息矛盾！" + errorTerminal +
+                                                                "，请检查", DataLevel.Warning);
                                                         }));
                                                     }
 
@@ -720,7 +735,8 @@ namespace BrokenRailMonitorViaWiFi
                                                             {
                                                                 errorTerminal = tNextNo.ToString() + "号终端接收异常";
                                                             }
-                                                            this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨通断信息矛盾！" + errorTerminal + "，请检查", DataLevel.Warning);
+                                                            this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨通断信息矛盾！" + errorTerminal +
+                                                                "，请检查", DataLevel.Warning);
                                                         }));
                                                     }
                                                 }
@@ -1126,11 +1142,11 @@ namespace BrokenRailMonitorViaWiFi
                                 byte[] sendData;
                                 if (i == include4GIndex.Count - 1)
                                 {
-                                    sendData = _sendDataPackage.PackageSendData(0xff, (byte)newGetSectionWin.TerminalBig, 0x52, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
+                                    sendData = _sendDataPackage.PackageSendData(0xff, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
                                 }
                                 else
                                 {
-                                    sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[i + 1] - 1].TerminalNumber, 0x52, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
+                                    sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[i + 1] - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
                                 }
                                 if (socket != null)
                                 {
@@ -1156,7 +1172,7 @@ namespace BrokenRailMonitorViaWiFi
                             }
                             Socket socket = this.MasterControlList[previous4GPointIndex].GetNearest4GTerminalSocket(true);
                             byte[] sendData;
-                            sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[0] - 1].TerminalNumber, 0x52, new byte[2] { (byte)newGetSectionWin.TerminalSmall, 0 });
+                            sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[0] - 1].TerminalNumber, 0x55, new byte[2] { (byte)newGetSectionWin.TerminalSmall, 0 });
 
                             if (socket != null)
                             {
@@ -1172,11 +1188,11 @@ namespace BrokenRailMonitorViaWiFi
                                 byte[] sendData1;
                                 if (i == include4GIndex.Count - 1)
                                 {
-                                    sendData1 = _sendDataPackage.PackageSendData(0xff, (byte)newGetSectionWin.TerminalBig, 0x52, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
+                                    sendData1 = _sendDataPackage.PackageSendData(0xff, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
                                 }
                                 else
                                 {
-                                    sendData1 = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[i + 1] - 1].TerminalNumber, 0x52, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
+                                    sendData1 = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[i + 1] - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
                                 }
                                 if (socketAnother != null)
                                 {

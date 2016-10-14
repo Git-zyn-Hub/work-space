@@ -1,0 +1,40 @@
+﻿<Window x:Class="BrokenRailMonitorViaWiFi.PointInfoResultWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
+        mc:Ignorable="d"
+        Title="单点配置信息反馈" Height="260" Width="318"
+        ResizeMode="NoResize" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <Label x:Name="lblTerminalNo" HorizontalAlignment="Center" FontSize="18"></Label>
+        </StackPanel>
+        <DockPanel Grid.Row="1" VerticalAlignment="Center" Margin="50,0">
+            <Label>相邻小终端：</Label>
+            <Label x:Name="lblNeighbourSmall" Width="40" HorizontalAlignment="Right" Margin="0,0,50,0" HorizontalContentAlignment="Center"></Label>
+        </DockPanel>
+        <DockPanel Grid.Row="2" VerticalAlignment="Center" Margin="50,0">
+            <Label>相邻大终端：</Label>
+            <Label x:Name="lblNeighbourBig" Width="40" HorizontalAlignment="Right" Margin="0,0,50,0" HorizontalContentAlignment="Center"></Label>
+        </DockPanel>
+        <DockPanel Grid.Row="3" VerticalAlignment="Center" Margin="50,0">
+            <Label>是否4G：</Label>
+            <Label x:Name="lblIs4G" Width="40" HorizontalAlignment="Right" Margin="0,0,50,0" HorizontalContentAlignment="Center"></Label>
+        </DockPanel>
+        <DockPanel Grid.Row="4" VerticalAlignment="Center" Margin="50,0">
+            <Label>是否终点：</Label>
+            <Label x:Name="lblIsEnd" Width="40" HorizontalAlignment="Right" Margin="0,0,50,0" HorizontalContentAlignment="Center"></Label>
+        </DockPanel>
+        <Button x:Name="btnEnter" Grid.Row="5" Width="80" Height="28" IsDefault="True" Click="btnEnter_Click">确定</Button>
+    </Grid>
+</Window>
