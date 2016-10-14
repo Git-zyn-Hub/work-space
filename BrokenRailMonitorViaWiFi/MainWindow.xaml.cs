@@ -539,17 +539,17 @@ namespace BrokenRailMonitorViaWiFi
                                                     xeRail2.AppendChild(xeSignalAmplitude2Left);
                                                     XmlElement xeSignalAmplitude2Right = xmlDoc.CreateElement("SignalAmplitudeRight");
                                                     xeRail2.AppendChild(xeSignalAmplitude2Right);
-                                                    xeTime.InnerText = actualReceive[7].ToString() + "-" + actualReceive[8].ToString() + "-" +
-                                                                       actualReceive[9].ToString() + "-" + actualReceive[10].ToString() + "-" +
-                                                                       actualReceive[11].ToString() + "-" + actualReceive[12].ToString();
-                                                    xeOnOff1.InnerText = actualReceive[13].ToString();
-                                                    xeStress1.InnerText = actualReceive[14].ToString() + "-" + actualReceive[15].ToString() + "-" + actualReceive[16].ToString();
-                                                    xeTemprature1.InnerText = actualReceive[17].ToString() + "-" + actualReceive[18].ToString();
+                                                    xeTime.InnerText = actualReceive[8].ToString() + "-" + actualReceive[9].ToString() + "-" +
+                                                                       actualReceive[10].ToString() + "-" + actualReceive[11].ToString() + "-" +
+                                                                       actualReceive[12].ToString() + "-" + actualReceive[13].ToString();
+                                                    xeOnOff1.InnerText = actualReceive[14].ToString();
+                                                    xeStress1.InnerText = actualReceive[15].ToString() + "-" + actualReceive[16].ToString() + "-" + actualReceive[17].ToString();
+                                                    xeTemprature1.InnerText = actualReceive[18].ToString() + "-" + actualReceive[19].ToString();
                                                     string strSignalAmplitude = "";
-                                                    for (int i = 19; i < 35; i++)
+                                                    for (int i = 20; i < 36; i++)
                                                     {
                                                         strSignalAmplitude += actualReceive[i].ToString();
-                                                        if (i == 34)
+                                                        if (i == 35)
                                                         {
                                                             continue;
                                                         }
@@ -557,24 +557,24 @@ namespace BrokenRailMonitorViaWiFi
                                                     }
                                                     xeSignalAmplitude1Left.InnerText = strSignalAmplitude;
                                                     strSignalAmplitude = "";
-                                                    for (int i = 35; i < 51; i++)
+                                                    for (int i = 36; i < 52; i++)
                                                     {
                                                         strSignalAmplitude += actualReceive[i].ToString();
-                                                        if (i == 50)
+                                                        if (i == 51)
                                                         {
                                                             continue;
                                                         }
                                                         strSignalAmplitude += "-";
                                                     }
                                                     xeSignalAmplitude1Right.InnerText = strSignalAmplitude;
-                                                    xeOnOff2.InnerText = actualReceive[51].ToString();
-                                                    xeStress2.InnerText = actualReceive[52].ToString() + "-" + actualReceive[53].ToString() + "-" + actualReceive[54].ToString();
-                                                    xeTemprature2.InnerText = actualReceive[55].ToString() + "-" + actualReceive[56].ToString();
+                                                    xeOnOff2.InnerText = actualReceive[52].ToString();
+                                                    xeStress2.InnerText = actualReceive[53].ToString() + "-" + actualReceive[54].ToString() + "-" + actualReceive[55].ToString();
+                                                    xeTemprature2.InnerText = actualReceive[56].ToString() + "-" + actualReceive[57].ToString();
                                                     strSignalAmplitude = "";
-                                                    for (int i = 57; i < 73; i++)
+                                                    for (int i = 58; i < 74; i++)
                                                     {
                                                         strSignalAmplitude += actualReceive[i].ToString();
-                                                        if (i == 72)
+                                                        if (i == 73)
                                                         {
                                                             continue;
                                                         }
@@ -582,10 +582,10 @@ namespace BrokenRailMonitorViaWiFi
                                                     }
                                                     xeSignalAmplitude2Left.InnerText = strSignalAmplitude;
                                                     strSignalAmplitude = "";
-                                                    for (int i = 73; i < 89; i++)
+                                                    for (int i = 74; i < 90; i++)
                                                     {
                                                         strSignalAmplitude += actualReceive[i].ToString();
-                                                        if (i == 88)
+                                                        if (i == 89)
                                                         {
                                                             continue;
                                                         }
