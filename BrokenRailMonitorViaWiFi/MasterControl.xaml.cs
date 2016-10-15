@@ -32,6 +32,7 @@ namespace BrokenRailMonitorViaWiFi
         private string _ipAndPort;
         private string _find4GErrorMsg;
         private SendDataPackage _sendDataPackage = new SendDataPackage();
+        private MainWindow _mainWin;
         public static readonly DependencyProperty Is4GProperty = DependencyProperty.Register("Is4G", typeof(bool), typeof(MasterControl), new PropertyMetadata(false, OnIs4GChanged));
 
         public bool Is4G
@@ -139,6 +140,11 @@ namespace BrokenRailMonitorViaWiFi
         {
             InitializeComponent();
         }
+        public MasterControl(MainWindow mainWin)
+        {
+            InitializeComponent();
+            _mainWin = mainWin;
+        }
         private static void OnIs4GChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if ((bool)e.NewValue == true)
@@ -216,6 +222,11 @@ namespace BrokenRailMonitorViaWiFi
         {
             try
             {
+                if (_mainWin != null)
+                {
+                    _mainWin.WaitingRingEnable();
+                    _mainWin.WaitReceiveTimer.Start();
+                }
                 byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf1, new byte[1] { (byte)_terminalNumber });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
@@ -224,6 +235,11 @@ namespace BrokenRailMonitorViaWiFi
                 }
                 else
                 {
+                    if (_mainWin != null)
+                    {
+                        _mainWin.WaitingRingDisable();
+                        _mainWin.WaitReceiveTimer.Stop();
+                    }
                     MessageBox.Show(Find4GErrorMsg);
                 }
             }
@@ -238,11 +254,10 @@ namespace BrokenRailMonitorViaWiFi
             try
             {
                 SignalSendConfigWindow newSignalSendConfigWin = new SignalSendConfigWindow();
-                HwndSource mainWinHwnd = (HwndSource.FromDependencyObject(this) as HwndSource);
-                MainWindow mainWin = mainWinHwnd.RootVisual as MainWindow;
-                if (mainWin != null)
+
+                if (_mainWin != null)
                 {
-                    newSignalSendConfigWin.Owner = mainWin;
+                    newSignalSendConfigWin.Owner = _mainWin;
                 }
                 if (!newSignalSendConfigWin.ShowDialog().Value)
                 {
@@ -269,19 +284,17 @@ namespace BrokenRailMonitorViaWiFi
 
         public Socket GetNearest4GTerminalSocket(bool isForward)
         {
-            HwndSource mainWinHwnd = (HwndSource.FromDependencyObject(this) as HwndSource);
-            MainWindow mainWin = mainWinHwnd.RootVisual as MainWindow;
             if (this.Is4G)
             {
-                if (mainWin != null)
+                if (_mainWin != null)
                 {
-                    for (int j = 0; j < mainWin.SocketRegister.Count; j++)
+                    for (int j = 0; j < _mainWin.SocketRegister.Count; j++)
                     {
-                        if (mainWin.SocketRegister[j] == this.TerminalNumber)
+                        if (_mainWin.SocketRegister[j] == this.TerminalNumber)
                         {
                             return this.SocketImport;
                         }
-                        else if (j == mainWin.SocketRegister.Count - 1)
+                        else if (j == _mainWin.SocketRegister.Count - 1)
                         {
                             break;
                         }
@@ -289,23 +302,23 @@ namespace BrokenRailMonitorViaWiFi
                     Find4GErrorMsg = "该终端本身为4G点，但此4G点的Socket连接未注册！";
                     return null;
                 }
-                Find4GErrorMsg = "获得的主窗口句柄为空！";
+                Find4GErrorMsg = "主窗口句柄为空！";
                 return null;
             }
             else
             {
-                if (mainWin != null)
+                if (_mainWin != null)
                 {
-                    if (mainWin.SocketRegister.Count == 0)
+                    if (_mainWin.SocketRegister.Count == 0)
                     {
                         Find4GErrorMsg = "注册的4G点Socket连接个数为0";
                         return null;
                     }
-                    else if (mainWin.SocketRegister.Count == 1)
+                    else if (_mainWin.SocketRegister.Count == 1)
                     {
-                        foreach (var item in mainWin.MasterControlList)
+                        foreach (var item in _mainWin.MasterControlList)
                         {
-                            if (item.TerminalNumber == mainWin.SocketRegister[0])
+                            if (item.TerminalNumber == _mainWin.SocketRegister[0])
                             {
                                 return item.SocketImport;
                             }
@@ -316,19 +329,19 @@ namespace BrokenRailMonitorViaWiFi
                         if (isForward)
                         {
                             //如果是正向
-                            int indexOfThisMasterControl = mainWin.MasterControlList.FindIndex(FindMasterControl);
+                            int indexOfThisMasterControl = _mainWin.MasterControlList.FindIndex(FindMasterControl);
                             for (int i = indexOfThisMasterControl; i >= 0; i--)
                             {
-                                if (mainWin.MasterControlList[i].Is4G)
+                                if (_mainWin.MasterControlList[i].Is4G)
                                 {
-                                    int terminal4GNo = mainWin.MasterControlList[i].TerminalNumber;
-                                    for (int j = 0; j < mainWin.SocketRegister.Count; j++)
+                                    int terminal4GNo = _mainWin.MasterControlList[i].TerminalNumber;
+                                    for (int j = 0; j < _mainWin.SocketRegister.Count; j++)
                                     {
-                                        if (mainWin.SocketRegister[j] == terminal4GNo)
+                                        if (_mainWin.SocketRegister[j] == terminal4GNo)
                                         {
-                                            return mainWin.MasterControlList[i].SocketImport;
+                                            return _mainWin.MasterControlList[i].SocketImport;
                                         }
-                                        else if (j == mainWin.SocketRegister.Count - 1)
+                                        else if (j == _mainWin.SocketRegister.Count - 1)
                                         {
                                             Find4GErrorMsg = "正向未找到小于该终端号的4G点Socket连接！";
                                             break;
@@ -340,19 +353,19 @@ namespace BrokenRailMonitorViaWiFi
                         else
                         {
                             //如果是反向
-                            int indexOfThisMasterControl = mainWin.MasterControlList.FindIndex(FindMasterControl);
-                            for (int i = indexOfThisMasterControl; i < mainWin.MasterControlList.Count; i++)
+                            int indexOfThisMasterControl = _mainWin.MasterControlList.FindIndex(FindMasterControl);
+                            for (int i = indexOfThisMasterControl; i < _mainWin.MasterControlList.Count; i++)
                             {
-                                if (mainWin.MasterControlList[i].Is4G)
+                                if (_mainWin.MasterControlList[i].Is4G)
                                 {
-                                    int terminal4GNo = mainWin.MasterControlList[i].TerminalNumber;
-                                    for (int j = 0; j < mainWin.SocketRegister.Count; j++)
+                                    int terminal4GNo = _mainWin.MasterControlList[i].TerminalNumber;
+                                    for (int j = 0; j < _mainWin.SocketRegister.Count; j++)
                                     {
-                                        if (mainWin.SocketRegister[j] == terminal4GNo)
+                                        if (_mainWin.SocketRegister[j] == terminal4GNo)
                                         {
-                                            return mainWin.MasterControlList[i].SocketImport;
+                                            return _mainWin.MasterControlList[i].SocketImport;
                                         }
-                                        else if (j == mainWin.SocketRegister.Count - 1)
+                                        else if (j == _mainWin.SocketRegister.Count - 1)
                                         {
                                             Find4GErrorMsg = "反向未找到大于该终端号的4G点Socket连接！";
                                             break;
@@ -363,7 +376,7 @@ namespace BrokenRailMonitorViaWiFi
                         }
                     }
                 }
-                Find4GErrorMsg = "获得的主窗口句柄为空！";
+                Find4GErrorMsg = "主窗口句柄为空！";
                 return null;
             }
         }

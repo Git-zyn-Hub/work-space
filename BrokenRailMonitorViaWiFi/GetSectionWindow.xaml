@@ -19,7 +19,7 @@
             <Label>号终端之间的铁轨通断信息</Label>
         </WrapPanel>
         <DockPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Height="24">
-            <Button x:Name="btnEnter" Width="70" Click="btnEnter_Click">确定</Button>
+            <Button x:Name="btnEnter" Width="70" Click="btnEnter_Click" IsDefault="True">确定</Button>
             <Button x:Name="btnCancel" Width="70" Margin="30,0,0,0" Click="btnCancel_Click">取消</Button>
         </DockPanel>
     </Grid>

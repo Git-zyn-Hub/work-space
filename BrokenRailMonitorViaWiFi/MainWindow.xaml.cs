@@ -43,6 +43,7 @@ namespace BrokenRailMonitorViaWiFi
         private List<Rail> _rail1List = new List<Rail>();
         private List<Rail> _rail2List = new List<Rail>();
         private DispatcherTimer _getAllRailInfoTimer = new DispatcherTimer();
+        private DispatcherTimer _waitReceiveTimer = new DispatcherTimer();
         private int _packageCount = 0;
         private int _receiveEmptyPackageCount = 0;
         private List<int> _socketRegister = new List<int>();
@@ -74,6 +75,19 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
+        public DispatcherTimer WaitReceiveTimer
+        {
+            get
+            {
+                return _waitReceiveTimer;
+            }
+
+            set
+            {
+                _waitReceiveTimer = value;
+            }
+        }
+
         //public SerialPort SerialPort
         //{
         //    get { return _serialPort1; }
@@ -90,6 +104,9 @@ namespace BrokenRailMonitorViaWiFi
             InitializeComponent();
             _getAllRailInfoTimer.Tick += getAllRailInfoTimer_Tick;
             _getAllRailInfoTimer.Interval = new TimeSpan(0, 0, 20);
+
+            WaitReceiveTimer.Tick += WaitReceiveTimer_Tick;
+            WaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
             //_waitingRingThread = new Thread(waitingRingEnable);
         }
 
@@ -119,7 +136,7 @@ namespace BrokenRailMonitorViaWiFi
                     XmlNode terminalNoNode = device.SelectSingleNode("TerminalNo");
                     string innerTextTerminalNo = terminalNoNode.InnerText.Trim();
                     int terminalNo = Convert.ToInt32(innerTextTerminalNo);
-                    MasterControl oneMasterControl = new MasterControl();
+                    MasterControl oneMasterControl = new MasterControl(this);
                     oneMasterControl.lblNumber.Content = terminalNo;
                     this.MasterControlList.Add(oneMasterControl);
 
@@ -266,6 +283,13 @@ namespace BrokenRailMonitorViaWiFi
                             {
                                 _receiveEmptyPackageCount = 0;
                                 MessageBox.Show("与" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！");
+                                foreach (var item in MasterControlList)
+                                {
+                                    if (item.IpAndPort == socket.RemoteEndPoint.ToString())
+                                    {
+                                        _socketRegister.Remove(item.TerminalNumber);
+                                    }
+                                }
                                 break;
                             }
                             _receiveEmptyPackageCount++;
@@ -296,18 +320,9 @@ namespace BrokenRailMonitorViaWiFi
                         {
                             actualReceive[i] = receivedBytes[i];
                         }
+                        byte[] packageUnhandled = new byte[0];
 
-                        StringBuilder sb = new StringBuilder(500);
-                        for (int i = 0; i < actualReceive.Length; i++)
-                        {
-                            sb.Append(actualReceive[i].ToString("x2"));
-                        }
-                        this.Dispatcher.BeginInvoke(new Action(() =>
-                        {
-                            this.dataShowUserCtrl.AddShowData("收到数据  " + sb.ToString(), DataLevel.Default);
-                        }));
-
-                        ASCIIEncoding encoding = new ASCIIEncoding();
+                        handlePackage: ASCIIEncoding encoding = new ASCIIEncoding();
                         string strReceive = encoding.GetString(actualReceive);
                         if (strReceive.Length > 2)
                         {
@@ -394,11 +409,36 @@ namespace BrokenRailMonitorViaWiFi
                                 //检查校验和
                                 if (actualReceive[0] == 0x66 && actualReceive[1] == 0xcc)
                                 {
+                                    StringBuilder sb = new StringBuilder(500);
+                                    for (int i = 0; i < actualReceive.Length; i++)
+                                    {
+                                        sb.Append(actualReceive[i].ToString("x2"));
+                                    }
+                                    this.Dispatcher.BeginInvoke(new Action(() =>
+                                    {
+                                        this.dataShowUserCtrl.AddShowData("收到数据  " + sb.ToString(), DataLevel.Default);
+                                    }));
+
                                     int length = (actualReceive[2] << 8) + actualReceive[3];
                                     if (length != actualReceive.Length)
                                     {
-                                        MessageBox.Show("长度字段与实际收到长度不相等");
-                                        continue;
+                                        //处理粘包的情况。
+                                        int unhandledLength = actualReceive.Length - length;
+                                        byte[] packagePrevious = new byte[length];
+                                        packageUnhandled = new byte[unhandledLength];
+                                        for (int j = 0; j < length; j++)
+                                        {
+                                            packagePrevious[j] = actualReceive[j];
+                                        }
+                                        for (int i = 0; i < unhandledLength; i++)
+                                        {
+                                            packageUnhandled[i] = actualReceive[length + i];
+                                        }
+                                        actualReceive = new byte[length];
+                                        packagePrevious.CopyTo(actualReceive, 0);
+                                        goto handlePackage;
+                                        //MessageBox.Show("长度字段与实际收到长度不相等");
+                                        //continue;
                                     }
                                     int checksum = 0;
                                     for (int i = 0; i < actualReceive.Length - 2; i++)
@@ -464,6 +504,11 @@ namespace BrokenRailMonitorViaWiFi
                                         break;
                                     case 0xf1:
                                         {
+                                            this.Dispatcher.Invoke(new Action(() =>
+                                            {
+                                                this.WaitReceiveTimer.Stop();
+                                                this.WaitingRingDisable();
+                                            }));
                                             int terminalNo = actualReceive[7];
                                             int i = 0;
                                             int count = MasterControlList.Count;
@@ -618,13 +663,18 @@ namespace BrokenRailMonitorViaWiFi
                                             }));
                                         }
                                         break;
-                                    case 0xf6:
+                                    case 0x55:
+                                    case 0x56:
                                         {
                                             if (this._svtThumbnail == null)
                                             {
                                                 MessageBox.Show("设备及铁轨未初始化！");
                                                 return;
                                             }
+
+                                            this.WaitingRingDisable();
+                                            this.WaitReceiveTimer.Stop();
+
                                             int length = (actualReceive[2] << 8) + actualReceive[3];
                                             byte[] bytesOnOffContent = new byte[length - 9];
                                             for (int i = 7; i < length - 2; i++)
@@ -632,114 +682,180 @@ namespace BrokenRailMonitorViaWiFi
                                                 bytesOnOffContent[i - 7] = actualReceive[i];
                                             }
                                             int contentLength = bytesOnOffContent.Length;
-                                            if (contentLength % 2 == 0)
+                                            if (contentLength % 3 == 0)
                                             {
-                                                for (int i = 0; i < contentLength - 2; i++, i++)
+                                                if (contentLength == 3)
                                                 {
+                                                    //如果只有一个终端的数据就不存在两个终端数据冲突的情况。
+                                                    int index = findMasterControlIndex(bytesOnOffContent[0]);
                                                     //检查1号铁轨
-                                                    if (((bytesOnOffContent[i] & 0xf0) >> 4) == (bytesOnOffContent[i + 2] & 0x0f))
+                                                    if (index != 0)
                                                     {
-                                                        int onOff = (bytesOnOffContent[i] & 0xf0) >> 4;
+                                                        //第一个终端没有左边的铁轨
+                                                        int onOffRail1Left = bytesOnOffContent[1] & 0x0f;
                                                         this.Dispatcher.Invoke(new Action(() =>
                                                         {
-                                                            if (onOff == 0)
-                                                            {//通的
-                                                                this._svtThumbnail.Normal(new int[1] { i / 2 }, 1);
-                                                                Rail rail = this.cvsRail1.Children[i / 2] as Rail;
-                                                                rail.Normal();
-                                                            }
-                                                            else if (onOff == 7)
-                                                            {//断的
-                                                                int tNo = MasterControlList[i / 2].TerminalNumber;
-                                                                int tNextNo = MasterControlList[i / 2 + 1].TerminalNumber;
-
-                                                                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨断开！", DataLevel.Error);
-                                                                this._svtThumbnail.Error(new int[1] { i / 2 }, 1);
-                                                                Rail rail = this.cvsRail1.Children[i / 2] as Rail;
-                                                                rail.Error();
-                                                            }
-                                                            else
-                                                            {
-                                                                MessageBox.Show("收到未定义数据！");
-                                                            }
+                                                            setRail1State(index - 1, onOffRail1Left);
                                                         }));
                                                     }
-                                                    else
+                                                    if (index != MasterControlList.Count - 1)
                                                     {
+                                                        //最后一个终端没有右边的铁轨
+                                                        int onOffRail1Right = (bytesOnOffContent[1] & 0xf0) >> 4;
                                                         this.Dispatcher.Invoke(new Action(() =>
                                                         {
-                                                            this._svtThumbnail.Different(new int[1] { i / 2 }, 1);
-                                                            Rail rail = this.cvsRail1.Children[i / 2] as Rail;
-                                                            rail.Different();
-
-                                                            int tNo = MasterControlList[i / 2].TerminalNumber;
-                                                            int tNextNo = MasterControlList[i / 2 + 1].TerminalNumber;
-                                                            string errorTerminal = string.Empty;
-                                                            if ((bytesOnOffContent[i] & 0xf0) == 0x70)
-                                                            {
-                                                                errorTerminal = tNo.ToString() + "号终端接收异常";
-                                                            }
-                                                            else if ((bytesOnOffContent[i + 2] & 0x0f) == 0x07)
-                                                            {
-                                                                errorTerminal = tNextNo.ToString() + "号终端接收异常";
-                                                            }
-                                                            this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨通断信息矛盾！" + errorTerminal +
-                                                                "，请检查", DataLevel.Warning);
+                                                            setRail1State(index, onOffRail1Right);
                                                         }));
                                                     }
 
                                                     //检查2号铁轨
-                                                    if (((bytesOnOffContent[i + 1] & 0xf0) >> 4) == (bytesOnOffContent[i + 3] & 0x0f))
+                                                    if (index != 0)
                                                     {
-                                                        int onOff = (bytesOnOffContent[i + 1] & 0xf0) >> 4;
+                                                        //第一个终端没有左边的铁轨
+                                                        int onOffRail2Left = bytesOnOffContent[2] & 0x0f;
                                                         this.Dispatcher.Invoke(new Action(() =>
                                                         {
-                                                            if (onOff == 0)
-                                                            {//通的
-                                                                this._svtThumbnail.Normal(new int[1] { i / 2 }, 2);
-                                                                Rail rail = this.cvsRail2.Children[i / 2] as Rail;
-                                                                rail.Normal();
-                                                            }
-                                                            else if (onOff == 7)
-                                                            {//断的
-                                                                int tNo = MasterControlList[i / 2].TerminalNumber;
-                                                                int tNextNo = MasterControlList[i / 2 + 1].TerminalNumber;
-
-                                                                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨断开！", DataLevel.Error);
-                                                                this._svtThumbnail.Error(new int[1] { i / 2 }, 2);
-                                                                Rail rail = this.cvsRail2.Children[i / 2] as Rail;
-                                                                rail.Error();
-                                                            }
-                                                            else
-                                                            {
-                                                                MessageBox.Show("收到未定义数据！");
-                                                            }
+                                                            setRail1State(index - 1, onOffRail2Left);
                                                         }));
                                                     }
-                                                    else
+                                                    if (index != MasterControlList.Count - 1)
                                                     {
+                                                        //最后一个终端没有右边的铁轨
+                                                        int onOffRail2Right = (bytesOnOffContent[2] & 0xf0) >> 4;
                                                         this.Dispatcher.Invoke(new Action(() =>
                                                         {
-                                                            this._svtThumbnail.Different(new int[1] { i / 2 }, 2);
-                                                            Rail rail = this.cvsRail2.Children[i / 2] as Rail;
-                                                            rail.Different();
-
-                                                            int tNo = MasterControlList[i / 2].TerminalNumber;
-                                                            int tNextNo = MasterControlList[i / 2 + 1].TerminalNumber;
-                                                            string errorTerminal = string.Empty;
-                                                            if ((bytesOnOffContent[i + 1] & 0xf0) == 0x70)
-                                                            {
-                                                                errorTerminal = tNo.ToString() + "号终端接收异常";
-                                                            }
-                                                            else if ((bytesOnOffContent[i + 3] & 0x0f) == 0x07)
-                                                            {
-                                                                errorTerminal = tNextNo.ToString() + "号终端接收异常";
-                                                            }
-                                                            this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨通断信息矛盾！" + errorTerminal +
-                                                                "，请检查", DataLevel.Warning);
+                                                            setRail2State(index, onOffRail2Right);
                                                         }));
                                                     }
                                                 }
+                                                else
+                                                {
+                                                    //如果有多个终端的数据，需要处理冲突。
+                                                    for (int i = 0; i < contentLength - 3; i++, i++, i++)
+                                                    {
+                                                        int index = findMasterControlIndex(bytesOnOffContent[i]);
+                                                        //检查1号铁轨
+                                                        if (i == 0 && index != 0)
+                                                        {
+                                                            //第一个终端没有左边的铁轨
+                                                            int onOffRail1Left = bytesOnOffContent[1] & 0x0f;
+                                                            this.Dispatcher.Invoke(new Action(() =>
+                                                            {
+                                                                setRail1State(index - 1, onOffRail1Left);
+                                                            }));
+                                                        }
+                                                        else
+                                                        {
+                                                            if (((bytesOnOffContent[i + 1] & 0xf0) >> 4) == (bytesOnOffContent[i + 4] & 0x0f))
+                                                            {
+                                                                //不冲突
+                                                                int onOff = (bytesOnOffContent[i + 1] & 0xf0) >> 4;
+                                                                this.Dispatcher.Invoke(new Action(() =>
+                                                                {
+                                                                    setRail1State(index, onOff);
+                                                                }));
+                                                            }
+                                                            else
+                                                            {
+                                                                //冲突
+                                                                this.Dispatcher.Invoke(new Action(() =>
+                                                                {
+                                                                    this._svtThumbnail.Different(new int[1] { index }, 1);
+                                                                    Rail rail = this.cvsRail1.Children[index] as Rail;
+                                                                    rail.Different();
+
+                                                                    int tNo = MasterControlList[index].TerminalNumber;
+                                                                    int tNextNo = MasterControlList[index + 1].TerminalNumber;
+                                                                    string errorTerminal = string.Empty;
+                                                                    if ((bytesOnOffContent[i + 1] & 0xf0) == 0x70)
+                                                                    {
+                                                                        errorTerminal = tNo.ToString() + "号终端接收异常";
+                                                                    }
+                                                                    else if ((bytesOnOffContent[i + 4] & 0x0f) == 0x07)
+                                                                    {
+                                                                        errorTerminal = tNextNo.ToString() + "号终端接收异常";
+                                                                    }
+                                                                    this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨通断信息矛盾！" + errorTerminal +
+                                                                        "，请检查", DataLevel.Warning);
+                                                                }));
+                                                            }
+                                                        }
+                                                        if (i == (contentLength - 6))
+                                                        {
+                                                            int indexLastTerminal = findMasterControlIndex(bytesOnOffContent[i + 3]);
+                                                            if (indexLastTerminal != MasterControlList.Count - 1)
+                                                            {
+                                                                //最后一个终端没有右边的铁轨
+                                                                int onOffRail1Right = (bytesOnOffContent[i + 4] & 0xf0) >> 4;
+                                                                this.Dispatcher.Invoke(new Action(() =>
+                                                                {
+                                                                    setRail1State(index, onOffRail1Right);
+                                                                }));
+                                                            }
+                                                        }
+
+                                                        //检查2号铁轨
+                                                        if (i == 0 && index != 0)
+                                                        {
+                                                            //第一个终端没有左边的铁轨
+                                                            int onOffRail2Left = bytesOnOffContent[2] & 0x0f;
+                                                            this.Dispatcher.Invoke(new Action(() =>
+                                                            {
+                                                                setRail1State(index - 1, onOffRail2Left);
+                                                            }));
+                                                        }
+                                                        else
+                                                        {
+                                                            if (((bytesOnOffContent[i + 2] & 0xf0) >> 4) == (bytesOnOffContent[i + 5] & 0x0f))
+                                                            {
+                                                                //不冲突
+                                                                int onOff = (bytesOnOffContent[i + 2] & 0xf0) >> 4;
+                                                                this.Dispatcher.Invoke(new Action(() =>
+                                                                {
+                                                                    setRail2State(index, onOff);
+                                                                }));
+                                                            }
+                                                            else
+                                                            {
+                                                                //冲突
+                                                                this.Dispatcher.Invoke(new Action(() =>
+                                                                {
+                                                                    this._svtThumbnail.Different(new int[1] { index }, 2);
+                                                                    Rail rail = this.cvsRail2.Children[index] as Rail;
+                                                                    rail.Different();
+
+                                                                    int tNo = MasterControlList[index].TerminalNumber;
+                                                                    int tNextNo = MasterControlList[index + 1].TerminalNumber;
+                                                                    string errorTerminal = string.Empty;
+                                                                    if ((bytesOnOffContent[i + 2] & 0xf0) == 0x70)
+                                                                    {
+                                                                        errorTerminal = tNo.ToString() + "号终端接收异常";
+                                                                    }
+                                                                    else if ((bytesOnOffContent[i + 5] & 0x0f) == 0x07)
+                                                                    {
+                                                                        errorTerminal = tNextNo.ToString() + "号终端接收异常";
+                                                                    }
+                                                                    this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨通断信息矛盾！" + errorTerminal +
+                                                                        "，请检查", DataLevel.Warning);
+                                                                }));
+                                                            }
+                                                        }
+                                                        if (i == (contentLength - 6))
+                                                        {
+                                                            int indexLastTerminal = findMasterControlIndex(bytesOnOffContent[i + 3]);
+                                                            if (indexLastTerminal != MasterControlList.Count - 1)
+                                                            {
+                                                                //最后一个终端没有右边的铁轨
+                                                                int onOffRail2Right = (bytesOnOffContent[i + 5] & 0xf0) >> 4;
+                                                                this.Dispatcher.Invoke(new Action(() =>
+                                                                {
+                                                                    setRail2State(index, onOffRail2Right);
+                                                                }));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
                                                 int rail1NormalCount = 0;
                                                 int rail2NormalCount = 0;
                                                 this.Dispatcher.Invoke(new Action(() =>
@@ -769,13 +885,8 @@ namespace BrokenRailMonitorViaWiFi
                                             }
                                             else
                                             {
-                                                MessageBox.Show("发送数据内容的长度错误，应该是2的倍数");
+                                                MessageBox.Show("发送数据内容的长度错误，应该是3的倍数");
                                             }
-                                        }
-                                        break;
-                                    case 0x55:
-                                        {
-
                                         }
                                         break;
                                     //case 0xf7:
@@ -793,6 +904,13 @@ namespace BrokenRailMonitorViaWiFi
                             {
                                 MessageBox.Show("收到的数据帧头不对！");
                             }
+                            if (packageUnhandled.Length != 0)
+                            {
+                                actualReceive = new byte[packageUnhandled.Length];
+                                packageUnhandled.CopyTo(actualReceive, 0);
+                                packageUnhandled = new byte[0];
+                                goto handlePackage;
+                            }
                         }
                     }
                 }
@@ -800,6 +918,54 @@ namespace BrokenRailMonitorViaWiFi
             catch (Exception ee)
             {
                 MessageBox.Show("Socket监听线程异常：" + ee.Message);
+            }
+        }
+
+        private void setRail1State(int index, int onOff)
+        {
+            if (onOff == 0)
+            {//通的
+                this._svtThumbnail.Normal(new int[1] { index }, 1);
+                Rail rail = this.cvsRail1.Children[index] as Rail;
+                rail.Normal();
+            }
+            else if (onOff == 7)
+            {//断的
+                int tNo = MasterControlList[index].TerminalNumber;
+                int tNextNo = MasterControlList[index + 1].TerminalNumber;
+
+                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨断开！", DataLevel.Error);
+                this._svtThumbnail.Error(new int[1] { index }, 1);
+                Rail rail = this.cvsRail1.Children[index] as Rail;
+                rail.Error();
+            }
+            else
+            {
+                MessageBox.Show("收到未定义数据！");
+            }
+        }
+
+        private void setRail2State(int index, int onOff)
+        {
+            if (onOff == 0)
+            {//通的
+                this._svtThumbnail.Normal(new int[1] { index }, 2);
+                Rail rail = this.cvsRail2.Children[index] as Rail;
+                rail.Normal();
+            }
+            else if (onOff == 7)
+            {//断的
+                int tNo = MasterControlList[index].TerminalNumber;
+                int tNextNo = MasterControlList[index + 1].TerminalNumber;
+
+                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨断开！", DataLevel.Error);
+                this._svtThumbnail.Error(new int[1] { index }, 2);
+                Rail rail = this.cvsRail2.Children[index] as Rail;
+                rail.Error();
+            }
+            else
+            {
+                MessageBox.Show("收到未定义数据！");
             }
         }
         //public void SettingWinClose()
@@ -1030,6 +1196,12 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
+        private void WaitReceiveTimer_Tick(object sender, EventArgs e)
+        {
+            this.WaitingRingDisable();
+            this.WaitReceiveTimer.Stop();
+            MessageBox.Show("超过20秒未收到数据，连接肯能已断开！");
+        }
         //private void miGetAllDevicesSignalAmplitude_Click(object sender, RoutedEventArgs e)
         //{
         //    try
@@ -1104,6 +1276,8 @@ namespace BrokenRailMonitorViaWiFi
                     return;
                 }
 
+                this.WaitingRingEnable();
+                this.WaitReceiveTimer.Start();
                 List<int> include4GIndex = new List<int>();
                 for (int i = 0; i < _4GPointIndex.Count; i++)
                 {
@@ -1114,6 +1288,8 @@ namespace BrokenRailMonitorViaWiFi
                 }
                 if (_4GPointIndex.Count == 0)
                 {
+                    this.WaitingRingDisable();
+                    this.WaitReceiveTimer.Stop();
                     MessageBox.Show("系统中不包含4G点，请检查config文档！");
                 }
                 else
@@ -1129,6 +1305,8 @@ namespace BrokenRailMonitorViaWiFi
                         }
                         else
                         {
+                            this.WaitingRingDisable();
+                            this.WaitReceiveTimer.Stop();
                             MessageBox.Show(this.MasterControlList[_4GPointIndex[0]].Find4GErrorMsg, "来自终端" + this.MasterControlList[_4GPointIndex[0]].TerminalNumber + "的消息：");
                         }
                     }
@@ -1154,6 +1332,8 @@ namespace BrokenRailMonitorViaWiFi
                                 }
                                 else
                                 {
+                                    this.WaitingRingDisable();
+                                    this.WaitReceiveTimer.Stop();
                                     MessageBox.Show(this.MasterControlList[include4GIndex[i]].Find4GErrorMsg, "来自终端" + this.MasterControlList[include4GIndex[i]].TerminalNumber + "的消息：");
                                 }
                             }
@@ -1180,6 +1360,8 @@ namespace BrokenRailMonitorViaWiFi
                             }
                             else
                             {
+                                this.WaitingRingDisable();
+                                this.WaitReceiveTimer.Stop();
                                 MessageBox.Show(this.MasterControlList[previous4GPointIndex].Find4GErrorMsg, "来自终端" + this.MasterControlList[previous4GPointIndex].TerminalNumber + "的消息：");
                             }
                             for (int i = 0; i < include4GIndex.Count; i++)
@@ -1200,6 +1382,8 @@ namespace BrokenRailMonitorViaWiFi
                                 }
                                 else
                                 {
+                                    this.WaitingRingDisable();
+                                    this.WaitReceiveTimer.Stop();
                                     MessageBox.Show(this.MasterControlList[include4GIndex[i]].Find4GErrorMsg, "来自终端" + this.MasterControlList[include4GIndex[i]].TerminalNumber + "的消息：");
                                 }
                             }
@@ -1242,8 +1426,26 @@ namespace BrokenRailMonitorViaWiFi
                 writer.Close();
             }
         }
+        /// <summary>
+        /// 根据终端号寻找终端所在List的索引。
+        /// </summary>
+        /// <param name="terminalNo">终端号</param>
+        /// <returns>如果找到返回索引，否则返回-1</returns>
+        private int findMasterControlIndex(int terminalNo)
+        {
+            int i = 0;
+            foreach (var item in this.MasterControlList)
+            {
+                if (item.TerminalNumber == terminalNo)
+                {
+                    return i;
+                }
+                i++;
+            }
+            return -1;
+        }
 
-        private void waitingRingEnable()
+        public void WaitingRingEnable()
         {
             this.Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -1252,10 +1454,13 @@ namespace BrokenRailMonitorViaWiFi
             }));
         }
 
-        private void waitingRingDisable()
+        public void WaitingRingDisable()
         {
-            this.modernProgressRing.IsActive = false;
-            this.gridMain.IsEnabled = true;
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                this.modernProgressRing.IsActive = false;
+                this.gridMain.IsEnabled = true;
+            }));
         }
         private void Window_Closing(object sender, CancelEventArgs e)
         {
