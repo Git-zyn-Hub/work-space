@@ -51,7 +51,7 @@
                     <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                    <chart:Axis Interval="1" IntervalType="Hours" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -66,7 +66,7 @@
                     <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                    <chart:Axis Interval="1" IntervalType="Hours" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -81,7 +81,7 @@
                     <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                    <chart:Axis Interval="1" IntervalType="Hours" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -93,10 +93,10 @@
                     <chart:Title Text="轨1应力"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="65535" Interval="6000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                    <chart:Axis Interval="1" IntervalType="Hours" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -108,10 +108,10 @@
                     <chart:Title Text="轨2应力"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="65535" Interval="6000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                    <chart:Axis Interval="1" IntervalType="Hours" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -123,10 +123,10 @@
                     <chart:Title Text="轨1左信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="4300000000"  Interval="400000000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                    <chart:Axis Interval="1" IntervalType="Hours" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -138,10 +138,10 @@
                     <chart:Title Text="轨1右信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="4300000000"  Interval="400000000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                    <chart:Axis Interval="1" IntervalType="Hours" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -153,10 +153,10 @@
                     <chart:Title Text="轨2左信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="4300000000"  Interval="400000000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                    <chart:Axis Interval="1" IntervalType="Hours" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -168,10 +168,10 @@
                     <chart:Title Text="轨2右信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="-40" AxisMaximum="60" Interval="10"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="4300000000"  Interval="400000000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="1" IntervalType="Minutes" ValueFormatString="hh:mm:ss"/>
+                    <chart:Axis Interval="1" IntervalType="Hours" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
         </Grid>

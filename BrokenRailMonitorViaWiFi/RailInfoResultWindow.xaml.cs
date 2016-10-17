@@ -29,6 +29,10 @@ namespace BrokenRailMonitorViaWiFi
         private int[] _terminalTemprature;
         private int[] _rail1Stress;
         private int[] _rail2Stress;
+        private List<int[]> _rail1LeftSigAmpList;
+        private List<int[]> _rail1RightSigAmpList;
+        private List<int[]> _rail2LeftSigAmpList;
+        private List<int[]> _rail2RightSigAmpList;
         private static RailInfoResultWindow _uniqueInstance;
         private MasterControl _masterCtrl;
 
@@ -96,6 +100,10 @@ namespace BrokenRailMonitorViaWiFi
                 _terminalTemprature = new int[nodeCount];
                 _rail1Stress = new int[nodeCount];
                 _rail2Stress = new int[nodeCount];
+                _rail1LeftSigAmpList = new List<int[]>();
+                _rail1RightSigAmpList = new List<int[]>();
+                _rail2LeftSigAmpList = new List<int[]>();
+                _rail2RightSigAmpList = new List<int[]>();
                 int i = 0;
                 foreach (XmlNode node in xn0)
                 {
@@ -143,12 +151,64 @@ namespace BrokenRailMonitorViaWiFi
                     XmlNode stress1Node = node.SelectSingleNode("Rail1/Stress");
                     string innerTextStress1 = stress1Node.InnerText.Trim();
                     string[] stress1 = innerTextStress1.Split('-');
-                    _rail1Stress[i] = (Convert.ToInt32(stress1[0])) << 8 + Convert.ToInt32(stress1[1]);
+                    _rail1Stress[i] = ((Convert.ToInt32(stress1[0])) << 8) + Convert.ToInt32(stress1[1]);
 
                     XmlNode stress2Node = node.SelectSingleNode("Rail2/Stress");
                     string innerTextStress2 = stress2Node.InnerText.Trim();
                     string[] stress2 = innerTextStress2.Split('-');
-                    _rail2Stress[i] = (Convert.ToInt32(stress2[0])) << 8 + Convert.ToInt32(stress2[1]);
+                    _rail2Stress[i] = ((Convert.ToInt32(stress2[0])) << 8) + Convert.ToInt32(stress2[1]);
+
+                    XmlNode rail1LeftSigAmpNode = node.SelectSingleNode("Rail1/SignalAmplitudeLeft");
+                    string innerTextRail1LeftSigAmp = rail1LeftSigAmpNode.InnerText.Trim();
+                    string[] strRail1LeftSigAmp = innerTextRail1LeftSigAmp.Split('-');
+                    int[] intRail1LeftSigAmp = new int[4];
+                    for (int k = 0; k < strRail1LeftSigAmp.Length; k += 4)
+                    {
+                        intRail1LeftSigAmp[k / 4] = (Convert.ToInt32(strRail1LeftSigAmp[k]) << 24) +
+                                                (Convert.ToInt32(strRail1LeftSigAmp[k + 1]) << 16) +
+                                                (Convert.ToInt32(strRail1LeftSigAmp[k + 2]) << 8) +
+                                                (Convert.ToInt32(strRail1LeftSigAmp[k + 3]));
+                    }
+                    _rail1LeftSigAmpList.Add(intRail1LeftSigAmp);
+
+                    XmlNode rail1RightSigAmpNode = node.SelectSingleNode("Rail1/SignalAmplitudeRight");
+                    string innerTextRail1RightSigAmp = rail1RightSigAmpNode.InnerText.Trim();
+                    string[] strRail1RightSigAmp = innerTextRail1RightSigAmp.Split('-');
+                    int[] intRail1RightSigAmp = new int[4];
+                    for (int k = 0; k < strRail1RightSigAmp.Length; k += 4)
+                    {
+                        intRail1RightSigAmp[k / 4] = (Convert.ToInt32(strRail1RightSigAmp[k]) << 24) +
+                                                (Convert.ToInt32(strRail1RightSigAmp[k + 1]) << 16) +
+                                                (Convert.ToInt32(strRail1RightSigAmp[k + 2]) << 8) +
+                                                (Convert.ToInt32(strRail1RightSigAmp[k + 3]));
+                    }
+                    _rail1RightSigAmpList.Add(intRail1RightSigAmp);
+
+                    XmlNode rail2LeftSigAmpNode = node.SelectSingleNode("Rail2/SignalAmplitudeLeft");
+                    string innerTextRail2LeftSigAmp = rail2LeftSigAmpNode.InnerText.Trim();
+                    string[] strRail2LeftSigAmp = innerTextRail2LeftSigAmp.Split('-');
+                    int[] intRail2LeftSigAmp = new int[4];
+                    for (int k = 0; k < strRail2LeftSigAmp.Length; k += 4)
+                    {
+                        intRail2LeftSigAmp[k / 4] = (Convert.ToInt32(strRail2LeftSigAmp[k]) << 24) +
+                                                (Convert.ToInt32(strRail2LeftSigAmp[k + 1]) << 16) +
+                                                (Convert.ToInt32(strRail2LeftSigAmp[k + 2]) << 8) +
+                                                (Convert.ToInt32(strRail2LeftSigAmp[k + 3]));
+                    }
+                    _rail2LeftSigAmpList.Add(intRail2LeftSigAmp);
+
+                    XmlNode rail2RightSigAmpNode = node.SelectSingleNode("Rail2/SignalAmplitudeRight");
+                    string innerTextRail2RightSigAmp = rail2RightSigAmpNode.InnerText.Trim();
+                    string[] strRail2RightSigAmp = innerTextRail2RightSigAmp.Split('-');
+                    int[] intRail2RightSigAmp = new int[4];
+                    for (int k = 0; k < strRail2RightSigAmp.Length; k += 4)
+                    {
+                        intRail2RightSigAmp[k / 4] = (Convert.ToInt32(strRail2RightSigAmp[k]) << 24) +
+                                                (Convert.ToInt32(strRail2RightSigAmp[k + 1]) << 16) +
+                                                (Convert.ToInt32(strRail2RightSigAmp[k + 2]) << 8) +
+                                                (Convert.ToInt32(strRail2RightSigAmp[k + 3]));
+                    }
+                    _rail2RightSigAmpList.Add(intRail2RightSigAmp);
 
                     //铁轨通断，只看最新的一个记录。
                     if (i == nodeCount - 1)
@@ -291,6 +351,78 @@ namespace BrokenRailMonitorViaWiFi
                     dataSeries.DataPoints.Add(dataPointStress2);
                 }
                 chartRail2Stress.Series.Add(dataSeries);
+
+                chartRail1LeftSignalAmplitude.Series.Clear();
+                dataSeries = new DataSeries();
+                dataSeries.RenderAs = RenderAs.Line;
+                dataSeries.XValueType = ChartValueTypes.DateTime;
+                DataPoint dPRail1LeftSigAmp;
+                for (int j = 0; j < _rail1LeftSigAmpList.Count; j++)
+                {
+                    for (int k = 0; k < 4; k++)
+                    {
+                        dPRail1LeftSigAmp = new DataPoint();
+                        dPRail1LeftSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
+                        dPRail1LeftSigAmp.YValue = _rail1LeftSigAmpList[j][k];
+                        dPRail1LeftSigAmp.MarkerSize = 8;
+                        dataSeries.DataPoints.Add(dPRail1LeftSigAmp);
+                    }
+                }
+                chartRail1LeftSignalAmplitude.Series.Add(dataSeries);
+
+                chartRail1RightSignalAmplitude.Series.Clear();
+                dataSeries = new DataSeries();
+                dataSeries.RenderAs = RenderAs.Line;
+                dataSeries.XValueType = ChartValueTypes.DateTime;
+                DataPoint dPRail1RightSigAmp;
+                for (int j = 0; j < _rail1RightSigAmpList.Count; j++)
+                {
+                    for (int k = 0; k < 4; k++)
+                    {
+                        dPRail1RightSigAmp = new DataPoint();
+                        dPRail1RightSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
+                        dPRail1RightSigAmp.YValue = _rail1RightSigAmpList[j][k];
+                        dPRail1RightSigAmp.MarkerSize = 8;
+                        dataSeries.DataPoints.Add(dPRail1RightSigAmp);
+                    }
+                }
+                chartRail1RightSignalAmplitude.Series.Add(dataSeries);
+
+                chartRail2LeftSignalAmplitude.Series.Clear();
+                dataSeries = new DataSeries();
+                dataSeries.RenderAs = RenderAs.Line;
+                dataSeries.XValueType = ChartValueTypes.DateTime;
+                DataPoint dPRail2LeftSigAmp;
+                for (int j = 0; j < _rail2LeftSigAmpList.Count; j++)
+                {
+                    for (int k = 0; k < 4; k++)
+                    {
+                        dPRail2LeftSigAmp = new DataPoint();
+                        dPRail2LeftSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
+                        dPRail2LeftSigAmp.YValue = _rail2LeftSigAmpList[j][k];
+                        dPRail2LeftSigAmp.MarkerSize = 8;
+                        dataSeries.DataPoints.Add(dPRail2LeftSigAmp);
+                    }
+                }
+                chartRail2LeftSignalAmplitude.Series.Add(dataSeries);
+
+                chartRail2RightSignalAmplitude.Series.Clear();
+                dataSeries = new DataSeries();
+                dataSeries.RenderAs = RenderAs.Line;
+                dataSeries.XValueType = ChartValueTypes.DateTime;
+                DataPoint dPRail2RightSigAmp;
+                for (int j = 0; j < _rail2RightSigAmpList.Count; j++)
+                {
+                    for (int k = 0; k < 4; k++)
+                    {
+                        dPRail2RightSigAmp = new DataPoint();
+                        dPRail2RightSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
+                        dPRail2RightSigAmp.YValue = _rail2RightSigAmpList[j][k];
+                        dPRail2RightSigAmp.MarkerSize = 8;
+                        dataSeries.DataPoints.Add(dPRail2RightSigAmp);
+                    }
+                }
+                chartRail2RightSignalAmplitude.Series.Add(dataSeries);
             }
             catch (Exception ee)
             {
