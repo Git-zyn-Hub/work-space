@@ -48,6 +48,7 @@ namespace BrokenRailMonitorViaWiFi
         private int _receiveEmptyPackageCount = 0;
         private List<int> _socketRegister = new List<int>();
         private List<int> _4GPointIndex = new List<int>();
+        private Dictionary<int, bool> _terminalsReceiveFlag;
 
         public List<int> SocketRegister
         {
@@ -414,7 +415,7 @@ namespace BrokenRailMonitorViaWiFi
                                     {
                                         sb.Append(actualReceive[i].ToString("x2"));
                                     }
-                                    this.Dispatcher.BeginInvoke(new Action(() =>
+                                    this.Dispatcher.Invoke(new Action(() =>
                                     {
                                         this.dataShowUserCtrl.AddShowData("收到数据  " + sb.ToString(), DataLevel.Default);
                                     }));
@@ -561,8 +562,8 @@ namespace BrokenRailMonitorViaWiFi
                                     case 0xf5:
                                         {
                                             checkDirectory();
-                                            initialFileConfig(actualReceive[5]);
-                                            string fileName = System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName + @"\DataTerminal" + actualReceive[5].ToString("D3") + ".xml";
+                                            initialFileConfig(actualReceive[7]);
+                                            string fileName = System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName + @"\DataTerminal" + actualReceive[7].ToString("D3") + ".xml";
                                             if (File.Exists(fileName))
                                             {
                                                 XmlDocument xmlDoc = new XmlDocument();
@@ -657,7 +658,17 @@ namespace BrokenRailMonitorViaWiFi
                                             }
                                             this.Dispatcher.Invoke(new Action(() =>
                                             {
-                                                RailInfoResultWindow railInfoResultWin = RailInfoResultWindow.GetInstance(actualReceive[5]);
+                                                RailInfoResultWindow railInfoResultWin = RailInfoResultWindow.GetInstance(actualReceive[7]);
+                                                int index = findMasterControlIndex(actualReceive[7]);
+                                                if (index == -1)
+                                                {
+                                                    MessageBox.Show("收到的终端号在终端集合中不存在！");
+                                                    return;
+                                                }
+                                                else
+                                                {
+                                                    railInfoResultWin.MasterCtrl = this.MasterControlList[index];
+                                                }
                                                 railInfoResultWin.RefreshResult();
                                                 railInfoResultWin.Show();
                                             }));
@@ -677,10 +688,18 @@ namespace BrokenRailMonitorViaWiFi
 
                                             int length = (actualReceive[2] << 8) + actualReceive[3];
                                             byte[] bytesOnOffContent = new byte[length - 9];
+                                            byte[] bytesTemp = new byte[length - 9];
                                             for (int i = 7; i < length - 2; i++)
                                             {
                                                 bytesOnOffContent[i - 7] = actualReceive[i];
                                             }
+                                            for (int i = 0; i < bytesOnOffContent.Length; i += 3)
+                                            {
+                                                bytesTemp[i] = bytesOnOffContent[bytesOnOffContent.Length - i - 3];
+                                                bytesTemp[i + 1] = bytesOnOffContent[bytesOnOffContent.Length - i - 2];
+                                                bytesTemp[i + 2] = bytesOnOffContent[bytesOnOffContent.Length - i - 1];
+                                            }
+                                            bytesTemp.CopyTo(bytesOnOffContent, 0);
                                             int contentLength = bytesOnOffContent.Length;
                                             if (contentLength % 3 == 0)
                                             {
@@ -715,7 +734,7 @@ namespace BrokenRailMonitorViaWiFi
                                                         int onOffRail2Left = bytesOnOffContent[2] & 0x0f;
                                                         this.Dispatcher.Invoke(new Action(() =>
                                                         {
-                                                            setRail1State(index - 1, onOffRail2Left);
+                                                            setRail2State(index - 1, onOffRail2Left);
                                                         }));
                                                     }
                                                     if (index != MasterControlList.Count - 1)
@@ -789,7 +808,7 @@ namespace BrokenRailMonitorViaWiFi
                                                                 int onOffRail1Right = (bytesOnOffContent[i + 4] & 0xf0) >> 4;
                                                                 this.Dispatcher.Invoke(new Action(() =>
                                                                 {
-                                                                    setRail1State(index, onOffRail1Right);
+                                                                    setRail1State(indexLastTerminal, onOffRail1Right);
                                                                 }));
                                                             }
                                                         }
@@ -801,7 +820,7 @@ namespace BrokenRailMonitorViaWiFi
                                                             int onOffRail2Left = bytesOnOffContent[2] & 0x0f;
                                                             this.Dispatcher.Invoke(new Action(() =>
                                                             {
-                                                                setRail1State(index - 1, onOffRail2Left);
+                                                                setRail2State(index - 1, onOffRail2Left);
                                                             }));
                                                         }
                                                         else
@@ -849,7 +868,7 @@ namespace BrokenRailMonitorViaWiFi
                                                                 int onOffRail2Right = (bytesOnOffContent[i + 5] & 0xf0) >> 4;
                                                                 this.Dispatcher.Invoke(new Action(() =>
                                                                 {
-                                                                    setRail2State(index, onOffRail2Right);
+                                                                    setRail2State(indexLastTerminal, onOffRail2Right);
                                                                 }));
                                                             }
                                                         }
@@ -887,6 +906,17 @@ namespace BrokenRailMonitorViaWiFi
                                             {
                                                 MessageBox.Show("发送数据内容的长度错误，应该是3的倍数");
                                             }
+                                        }
+                                        break;
+                                    case 0x88:
+                                        {
+                                            this.WaitingRingDisable();
+                                            this.WaitReceiveTimer.Stop();
+
+                                            this.Dispatcher.BeginInvoke(new Action(() =>
+                                            {
+                                                this.dataShowUserCtrl.AddShowData(actualReceive[7].ToString() + "号终端失联，未收到其返回的数据！", DataLevel.Error);
+                                            }));
                                         }
                                         break;
                                     //case 0xf7:
@@ -1200,7 +1230,7 @@ namespace BrokenRailMonitorViaWiFi
         {
             this.WaitingRingDisable();
             this.WaitReceiveTimer.Stop();
-            MessageBox.Show("超过20秒未收到数据，连接肯能已断开！");
+            MessageBox.Show("超过20秒未收到数据，连接可能已断开！");
         }
         //private void miGetAllDevicesSignalAmplitude_Click(object sender, RoutedEventArgs e)
         //{

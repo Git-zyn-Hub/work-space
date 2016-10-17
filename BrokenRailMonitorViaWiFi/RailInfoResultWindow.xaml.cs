@@ -27,7 +27,23 @@ namespace BrokenRailMonitorViaWiFi
         private int[] _rail1Temprature;
         private int[] _rail2Temprature;
         private int[] _terminalTemprature;
-        private static RailInfoResultWindow uniqueInstance;
+        private int[] _rail1Stress;
+        private int[] _rail2Stress;
+        private static RailInfoResultWindow _uniqueInstance;
+        private MasterControl _masterCtrl;
+
+        public MasterControl MasterCtrl
+        {
+            get
+            {
+                return _masterCtrl;
+            }
+
+            set
+            {
+                _masterCtrl = value;
+            }
+        }
 
         private RailInfoResultWindow(int terminalNo)
         {
@@ -39,16 +55,28 @@ namespace BrokenRailMonitorViaWiFi
 
         public static RailInfoResultWindow GetInstance(int terminalNo)
         {
-            if (uniqueInstance == null)
+            if (_uniqueInstance == null)
             {
-                uniqueInstance = new RailInfoResultWindow(terminalNo);
+                _uniqueInstance = new RailInfoResultWindow(terminalNo);
             }
-            return uniqueInstance;
+            return _uniqueInstance;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
+            if (MasterCtrl != null)
+            {
+                if (MasterCtrl.NeighbourSmall == 0)
+                {
+                    this.rail1Left.Visibility = Visibility.Hidden;
+                    this.rail2Left.Visibility = Visibility.Hidden;
+                }
+                if (MasterCtrl.NeighbourBig == 0xff)
+                {
+                    this.rail1Right.Visibility = Visibility.Hidden;
+                    this.rail2Right.Visibility = Visibility.Hidden;
+                }
+            }
         }
 
         public void RefreshResult()
@@ -66,6 +94,8 @@ namespace BrokenRailMonitorViaWiFi
                 _rail1Temprature = new int[nodeCount];
                 _rail2Temprature = new int[nodeCount];
                 _terminalTemprature = new int[nodeCount];
+                _rail1Stress = new int[nodeCount];
+                _rail2Stress = new int[nodeCount];
                 int i = 0;
                 foreach (XmlNode node in xn0)
                 {
@@ -109,7 +139,18 @@ namespace BrokenRailMonitorViaWiFi
                     {
                         _rail2Temprature[i] = -(_rail2Temprature[i] & 0x7f);
                     }
-                    //铁轨通断
+
+                    XmlNode stress1Node = node.SelectSingleNode("Rail1/Stress");
+                    string innerTextStress1 = stress1Node.InnerText.Trim();
+                    string[] stress1 = innerTextStress1.Split('-');
+                    _rail1Stress[i] = (Convert.ToInt32(stress1[0])) << 8 + Convert.ToInt32(stress1[1]);
+
+                    XmlNode stress2Node = node.SelectSingleNode("Rail2/Stress");
+                    string innerTextStress2 = stress2Node.InnerText.Trim();
+                    string[] stress2 = innerTextStress2.Split('-');
+                    _rail2Stress[i] = (Convert.ToInt32(stress2[0])) << 8 + Convert.ToInt32(stress2[1]);
+
+                    //铁轨通断，只看最新的一个记录。
                     if (i == nodeCount - 1)
                     {
                         XmlNode rail1OnOffNode = node.SelectSingleNode("Rail1/OnOff");
@@ -220,6 +261,36 @@ namespace BrokenRailMonitorViaWiFi
                     dataSeries.DataPoints.Add(dataPoint2);
                 }
                 chartRail2Temprature.Series.Add(dataSeries);
+
+                chartRail1Stress.Series.Clear();
+                dataSeries = new DataSeries();
+                dataSeries.RenderAs = RenderAs.Line;
+                dataSeries.XValueType = ChartValueTypes.DateTime;
+                DataPoint dataPointStress1;
+                for (int k = 0; k < nodeCount; k++)
+                {
+                    dataPointStress1 = new DataPoint();
+                    dataPointStress1.XValue = _dateTimeList[k];
+                    dataPointStress1.YValue = _rail1Stress[k];
+                    dataPointStress1.MarkerSize = 8;
+                    dataSeries.DataPoints.Add(dataPointStress1);
+                }
+                chartRail1Stress.Series.Add(dataSeries);
+
+                chartRail2Stress.Series.Clear();
+                dataSeries = new DataSeries();
+                dataSeries.RenderAs = RenderAs.Line;
+                dataSeries.XValueType = ChartValueTypes.DateTime;
+                DataPoint dataPointStress2;
+                for (int k = 0; k < nodeCount; k++)
+                {
+                    dataPointStress2 = new DataPoint();
+                    dataPointStress2.XValue = _dateTimeList[k];
+                    dataPointStress2.YValue = _rail2Stress[k];
+                    dataPointStress2.MarkerSize = 8;
+                    dataSeries.DataPoints.Add(dataPointStress2);
+                }
+                chartRail2Stress.Series.Add(dataSeries);
             }
             catch (Exception ee)
             {
@@ -240,6 +311,11 @@ namespace BrokenRailMonitorViaWiFi
 
             //lineChart.HideIndicator();
             //root.Children.RemoveAt(10);
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            _uniqueInstance = null;
         }
     }
 }

@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
         xmlns:chart="clr-namespace:Visifire.Charts;assembly=WPFVisifire.Charts"
         mc:Ignorable="d"
-        Title="铁轨信息结果显示" Height="600" Width="800" Loaded="Window_Loaded" WindowState="Maximized">
+        Title="铁轨信息结果显示" Height="600" Width="800" 
+        Loaded="Window_Loaded" WindowState="Maximized" Closed="Window_Closed">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
