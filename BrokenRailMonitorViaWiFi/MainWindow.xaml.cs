@@ -44,6 +44,7 @@ namespace BrokenRailMonitorViaWiFi
         private List<Rail> _rail2List = new List<Rail>();
         private DispatcherTimer _getAllRailInfoTimer = new DispatcherTimer();
         private DispatcherTimer _waitReceiveTimer = new DispatcherTimer();
+        private DispatcherTimer _multicastWaitReceiveTimer = new DispatcherTimer();
         private int _packageCount = 0;
         private int _receiveEmptyPackageCount = 0;
         private List<int> _socketRegister = new List<int>();
@@ -108,6 +109,9 @@ namespace BrokenRailMonitorViaWiFi
 
             WaitReceiveTimer.Tick += WaitReceiveTimer_Tick;
             WaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
+
+            _multicastWaitReceiveTimer.Tick += multicastWaitReceiveTimer_Tick;
+            _multicastWaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
             //_waitingRingThread = new Thread(waitingRingEnable);
         }
 
@@ -707,6 +711,10 @@ namespace BrokenRailMonitorViaWiFi
                                                 {
                                                     //如果只有一个终端的数据就不存在两个终端数据冲突的情况。
                                                     int index = findMasterControlIndex(bytesOnOffContent[0]);
+                                                    if (_terminalsReceiveFlag != null)
+                                                    {
+                                                        _terminalsReceiveFlag[bytesOnOffContent[0]] = true;
+                                                    }
                                                     //检查1号铁轨
                                                     if (index != 0)
                                                     {
@@ -753,6 +761,10 @@ namespace BrokenRailMonitorViaWiFi
                                                     for (int i = 0; i < contentLength - 3; i++, i++, i++)
                                                     {
                                                         int index = findMasterControlIndex(bytesOnOffContent[i]);
+                                                        if (_terminalsReceiveFlag != null)
+                                                        {
+                                                            _terminalsReceiveFlag[bytesOnOffContent[i]] = true;
+                                                        }
                                                         //检查1号铁轨
                                                         if (i == 0 && index != 0)
                                                         {
@@ -1232,6 +1244,23 @@ namespace BrokenRailMonitorViaWiFi
             this.WaitReceiveTimer.Stop();
             MessageBox.Show("超过20秒未收到数据，连接可能已断开！");
         }
+        private void multicastWaitReceiveTimer_Tick(object sender, EventArgs e)
+        {
+            this._multicastWaitReceiveTimer.Stop();
+            string notReceiveNo = string.Empty;
+            foreach (var item in _terminalsReceiveFlag)
+            {
+                if (item.Value == false)
+                {
+                    notReceiveNo += (item.Key + "、");
+                }
+            }
+            notReceiveNo = notReceiveNo.Substring(0, notReceiveNo.Length - 1);
+            if (notReceiveNo != string.Empty)
+            {
+                MessageBox.Show("超过20秒未收到" + notReceiveNo + "号终端的数据，终端物理链路可能已断开！");
+            }
+        }
         //private void miGetAllDevicesSignalAmplitude_Click(object sender, RoutedEventArgs e)
         //{
         //    try
@@ -1308,6 +1337,16 @@ namespace BrokenRailMonitorViaWiFi
 
                 this.WaitingRingEnable();
                 this.WaitReceiveTimer.Start();
+
+                int terminalStartIndex = findMasterControlIndex(newGetSectionWin.TerminalSmall);
+                int terminalEndIndex = findMasterControlIndex(newGetSectionWin.TerminalBig);
+                _terminalsReceiveFlag = new Dictionary<int, bool>();
+                for (int i = terminalStartIndex; i <= terminalEndIndex; i++)
+                {
+                    _terminalsReceiveFlag.Add(this.MasterControlList[i].TerminalNumber, false);
+                }
+                _multicastWaitReceiveTimer.Start();
+
                 List<int> include4GIndex = new List<int>();
                 for (int i = 0; i < _4GPointIndex.Count; i++)
                 {

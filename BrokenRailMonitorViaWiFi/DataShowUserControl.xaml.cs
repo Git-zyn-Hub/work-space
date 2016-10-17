@@ -50,7 +50,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             txtData.Text = nowTime + "  " + data;
             this.stpContainer.Children.Add(txtData);
-            this.scrollViewer.Focus();
+            //this.scrollViewer.Focus();
             this.scrollViewer.ScrollToEnd();
         }
     }
