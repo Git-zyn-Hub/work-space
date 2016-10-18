@@ -40,6 +40,7 @@ namespace BrokenRailMonitorViaWiFi
         private List<Chart> _charts = new List<Chart>();
         private double _originChartWidth = 0;
         private double _originChartHeight = 0;
+        private int _checkCount = 0;
 
         public MasterControl MasterCtrl
         {
@@ -89,13 +90,34 @@ namespace BrokenRailMonitorViaWiFi
             for (int i = 0; i < 9; i++)
             {
                 CheckBox aCheckBox = new CheckBox();
-                this.gridChart.Children.Add(aCheckBox);
                 aCheckBox.SetValue(HorizontalAlignmentProperty, HorizontalAlignment.Right);
                 aCheckBox.SetValue(VerticalAlignmentProperty, VerticalAlignment.Top);
                 aCheckBox.SetValue(Grid.RowProperty, i / 3);
                 aCheckBox.SetValue(Grid.ColumnProperty, i % 3);
                 aCheckBox.SetValue(Panel.ZIndexProperty, 100);
+                aCheckBox.Checked += ACheckBox_Checked;
+                aCheckBox.Unchecked += ACheckBox_Unchecked;
+                this.gridChart.Children.Add(aCheckBox);
                 this._checkBoxes.Add(aCheckBox);
+            }
+        }
+
+        private void ACheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _checkCount--;
+        }
+
+        private void ACheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            _checkCount++;
+            if (_checkCount > 4)
+            {
+                CheckBox cbSender = sender as CheckBox;
+                if (cbSender != null)
+                {
+                    cbSender.IsChecked = false;
+                    MessageBox.Show("最多只能选择4个图表进行全屏！");
+                }
             }
         }
 
@@ -480,6 +502,22 @@ namespace BrokenRailMonitorViaWiFi
                 _charts.Add(chartRail2LeftSignalAmplitude);
                 _charts.Add(chartRail2RightSignalAmplitude);
             }
+            bool hasCheckBoxChecked = false;
+            for (int i = 0; i < 9; i++)
+            {
+                if (_checkBoxes[i].IsChecked.HasValue)
+                {
+                    if (_checkBoxes[i].IsChecked.Value)
+                    {
+                        hasCheckBoxChecked = true;
+                    }
+                }
+            }
+            if (!hasCheckBoxChecked)
+            {
+                MessageBox.Show("没有图表被选中！");
+                return;
+            }
             _originChartWidth = chartRail1Temprature.ActualWidth;
             _originChartHeight = chartRail1Temprature.ActualHeight;
             this.gridChart.Children.Clear();
@@ -492,11 +530,111 @@ namespace BrokenRailMonitorViaWiFi
                     if (_checkBoxes[i].IsChecked.Value)
                     {
                         _fullScreenWin.gridFullScreen.Children.Add(_charts[i]);
-                        _charts[i].Width = System.Windows.SystemParameters.PrimaryScreenWidth;
-                        _charts[i].Height = System.Windows.SystemParameters.PrimaryScreenHeight;
-                        //_charts[i].();
                     }
                 }
+            }
+            switch (_fullScreenWin.gridFullScreen.Children.Count)
+            {
+                case 1:
+                    {
+                        Chart aChart = _fullScreenWin.gridFullScreen.Children[0] as Chart;
+                        if (aChart != null)
+                        {
+                            aChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth;
+                            aChart.Height = System.Windows.SystemParameters.PrimaryScreenHeight;
+                        }
+                    }
+                    break;
+                case 2:
+                    {
+                        ColumnDefinition oneColumn = new ColumnDefinition();
+                        ColumnDefinition twoColumn = new ColumnDefinition();
+                        _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(oneColumn);
+                        _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(twoColumn);
+
+                        Chart oneChart = _fullScreenWin.gridFullScreen.Children[0] as Chart;
+                        Chart twoChart = _fullScreenWin.gridFullScreen.Children[1] as Chart;
+                        if (oneChart != null && twoChart != null)
+                        {
+                            oneChart.SetValue(Grid.RowProperty, 0);
+                            oneChart.SetValue(Grid.ColumnProperty, 0);
+                            twoChart.SetValue(Grid.RowProperty, 0);
+                            twoChart.SetValue(Grid.ColumnProperty, 1);
+                            oneChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth / 2;
+                            oneChart.Height = System.Windows.SystemParameters.PrimaryScreenHeight;
+                            twoChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth / 2;
+                            twoChart.Height = System.Windows.SystemParameters.PrimaryScreenHeight;
+                        }
+                    }
+                    break;
+                case 3:
+                    {
+                        ColumnDefinition oneColumn = new ColumnDefinition();
+                        ColumnDefinition twoColumn = new ColumnDefinition();
+                        ColumnDefinition threeColumn = new ColumnDefinition();
+                        _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(oneColumn);
+                        _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(twoColumn);
+                        _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(threeColumn);
+
+                        Chart oneChart = _fullScreenWin.gridFullScreen.Children[0] as Chart;
+                        Chart twoChart = _fullScreenWin.gridFullScreen.Children[1] as Chart;
+                        Chart threeChart = _fullScreenWin.gridFullScreen.Children[2] as Chart;
+                        if (oneChart != null && twoChart != null && threeChart != null)
+                        {
+                            oneChart.SetValue(Grid.RowProperty, 0);
+                            oneChart.SetValue(Grid.ColumnProperty, 0);
+                            twoChart.SetValue(Grid.RowProperty, 0);
+                            twoChart.SetValue(Grid.ColumnProperty, 1);
+                            threeChart.SetValue(Grid.RowProperty, 0);
+                            threeChart.SetValue(Grid.ColumnProperty, 2);
+                            oneChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth / 3;
+                            oneChart.Height = System.Windows.SystemParameters.PrimaryScreenHeight;
+                            twoChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth / 3;
+                            twoChart.Height = System.Windows.SystemParameters.PrimaryScreenHeight;
+                            threeChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth / 3;
+                            threeChart.Height = System.Windows.SystemParameters.PrimaryScreenHeight;
+                        }
+                    }
+                    break;
+                case 4:
+                    {
+                        ColumnDefinition oneColumn = new ColumnDefinition();
+                        ColumnDefinition twoColumn = new ColumnDefinition();
+                        RowDefinition oneRow = new RowDefinition();
+                        RowDefinition twoRow = new RowDefinition();
+                        _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(oneColumn);
+                        _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(twoColumn);
+                        _fullScreenWin.gridFullScreen.RowDefinitions.Add(oneRow);
+                        _fullScreenWin.gridFullScreen.RowDefinitions.Add(twoRow);
+
+                        Chart oneChart = _fullScreenWin.gridFullScreen.Children[0] as Chart;
+                        Chart twoChart = _fullScreenWin.gridFullScreen.Children[1] as Chart;
+                        Chart threeChart = _fullScreenWin.gridFullScreen.Children[2] as Chart;
+                        Chart fourChart = _fullScreenWin.gridFullScreen.Children[3] as Chart;
+
+                        if (oneChart != null && twoChart != null && threeChart != null && fourChart != null)
+                        {
+                            oneChart.SetValue(Grid.RowProperty, 0);
+                            oneChart.SetValue(Grid.ColumnProperty, 0);
+                            twoChart.SetValue(Grid.RowProperty, 0);
+                            twoChart.SetValue(Grid.ColumnProperty, 1);
+                            threeChart.SetValue(Grid.RowProperty, 1);
+                            threeChart.SetValue(Grid.ColumnProperty, 0);
+                            fourChart.SetValue(Grid.RowProperty, 1);
+                            fourChart.SetValue(Grid.ColumnProperty, 1);
+                            oneChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth / 2;
+                            oneChart.Height = System.Windows.SystemParameters.PrimaryScreenHeight / 2;
+                            twoChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth / 2;
+                            twoChart.Height = System.Windows.SystemParameters.PrimaryScreenHeight / 2;
+                            threeChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth / 2;
+                            threeChart.Height = System.Windows.SystemParameters.PrimaryScreenHeight / 2;
+                            fourChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth / 2;
+                            fourChart.Height = System.Windows.SystemParameters.PrimaryScreenHeight / 2;
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
             _fullScreenWin.Show();
         }

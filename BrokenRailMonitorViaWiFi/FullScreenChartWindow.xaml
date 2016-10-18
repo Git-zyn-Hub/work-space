@@ -20,23 +20,26 @@
                         CanExecute="CommandBinding_cmdExitFullScreen_CanExecute"
                         Executed="CommandBinding_cmdExitFullScreen_Executed" />
     </Window.CommandBindings>
-    <Grid x:Name="gridFullScreen">
-        <Popup x:Name="ppuToolTip" IsOpen="False" Placement="Center">
-            <Border Background="AntiqueWhite" CornerRadius="5" Padding="5" Width="220">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.25*" />
-                        <ColumnDefinition Width="0.9*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <Image Source="/BrokenRailMonitorViaWiFi;component/Resources/small_info_icon.png" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="3" Width="33" Stretch="Uniform"/>
-                    <TextBlock FontFamily="Tahoma" Grid.Row="0" Grid.Column="1" FontSize="13" Text="提示：" Foreground="#5095D6" />
-                    <TextBlock FontFamily="Tahoma" Grid.Row="1" Grid.Column="1" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">要退出全屏，请按 Esc 键</TextBlock>
-                </Grid>
-            </Border>
-        </Popup>
+    <Grid>
+        <Grid x:Name="gridFullScreen"></Grid>
+        <Grid>
+            <Popup x:Name="ppuToolTip" IsOpen="False" Placement="Center">
+                <Border Background="AntiqueWhite" CornerRadius="5" Padding="5" Width="220">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.25*" />
+                            <ColumnDefinition Width="0.9*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Image Source="/BrokenRailMonitorViaWiFi;component/Resources/small_info_icon.png" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="3" Width="33" Stretch="Uniform"/>
+                        <TextBlock FontFamily="Tahoma" Grid.Row="0" Grid.Column="1" FontSize="13" Text="提示：" Foreground="#5095D6" />
+                        <TextBlock FontFamily="Tahoma" Grid.Row="1" Grid.Column="1" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center">要退出全屏，请按 Esc 键</TextBlock>
+                    </Grid>
+                </Border>
+            </Popup>
+        </Grid>
     </Grid>
 </Window>
