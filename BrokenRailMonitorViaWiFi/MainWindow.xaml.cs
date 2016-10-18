@@ -814,6 +814,10 @@ namespace BrokenRailMonitorViaWiFi
                                                         if (i == (contentLength - 6))
                                                         {
                                                             int indexLastTerminal = findMasterControlIndex(bytesOnOffContent[i + 3]);
+                                                            if (_terminalsReceiveFlag != null)
+                                                            {
+                                                                _terminalsReceiveFlag[bytesOnOffContent[i + 3]] = true;
+                                                            }
                                                             if (indexLastTerminal != MasterControlList.Count - 1)
                                                             {
                                                                 //最后一个终端没有右边的铁轨
@@ -924,6 +928,7 @@ namespace BrokenRailMonitorViaWiFi
                                         {
                                             this.WaitingRingDisable();
                                             this.WaitReceiveTimer.Stop();
+                                            this._multicastWaitReceiveTimer.Stop();
 
                                             this.Dispatcher.BeginInvoke(new Action(() =>
                                             {
@@ -1255,9 +1260,9 @@ namespace BrokenRailMonitorViaWiFi
                     notReceiveNo += (item.Key + "、");
                 }
             }
-            notReceiveNo = notReceiveNo.Substring(0, notReceiveNo.Length - 1);
             if (notReceiveNo != string.Empty)
             {
+                notReceiveNo = notReceiveNo.Substring(0, notReceiveNo.Length - 1);
                 MessageBox.Show("超过20秒未收到" + notReceiveNo + "号终端的数据，终端物理链路可能已断开！");
             }
         }

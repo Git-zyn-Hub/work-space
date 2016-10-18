@@ -13,6 +13,7 @@
             <RowDefinition Height="100"/>
             <RowDefinition Height="400*"/>
         </Grid.RowDefinitions>
+        <Button x:Name="btnFullScreen" Width="80" Height="30" HorizontalAlignment="Left" VerticalAlignment="Top" Click="btnFullScreen_Click">全屏</Button>
         <StackPanel VerticalAlignment="Center">
             <StackPanel x:Name="stpRail1" Height="36" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Label Padding="10" Width="50">轨1：</Label>
@@ -28,7 +29,7 @@
                 <local:Rail x:Name="rail2Right" Margin="2,0,50,0"/>
             </StackPanel>
         </StackPanel>
-        <Grid Grid.Row="1">
+        <Grid x:Name="gridChart" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>

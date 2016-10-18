@@ -35,6 +35,11 @@ namespace BrokenRailMonitorViaWiFi
         private List<int[]> _rail2RightSigAmpList;
         private static RailInfoResultWindow _uniqueInstance;
         private MasterControl _masterCtrl;
+        private List<CheckBox> _checkBoxes = new List<CheckBox>();
+        private FullScreenChartWindow _fullScreenWin;
+        private List<Chart> _charts = new List<Chart>();
+        private double _originChartWidth = 0;
+        private double _originChartHeight = 0;
 
         public MasterControl MasterCtrl
         {
@@ -80,6 +85,17 @@ namespace BrokenRailMonitorViaWiFi
                     this.rail1Right.Visibility = Visibility.Hidden;
                     this.rail2Right.Visibility = Visibility.Hidden;
                 }
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                CheckBox aCheckBox = new CheckBox();
+                this.gridChart.Children.Add(aCheckBox);
+                aCheckBox.SetValue(HorizontalAlignmentProperty, HorizontalAlignment.Right);
+                aCheckBox.SetValue(VerticalAlignmentProperty, VerticalAlignment.Top);
+                aCheckBox.SetValue(Grid.RowProperty, i / 3);
+                aCheckBox.SetValue(Grid.ColumnProperty, i % 3);
+                aCheckBox.SetValue(Panel.ZIndexProperty, 100);
+                this._checkBoxes.Add(aCheckBox);
             }
         }
 
@@ -448,6 +464,64 @@ namespace BrokenRailMonitorViaWiFi
         private void Window_Closed(object sender, EventArgs e)
         {
             _uniqueInstance = null;
+        }
+
+        private void btnFullScreen_Click(object sender, RoutedEventArgs e)
+        {
+            if (_charts.Count == 0)
+            {
+                _charts.Add(chartRail1Temprature);
+                _charts.Add(chartTerminalTemprature);
+                _charts.Add(chartRail2Temprature);
+                _charts.Add(chartRail1Stress);
+                _charts.Add(chartRail2Stress);
+                _charts.Add(chartRail1LeftSignalAmplitude);
+                _charts.Add(chartRail1RightSignalAmplitude);
+                _charts.Add(chartRail2LeftSignalAmplitude);
+                _charts.Add(chartRail2RightSignalAmplitude);
+            }
+            _originChartWidth = chartRail1Temprature.ActualWidth;
+            _originChartHeight = chartRail1Temprature.ActualHeight;
+            this.gridChart.Children.Clear();
+            _fullScreenWin = new FullScreenChartWindow();
+            _fullScreenWin.Closed += fullScreenWin_Closed;
+            for (int i = 0; i < 9; i++)
+            {
+                if (_checkBoxes[i].IsChecked.HasValue)
+                {
+                    if (_checkBoxes[i].IsChecked.Value)
+                    {
+                        _fullScreenWin.gridFullScreen.Children.Add(_charts[i]);
+                        _charts[i].Width = System.Windows.SystemParameters.PrimaryScreenWidth;
+                        _charts[i].Height = System.Windows.SystemParameters.PrimaryScreenHeight;
+                        //_charts[i].();
+                    }
+                }
+            }
+            _fullScreenWin.Show();
+        }
+
+        private void fullScreenWin_Closed(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 9; i++)
+            {
+                _fullScreenWin.gridFullScreen.Children.Clear();
+                this.gridChart.Children.Add(_charts[i]);
+                _charts[i].SetValue(Grid.RowProperty, i / 3);
+                _charts[i].SetValue(Grid.ColumnProperty, i % 3);
+                _charts[i].SetValue(Panel.ZIndexProperty, 10);
+                _charts[i].Width = _originChartWidth;
+                _charts[i].Height = _originChartHeight;
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                this.gridChart.Children.Add(_checkBoxes[i]);
+                _checkBoxes[i].SetValue(HorizontalAlignmentProperty, HorizontalAlignment.Right);
+                _checkBoxes[i].SetValue(VerticalAlignmentProperty, VerticalAlignment.Top);
+                _checkBoxes[i].SetValue(Grid.RowProperty, i / 3);
+                _checkBoxes[i].SetValue(Grid.ColumnProperty, i % 3);
+                _checkBoxes[i].SetValue(Panel.ZIndexProperty, 100);
+            }
         }
     }
 }

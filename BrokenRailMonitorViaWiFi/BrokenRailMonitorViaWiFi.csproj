@@ -66,6 +66,9 @@
     <Compile Include="DataShowUserControl.xaml.cs">
       <DependentUpon>DataShowUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FullScreenChartWindow.xaml.cs">
+      <DependentUpon>FullScreenChartWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GetSectionWindow.xaml.cs">
       <DependentUpon>GetSectionWindow.xaml</DependentUpon>
     </Compile>
@@ -90,6 +93,10 @@
       <DependentUpon>SignalSendConfigWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="DataShowUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FullScreenChartWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -165,6 +172,7 @@
     <Resource Include="train_rail.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\small_info_icon.png" />
     <Resource Include="config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
