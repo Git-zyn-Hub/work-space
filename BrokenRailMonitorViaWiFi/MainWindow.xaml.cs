@@ -288,6 +288,24 @@ namespace BrokenRailMonitorViaWiFi
                             {
                                 _receiveEmptyPackageCount = 0;
                                 MessageBox.Show("与" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！");
+                                try
+                                {
+                                    _socketListeningThread.Abort();
+                                    _socketMain.Close();
+                                    _socketAcceptThread.Abort();
+                                    CloseAcceptSocket();
+                                    _socketMain = null;
+                                    this.miConnect.Header = "连接";
+                                    this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
+                                }
+                                catch (Exception ee)
+                                {
+                                    MessageBox.Show("关闭线程及Socket异常：" + ee.Message);
+                                }
+                                finally
+                                {
+                                    miConnect_Click(this, null);
+                                }
                                 foreach (var item in MasterControlList)
                                 {
                                     if (item.IpAndPort == socket.RemoteEndPoint.ToString())
@@ -962,6 +980,10 @@ namespace BrokenRailMonitorViaWiFi
                     }
                 }
             }
+            catch (ThreadAbortException)
+            {
+
+            }
             catch (Exception ee)
             {
                 MessageBox.Show("Socket监听线程异常：" + ee.Message);
@@ -1086,14 +1108,18 @@ namespace BrokenRailMonitorViaWiFi
                     _socketListeningThread.Start(_acceptSocket);
                 }
             }
+            catch (ThreadAbortException)
+            {
+
+            }
             catch (Exception ee)
             {
                 MessageBox.Show("Socket接收异常：" + ee.Message);
             }
-            finally
-            {
-                CloseAcceptSocket();
-            }
+            //finally
+            //{
+            //    CloseAcceptSocket();
+            //}
         }
         private void receiveAndAddTerminal(Socket socket)
         {
@@ -1159,6 +1185,7 @@ namespace BrokenRailMonitorViaWiFi
             if (_acceptSocket != null)
             {
                 _acceptSocket.Disconnect(false);
+                _acceptSocket.Shutdown(SocketShutdown.Both);
                 _acceptSocket.Close();
             }
         }

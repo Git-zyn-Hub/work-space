@@ -25,7 +25,7 @@
             <Menu x:Name="menu" Height="25" Width="190" HorizontalAlignment="Left">
                 <MenuItem x:Name="miConnect" Header="连接" FontSize="15" Click="miConnect_Click"></MenuItem>
                 <MenuItem x:Name="miRefreshDevices" Header="刷新设备" FontSize="15" Click="miRefreshDevices_Click"></MenuItem>
-                <MenuItem Header="指令" FontSize="15">
+                <MenuItem x:Name="miCommand" Header="指令" FontSize="15">
                     <!--<MenuItem x:Name="miRailInitial" Header="初始化" Click="miRailInitial_Click"></MenuItem>-->
                     <!--<MenuItem x:Name="miTimeBaseCorrect" Header="发射时基校准" Click="miTimeBaseCorrect_Click"></MenuItem>-->
                     <MenuItem x:Name="miGetAllRailInfo" Header="获取所有终端铁轨信息" Click="miGetAllRailInfo_Click"></MenuItem>
