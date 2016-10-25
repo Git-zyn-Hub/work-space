@@ -381,7 +381,7 @@ namespace BrokenRailMonitorViaWiFi
                                                 {
                                                     if (!item.Is4G)
                                                     {
-                                                        MessageBox.Show("心跳包中包含的终端号所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！");
+                                                        MessageBox.Show("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！");
                                                         break;
                                                     }
                                                     if (item.SocketImport == null || item.IpAndPort != socket.RemoteEndPoint.ToString())
@@ -409,7 +409,7 @@ namespace BrokenRailMonitorViaWiFi
                                                     {
                                                         if (!item.Is4G)
                                                         {
-                                                            MessageBox.Show("心跳包中包含的终端号所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！");
+                                                            MessageBox.Show("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！");
                                                             break;
                                                         }
                                                         if (item.SocketImport == null || item.IpAndPort != socket.RemoteEndPoint.ToString())
@@ -430,62 +430,72 @@ namespace BrokenRailMonitorViaWiFi
                             else
                             {
                                 //检查校验和
-                                if (actualReceive[0] == 0x66 && actualReceive[1] == 0xcc)
+                                try
                                 {
-                                    StringBuilder sb = new StringBuilder(500);
-                                    for (int i = 0; i < actualReceive.Length; i++)
+                                    if (actualReceive[0] == 0x66 && actualReceive[1] == 0xcc)
                                     {
-                                        sb.Append(actualReceive[i].ToString("x2"));
-                                    }
-                                    this.Dispatcher.Invoke(new Action(() =>
-                                    {
-                                        this.dataShowUserCtrl.AddShowData("收到数据  " + sb.ToString(), DataLevel.Default);
-                                    }));
+                                        StringBuilder sb = new StringBuilder(500);
+                                        for (int i = 0; i < actualReceive.Length; i++)
+                                        {
+                                            sb.Append(actualReceive[i].ToString("x2"));
+                                        }
+                                        this.Dispatcher.Invoke(new Action(() =>
+                                        {
+                                            this.dataShowUserCtrl.AddShowData("收到数据  " + sb.ToString(), DataLevel.Default);
+                                        }));
 
-                                    int length = (actualReceive[2] << 8) + actualReceive[3];
-                                    if (length != actualReceive.Length)
-                                    {
-                                        //处理粘包的情况。
-                                        int unhandledLength = actualReceive.Length - length;
-                                        byte[] packagePrevious = new byte[length];
-                                        packageUnhandled = new byte[unhandledLength];
-                                        for (int j = 0; j < length; j++)
+                                        int length = (actualReceive[2] << 8) + actualReceive[3];
+                                        if (length != actualReceive.Length)
                                         {
-                                            packagePrevious[j] = actualReceive[j];
+                                            //处理粘包的情况。
+                                            int unhandledLength = actualReceive.Length - length;
+                                            byte[] packagePrevious = new byte[length];
+                                            packageUnhandled = new byte[unhandledLength];
+                                            for (int j = 0; j < length; j++)
+                                            {
+                                                packagePrevious[j] = actualReceive[j];
+                                            }
+                                            for (int i = 0; i < unhandledLength; i++)
+                                            {
+                                                packageUnhandled[i] = actualReceive[length + i];
+                                            }
+                                            actualReceive = new byte[length];
+                                            packagePrevious.CopyTo(actualReceive, 0);
+                                            goto handlePackage;
+                                            //MessageBox.Show("长度字段与实际收到长度不相等");
+                                            //continue;
                                         }
-                                        for (int i = 0; i < unhandledLength; i++)
+                                        int checksum = 0;
+                                        for (int i = 0; i < actualReceive.Length - 2; i++)
                                         {
-                                            packageUnhandled[i] = actualReceive[length + i];
+                                            checksum += actualReceive[i];
                                         }
-                                        actualReceive = new byte[length];
-                                        packagePrevious.CopyTo(actualReceive, 0);
-                                        goto handlePackage;
-                                        //MessageBox.Show("长度字段与实际收到长度不相等");
-                                        //continue;
+                                        int sumHigh;
+                                        int sumLow;
+                                        sumHigh = (checksum & 0xff00) >> 8;
+                                        sumLow = checksum & 0xff;
+                                        if (sumHigh != actualReceive[actualReceive.Length - 2] || sumLow != actualReceive[actualReceive.Length - 1])
+                                        {
+                                            MessageBox.Show("校验和出错");
+                                            continue;
+                                        }
                                     }
-                                    int checksum = 0;
-                                    for (int i = 0; i < actualReceive.Length - 2; i++)
+                                    else
                                     {
-                                        checksum += actualReceive[i];
-                                    }
-                                    int sumHigh;
-                                    int sumLow;
-                                    sumHigh = (checksum & 0xff00) >> 8;
-                                    sumLow = checksum & 0xff;
-                                    if (sumHigh != actualReceive[actualReceive.Length - 2] || sumLow != actualReceive[actualReceive.Length - 1])
-                                    {
-                                        MessageBox.Show("校验和出错");
+                                        this.Dispatcher.BeginInvoke(new Action(() =>
+                                        {
+                                            string strReceiveBroken = encoding.GetString(actualReceive);
+                                            this.dataShowUserCtrl.AddShowData("收到拆分的错误包  " + strReceiveBroken, DataLevel.Warning);
+                                        }));
                                         continue;
                                     }
                                 }
-                                else
+                                catch (Exception)
                                 {
-                                    this.Dispatcher.BeginInvoke(new Action(() =>
-                                    {
-                                        this.dataShowUserCtrl.AddShowData("收到拆分的错误包", DataLevel.Warning);
-                                    }));
-                                    continue;
+
+                                    throw;
                                 }
+
                             }
                             if (actualReceive[0] == 0x66 && actualReceive[1] == 0xcc)
                             {
@@ -521,6 +531,7 @@ namespace BrokenRailMonitorViaWiFi
                                                     this.dataShowUserCtrl.AddShowData("获取某段铁轨信息，4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 default:
+                                                    this.dataShowUserCtrl.AddShowData("未知指令被接收！", DataLevel.Normal);
                                                     break;
                                             }
                                         }));
@@ -1370,15 +1381,6 @@ namespace BrokenRailMonitorViaWiFi
                 this.WaitingRingEnable();
                 this.WaitReceiveTimer.Start();
 
-                int terminalStartIndex = findMasterControlIndex(newGetSectionWin.TerminalSmall);
-                int terminalEndIndex = findMasterControlIndex(newGetSectionWin.TerminalBig);
-                _terminalsReceiveFlag = new Dictionary<int, bool>();
-                for (int i = terminalStartIndex; i <= terminalEndIndex; i++)
-                {
-                    _terminalsReceiveFlag.Add(this.MasterControlList[i].TerminalNumber, false);
-                }
-                _multicastWaitReceiveTimer.Start();
-
                 List<int> include4GIndex = new List<int>();
                 for (int i = 0; i < _4GPointIndex.Count; i++)
                 {
@@ -1392,6 +1394,7 @@ namespace BrokenRailMonitorViaWiFi
                     this.WaitingRingDisable();
                     this.WaitReceiveTimer.Stop();
                     MessageBox.Show("系统中不包含4G点，请检查config文档！");
+                    return;
                 }
                 else
                 {
@@ -1409,6 +1412,7 @@ namespace BrokenRailMonitorViaWiFi
                             this.WaitingRingDisable();
                             this.WaitReceiveTimer.Stop();
                             MessageBox.Show(this.MasterControlList[_4GPointIndex[0]].Find4GErrorMsg, "来自终端" + this.MasterControlList[_4GPointIndex[0]].TerminalNumber + "的消息：");
+                            return;
                         }
                     }
                     else
@@ -1436,6 +1440,7 @@ namespace BrokenRailMonitorViaWiFi
                                     this.WaitingRingDisable();
                                     this.WaitReceiveTimer.Stop();
                                     MessageBox.Show(this.MasterControlList[include4GIndex[i]].Find4GErrorMsg, "来自终端" + this.MasterControlList[include4GIndex[i]].TerminalNumber + "的消息：");
+                                    return;
                                 }
                             }
                         }
@@ -1464,6 +1469,7 @@ namespace BrokenRailMonitorViaWiFi
                                 this.WaitingRingDisable();
                                 this.WaitReceiveTimer.Stop();
                                 MessageBox.Show(this.MasterControlList[previous4GPointIndex].Find4GErrorMsg, "来自终端" + this.MasterControlList[previous4GPointIndex].TerminalNumber + "的消息：");
+                                return;
                             }
                             for (int i = 0; i < include4GIndex.Count; i++)
                             {
@@ -1486,11 +1492,20 @@ namespace BrokenRailMonitorViaWiFi
                                     this.WaitingRingDisable();
                                     this.WaitReceiveTimer.Stop();
                                     MessageBox.Show(this.MasterControlList[include4GIndex[i]].Find4GErrorMsg, "来自终端" + this.MasterControlList[include4GIndex[i]].TerminalNumber + "的消息：");
+                                    return;
                                 }
                             }
                         }
                     }
                 }
+                int terminalStartIndex = findMasterControlIndex(newGetSectionWin.TerminalSmall);
+                int terminalEndIndex = findMasterControlIndex(newGetSectionWin.TerminalBig);
+                _terminalsReceiveFlag = new Dictionary<int, bool>();
+                for (int i = terminalStartIndex; i <= terminalEndIndex; i++)
+                {
+                    _terminalsReceiveFlag.Add(this.MasterControlList[i].TerminalNumber, false);
+                }
+                _multicastWaitReceiveTimer.Start();
             }
             catch (Exception ee)
             {

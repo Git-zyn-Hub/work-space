@@ -27,31 +27,39 @@ namespace BrokenRailMonitorViaWiFi
 
         public void AddShowData(string data, DataLevel dataLevel)
         {
-            string nowTime = System.DateTime.Now.ToString("HH:mm:ss");
-            TextBlock txtData = new TextBlock();
-            switch (dataLevel)
+            try
             {
-                case DataLevel.Default:
-                    txtData.Foreground = new SolidColorBrush(Colors.Black);
-                    break;
-                case DataLevel.Normal:
-                    txtData.Foreground = new SolidColorBrush(Colors.LightGreen);
-                    break;
-                case DataLevel.Warning:
-                    txtData.Foreground = new SolidColorBrush(Colors.Orange);
-                    txtData.FontWeight = FontWeights.Bold;
-                    break;
-                case DataLevel.Error:
-                    txtData.Foreground = new SolidColorBrush(Colors.Red);
-                    break;
-                default:
-                    txtData.Foreground = new SolidColorBrush(Colors.Black);
-                    break;
+                string nowTime = System.DateTime.Now.ToString("HH:mm:ss");
+                TextBlock txtData = new TextBlock();
+                switch (dataLevel)
+                {
+                    case DataLevel.Default:
+                        txtData.Foreground = new SolidColorBrush(Colors.Black);
+                        break;
+                    case DataLevel.Normal:
+                        txtData.Foreground = new SolidColorBrush(Colors.LightGreen);
+                        break;
+                    case DataLevel.Warning:
+                        txtData.Foreground = new SolidColorBrush(Colors.Orange);
+                        txtData.FontWeight = FontWeights.Bold;
+                        break;
+                    case DataLevel.Error:
+                        txtData.Foreground = new SolidColorBrush(Colors.Red);
+                        break;
+                    default:
+                        txtData.Foreground = new SolidColorBrush(Colors.Black);
+                        break;
+                }
+                txtData.Text = nowTime + "  " + data;
+                this.stpContainer.Children.Add(txtData);
+                //this.scrollViewer.Focus();
+                this.scrollViewer.ScrollToEnd();
             }
-            txtData.Text = nowTime + "  " + data;
-            this.stpContainer.Children.Add(txtData);
-            //this.scrollViewer.Focus();
-            this.scrollViewer.ScrollToEnd();
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 
