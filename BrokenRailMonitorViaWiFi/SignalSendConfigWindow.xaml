@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
         mc:Ignorable="d"
+        x:Name="signalSendConfigWin"
         Title="超声信号发射配置" Height="250" Width="300" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
@@ -16,19 +17,43 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0" VerticalAlignment="Center" Margin="30,0">
             <Label>发射间隔:</Label>
-            <TextBox x:Name="txtSendInterval" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+            <TextBox x:Name="txtSendInterval" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                <Binding Path="SendInterval" ElementName="signalSendConfigWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <local:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox>
         </DockPanel>
         <DockPanel Grid.Row="1" VerticalAlignment="Center" Margin="30,0">
             <Label>发射时机:</Label>
-            <TextBox x:Name="txtSendTimeOpportunity" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+            <TextBox x:Name="txtSendTimeOpportunity" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                <Binding Path="SendTimeOpportunity" ElementName="signalSendConfigWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <local:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox>
         </DockPanel>
         <DockPanel Grid.Row="2" VerticalAlignment="Center" Margin="30,0">
             <Label>相邻小终端发射时机:</Label>
-            <TextBox x:Name="txtNeighbourSmallOpportunity" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+            <TextBox x:Name="txtNeighbourSmallOpportunity" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                <Binding Path="NeighbourSmallOpportunity" ElementName="signalSendConfigWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <local:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox>
         </DockPanel>
         <DockPanel Grid.Row="3" VerticalAlignment="Center" Margin="30,0">
             <Label>相邻大终端发射时机:</Label>
-            <TextBox x:Name="txtNeighbourBigOpportunity" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+            <TextBox x:Name="txtNeighbourBigOpportunity" HorizontalAlignment="Right" VerticalContentAlignment="Center" Width="80" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                <Binding Path="NeighbourBigOpportunity" ElementName="signalSendConfigWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <local:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox>
         </DockPanel>
         <DockPanel Grid.Row="4" VerticalAlignment="Center" HorizontalAlignment="Center" Height="24">
             <Button x:Name="btnEnter" Width="70" Click="btnEnter_Click">确定</Button>

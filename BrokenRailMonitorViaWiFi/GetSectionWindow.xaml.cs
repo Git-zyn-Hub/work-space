@@ -19,8 +19,8 @@ namespace BrokenRailMonitorViaWiFi
     /// </summary>
     public partial class GetSectionWindow : Window
     {
-        private int _terminalSmall;
-        private int _terminalBig;
+        private int _terminalSmall = 0;
+        private int _terminalBig = 254;
         private List<MasterControl> _masterControlList = new List<MasterControl>();
         private bool _findTerminalSmall = false;
         private bool _findTerminalBig = false;

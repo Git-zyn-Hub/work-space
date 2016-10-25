@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
         mc:Ignorable="d"
+        x:Name="getSectionWin"
         Title="获取铁轨段" Height="176.705" Width="339.858" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
@@ -13,9 +14,21 @@
         </Grid.RowDefinitions>
         <WrapPanel VerticalAlignment="Center">
             <Label>获取从</Label>
-            <TextBox x:Name="txtTerminalSmall" VerticalContentAlignment="Center" Width="30" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+            <TextBox x:Name="txtTerminalSmall" VerticalContentAlignment="Center" Width="30" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                <Binding Path="TerminalSmall" ElementName="getSectionWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <local:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox>
             <Label>号终端到</Label>
-            <TextBox x:Name="txtTerminalBig" VerticalContentAlignment="Center" Width="30" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged"></TextBox>
+            <TextBox x:Name="txtTerminalBig" VerticalContentAlignment="Center" Width="30" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                <Binding Path="TerminalBig" ElementName="getSectionWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <local:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox>
             <Label>号终端之间的铁轨通断信息</Label>
         </WrapPanel>
         <DockPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Height="24">

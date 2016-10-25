@@ -92,6 +92,7 @@
     <Compile Include="SignalSendConfigWindow.xaml.cs">
       <DependentUpon>SignalSendConfigWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ValidationRules.cs" />
     <Compile Include="Windows\ThresholdSettingWindow.xaml.cs">
       <DependentUpon>ThresholdSettingWindow.xaml</DependentUpon>
     </Compile>

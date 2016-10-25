@@ -255,6 +255,49 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            <Style x:Key="ErrorInputStyle">
+                <Style.Triggers>
+                    <Trigger Property="Validation.HasError" Value="true">
+                        <Setter Property="Validation.ErrorTemplate">
+                            <Setter.Value>
+                                <ControlTemplate>
+                                    <DockPanel LastChildFill="True">
+                                        <Popup Placement="Bottom" IsOpen="True" StaysOpen="True" AllowsTransparency="True" Opacity="0">
+                                            <Border CornerRadius="7" DockPanel.Dock="Bottom"  HorizontalAlignment="Right" VerticalAlignment="Top" Padding="5" BorderThickness="3,3,3,3" MinWidth="120">
+                                                <Border.Background>
+                                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                        <GradientStop Color="#CF181818" Offset="0"/>
+                                                        <GradientStop Color="#BE1C1C1C" Offset="1"/>
+                                                    </LinearGradientBrush>
+                                                </Border.Background>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="0.1*" />
+                                                        <ColumnDefinition Width="0.9*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="Auto"/>
+                                                        <RowDefinition Height="Auto"/>
+                                                    </Grid.RowDefinitions>
+                                                    <Image Source="/BrokenRailMonitorViaWiFi;component/Resources/small_info_icon.png" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="3" Width="33" Stretch="Uniform"/>
+                                                    <TextBlock FontFamily="Tahoma" Grid.Row="0" Grid.Column="1" FontSize="13" Text="提示：" Foreground="#5095D6" />
+                                                    <TextBlock Grid.Row="1" Grid.Column="1" Foreground="Red" FontSize="11pt" HorizontalAlignment="Right"
+                                                       Text="{Binding ElementName=MyAdorner, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}">
+                                                    </TextBlock>
+                                                </Grid>
+                                            </Border>
+                                        </Popup>
+                                        <Border BorderBrush="Red" BorderThickness="1" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                            <AdornedElementPlaceholder Name="MyAdorner" />
+                                        </Border>
+                                    </DockPanel>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <!--速度出错 显示框 end-->
         </ResourceDictionary>
     </Application.Resources>
 </Application>
