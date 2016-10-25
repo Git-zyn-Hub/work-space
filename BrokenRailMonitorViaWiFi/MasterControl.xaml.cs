@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BrokenRailMonitorViaWiFi.Windows;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO.Ports;
@@ -266,6 +267,38 @@ namespace BrokenRailMonitorViaWiFi
                 byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf4,
                     new byte[4] { (byte)newSignalSendConfigWin.SendInterval,(byte)newSignalSendConfigWin.SendTimeOpportunity,
                                       (byte)newSignalSendConfigWin.NeighbourSmallOpportunity,(byte)newSignalSendConfigWin.NeighbourBigOpportunity  });
+                Socket socketGet = GetNearest4GTerminalSocket(true);
+                if (socketGet != null)
+                {
+                    socketGet.Send(sendData, SocketFlags.None);
+                }
+                else
+                {
+                    MessageBox.Show(Find4GErrorMsg);
+                }
+            }
+            catch (Exception ee)
+            {
+                MessageBox.Show(ee.Message);
+            }
+        }
+
+        private void miThresholdSetting_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ThresholdSettingWindow newThresholdSettingWin = new ThresholdSettingWindow();
+
+                if (_mainWin != null)
+                {
+                    newThresholdSettingWin.Owner = _mainWin;
+                }
+                if (!newThresholdSettingWin.ShowDialog().Value)
+                {
+                    return;
+                }
+                byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf2,
+                    new byte[2] { (byte)newThresholdSettingWin.ThresholdRail1, (byte)newThresholdSettingWin.ThresholdRail2 });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
                 {
