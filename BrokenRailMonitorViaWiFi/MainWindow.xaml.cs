@@ -277,6 +277,7 @@ namespace BrokenRailMonitorViaWiFi
                 Socket socket = oSocket as Socket;
                 if (socket != null)
                 {
+                    int accumulateNumber = 0;
                     while (true)
                     {
                         byte[] receivedBytes = new byte[2048];
@@ -290,13 +291,7 @@ namespace BrokenRailMonitorViaWiFi
                                 MessageBox.Show("与" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！");
                                 try
                                 {
-                                    _socketListeningThread.Abort();
-                                    _socketMain.Close();
-                                    _socketAcceptThread.Abort();
-                                    CloseAcceptSocket();
-                                    _socketMain = null;
-                                    this.miConnect.Header = "连接";
-                                    this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
+                                    socketDisconnect();
                                 }
                                 catch (Exception ee)
                                 {
@@ -343,18 +338,47 @@ namespace BrokenRailMonitorViaWiFi
                         {
                             actualReceive[i] = receivedBytes[i];
                         }
+                        //V519发满1024字节之后会截断一下，在下一个1024字节继续发送
+                        //long beforePlusRemainder = accumulateNumber % 1024;
+                        accumulateNumber += numBytes;
+                        int afterPlusRemainder = accumulateNumber % 1024;
+                        if (afterPlusRemainder == 0)
+                        {
+                            //等于0的时候说明接收的字段跨过1024字节，再收一组数据。
+                            //有一种特殊情况，就是收到1024字节的时候正好是一整包，这样进入判断的话就会将两个本来就应该分开的包连起来，这种情况没有处理。
+                            accumulateNumber = 0;
+                            receivedBytes = new byte[2048];
+                            numBytes = socket.Receive(receivedBytes, SocketFlags.None);
+                            accumulateNumber += numBytes;
+                            byte[] secondReceive = new byte[numBytes];
+                            for (int i = 0; i < numBytes; i++)
+                            {
+                                secondReceive[i] = receivedBytes[i];
+                            }
+                            byte[] sumReceive = new byte[actualReceive.Length + numBytes];
+                            actualReceive.CopyTo(sumReceive, 0);
+                            secondReceive.CopyTo(sumReceive, actualReceive.Length);
+                            actualReceive = new byte[sumReceive.Length];
+                            sumReceive.CopyTo(actualReceive, 0);
+                            this.Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                this.dataShowUserCtrl.AddShowData("跨越1024字节处理！", DataLevel.Warning);
+                            }));
+                        }
+
                         byte[] packageUnhandled = new byte[0];
 
                         handlePackage: ASCIIEncoding encoding = new ASCIIEncoding();
                         string strReceive = encoding.GetString(actualReceive);
-                        if (strReceive.Length > 2)
+                        if (strReceive.Length > 5)
                         {
                             string strReceiveFirst3Letter = strReceive.Substring(0, 3);
-                            if (strReceive == "Client \"Wifi-Module[1]\"")
+                            string strReceiveFirst6Letter = strReceive.Substring(0, 6);
+                            if (strReceiveFirst6Letter == "Client")
                             {
                                 this.Dispatcher.BeginInvoke(new Action(() =>
                                 {
-                                    this.dataShowUserCtrl.AddShowData("收到Client \"Wifi-Module[1]\"", DataLevel.Default);
+                                    this.dataShowUserCtrl.AddShowData("收到" + socket.RemoteEndPoint.ToString() + "->  " + strReceive, DataLevel.Default);
                                 }));
                                 continue;
                             }
@@ -988,6 +1012,13 @@ namespace BrokenRailMonitorViaWiFi
                                 goto handlePackage;
                             }
                         }
+                        else
+                        {
+                            this.Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                this.dataShowUserCtrl.AddShowData("接收数据长度小于6  " + strReceive, DataLevel.Warning);
+                            }));
+                        }
                     }
                 }
             }
@@ -997,6 +1028,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             catch (Exception ee)
             {
+                socketDisconnect();
                 MessageBox.Show("Socket监听线程异常：" + ee.Message);
             }
         }
@@ -1108,7 +1140,7 @@ namespace BrokenRailMonitorViaWiFi
                 {
                     _acceptSocket = _socketMain.Accept();
 
-                    receiveAndAddTerminal(_acceptSocket);
+                    //receiveAndAddTerminal(_acceptSocket);
                     this.Dispatcher.BeginInvoke(new Action(() =>
                     {
                         this.miConnect.Header = "已连接";
@@ -1199,6 +1231,17 @@ namespace BrokenRailMonitorViaWiFi
                 _acceptSocket.Shutdown(SocketShutdown.Both);
                 _acceptSocket.Close();
             }
+        }
+
+        private void socketDisconnect()
+        {
+            _socketListeningThread.Abort();
+            _socketMain.Close();
+            _socketAcceptThread.Abort();
+            CloseAcceptSocket();
+            _socketMain = null;
+            this.miConnect.Header = "连接";
+            this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
         }
         //private void miRailInitial_Click(object sender, RoutedEventArgs e)
         //{
