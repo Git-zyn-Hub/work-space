@@ -27,6 +27,8 @@ namespace BrokenRailMonitorViaWiFi
         private int[] _rail1Temprature;
         private int[] _rail2Temprature;
         private int[] _terminalTemprature;
+        private int[] _rail1ThisAmplitude;
+        private int[] _rail2ThisAmplitude;
         private int[] _rail1Stress;
         private int[] _rail2Stress;
         private List<int[]> _rail1LeftSigAmpList;
@@ -136,6 +138,8 @@ namespace BrokenRailMonitorViaWiFi
                 _rail1Temprature = new int[nodeCount];
                 _rail2Temprature = new int[nodeCount];
                 _terminalTemprature = new int[nodeCount];
+                _rail1ThisAmplitude = new int[nodeCount];
+                _rail2ThisAmplitude = new int[nodeCount];
                 _rail1Stress = new int[nodeCount];
                 _rail2Stress = new int[nodeCount];
                 _rail1LeftSigAmpList = new List<int[]>();
@@ -185,6 +189,16 @@ namespace BrokenRailMonitorViaWiFi
                     {
                         _rail2Temprature[i] = -(_rail2Temprature[i] & 0x7f);
                     }
+
+                    XmlNode rail1ThisAmpNode = node.SelectSingleNode("Rail1/ThisAmplitude");
+                    string innerTextRail1ThisAmp = rail1ThisAmpNode.InnerText.Trim();
+                    string[] rail1ThisAmp = innerTextRail1ThisAmp.Split('-');
+                    _rail1ThisAmplitude[i] = ((Convert.ToInt32(rail1ThisAmp[0])) << 8) + Convert.ToInt32(rail1ThisAmp[1]);
+
+                    XmlNode rail2ThisAmpNode = node.SelectSingleNode("Rail2/ThisAmplitude");
+                    string innerTextRail2ThisAmp = rail2ThisAmpNode.InnerText.Trim();
+                    string[] rail2ThisAmp = innerTextRail2ThisAmp.Split('-');
+                    _rail2ThisAmplitude[i] = ((Convert.ToInt32(rail2ThisAmp[0])) << 8) + Convert.ToInt32(rail2ThisAmp[1]);
 
                     XmlNode stress1Node = node.SelectSingleNode("Rail1/Stress");
                     string innerTextStress1 = stress1Node.InnerText.Trim();
@@ -331,7 +345,7 @@ namespace BrokenRailMonitorViaWiFi
 
                 }
                 chartTemprature.Series.Add(dataSeries);
-                
+
                 dataSeries = new DataSeries();
                 dataSeries.LegendText = "终端温度";
                 dataSeries.RenderAs = RenderAs.Line;
@@ -346,7 +360,7 @@ namespace BrokenRailMonitorViaWiFi
                     dataSeries.DataPoints.Add(dataPoint1);
                 }
                 chartTemprature.Series.Add(dataSeries);
-                
+
                 dataSeries = new DataSeries();
                 dataSeries.LegendText = "轨2温度";
                 dataSeries.RenderAs = RenderAs.Line;
@@ -361,6 +375,36 @@ namespace BrokenRailMonitorViaWiFi
                     dataSeries.DataPoints.Add(dataPoint2);
                 }
                 chartTemprature.Series.Add(dataSeries);
+
+                chartRail1ThisAmplitude.Series.Clear();
+                dataSeries = new DataSeries();
+                dataSeries.RenderAs = RenderAs.Line;
+                dataSeries.MarkerEnabled = false;
+                dataSeries.XValueType = ChartValueTypes.DateTime;
+                DataPoint dpRail1ThisAmplitude;
+                for (int k = 0; k < nodeCount; k++)
+                {
+                    dpRail1ThisAmplitude = new DataPoint();
+                    dpRail1ThisAmplitude.XValue = _dateTimeList[k];
+                    dpRail1ThisAmplitude.YValue = _rail1ThisAmplitude[k];
+                    dataSeries.DataPoints.Add(dpRail1ThisAmplitude);
+                }
+                chartRail1ThisAmplitude.Series.Add(dataSeries);
+
+                chartRail2ThisAmplitude.Series.Clear();
+                dataSeries = new DataSeries();
+                dataSeries.RenderAs = RenderAs.Line;
+                dataSeries.MarkerEnabled = false;
+                dataSeries.XValueType = ChartValueTypes.DateTime;
+                DataPoint dpRail2ThisAmplitude;
+                for (int k = 0; k < nodeCount; k++)
+                {
+                    dpRail2ThisAmplitude = new DataPoint();
+                    dpRail2ThisAmplitude.XValue = _dateTimeList[k];
+                    dpRail2ThisAmplitude.YValue = _rail2ThisAmplitude[k];
+                    dataSeries.DataPoints.Add(dpRail2ThisAmplitude);
+                }
+                chartRail2ThisAmplitude.Series.Add(dataSeries);
 
                 chartRail1Stress.Series.Clear();
                 dataSeries = new DataSeries();
