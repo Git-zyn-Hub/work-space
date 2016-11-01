@@ -135,6 +135,7 @@ namespace BrokenRailMonitorViaWiFi
                 XmlNodeList xn0 = xmlDoc.SelectSingleNode("Datas").ChildNodes;
 
                 int nodeCount = xn0.Count;
+                _dateTimeList.Clear();
                 _rail1Temprature = new int[nodeCount];
                 _rail2Temprature = new int[nodeCount];
                 _terminalTemprature = new int[nodeCount];
