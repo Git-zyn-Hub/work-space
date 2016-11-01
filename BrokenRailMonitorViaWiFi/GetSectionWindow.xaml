@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
         mc:Ignorable="d"
         x:Name="getSectionWin"
+        Loaded="getSectionWin_Loaded"
         Title="获取铁轨段" Height="176.705" Width="339.858" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
     <Grid>
         <Grid.RowDefinitions>
@@ -14,7 +15,8 @@
         </Grid.RowDefinitions>
         <WrapPanel VerticalAlignment="Center">
             <Label>获取从</Label>
-            <TextBox x:Name="txtTerminalSmall" VerticalContentAlignment="Center" Width="30" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+            <TextBox x:Name="txtTerminalSmall" VerticalContentAlignment="Center" Width="30" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" 
+                     GotFocus="txtTerminalSmall_GotFocus" Style="{DynamicResource ErrorInputStyle}">
                 <Binding Path="TerminalSmall" ElementName="getSectionWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
                         <local:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
@@ -22,7 +24,8 @@
                 </Binding>
             </TextBox>
             <Label>号终端到</Label>
-            <TextBox x:Name="txtTerminalBig" VerticalContentAlignment="Center" Width="30" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+            <TextBox x:Name="txtTerminalBig" VerticalContentAlignment="Center" Width="30" KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" 
+                     GotFocus="txtTerminalBig_GotFocus" Style="{DynamicResource ErrorInputStyle}">
                 <Binding Path="TerminalBig" ElementName="getSectionWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
                         <local:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />

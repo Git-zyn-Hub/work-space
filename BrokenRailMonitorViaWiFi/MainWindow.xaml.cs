@@ -42,7 +42,7 @@ namespace BrokenRailMonitorViaWiFi
         private List<MasterControl> _masterControlList = new List<MasterControl>();
         private List<Rail> _rail1List = new List<Rail>();
         private List<Rail> _rail2List = new List<Rail>();
-        private DispatcherTimer _getAllRailInfoTimer = new DispatcherTimer();
+        //private DispatcherTimer _getAllRailInfoTimer = new DispatcherTimer();
         private DispatcherTimer _waitReceiveTimer = new DispatcherTimer();
         private DispatcherTimer _multicastWaitReceiveTimer = new DispatcherTimer();
         private int _packageCount = 0;
@@ -542,18 +542,18 @@ namespace BrokenRailMonitorViaWiFi
                                                 case 0x52:
                                                     this.dataShowUserCtrl.AddShowData("实时时钟配置指令，4G终端已接收！", DataLevel.Normal);
                                                     break;
-                                                case 0xf3:
-                                                    this.dataShowUserCtrl.AddShowData("超声信号发射通报指令，4G终端已接收！", DataLevel.Normal);
-                                                    break;
+                                                //case 0xf3:
+                                                //    this.dataShowUserCtrl.AddShowData("超声信号发射通报指令，4G终端已接收！", DataLevel.Normal);
+                                                //    break;
                                                 case 0xf4:
                                                     this.dataShowUserCtrl.AddShowData("超声信号发射配置指令，4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 case 0xf5:
                                                     this.dataShowUserCtrl.AddShowData("获取单点铁轨信息指令，4G终端已接收！", DataLevel.Normal);
                                                     break;
-                                                case 0x56:
-                                                    this.dataShowUserCtrl.AddShowData("获取所有终端铁轨信息指令，4G终端已接收！", DataLevel.Normal);
-                                                    break;
+                                                //case 0x56:
+                                                //    this.dataShowUserCtrl.AddShowData("获取所有终端铁轨信息指令，4G终端已接收！", DataLevel.Normal);
+                                                //    break;
                                                 case 0x55:
                                                     this.dataShowUserCtrl.AddShowData("获取某段铁轨信息，4G终端已接收！", DataLevel.Normal);
                                                     break;

@@ -69,41 +69,53 @@ namespace BrokenRailMonitorViaWiFi
         public GetSectionWindow()
         {
             InitializeComponent();
-            //if (File.Exists("remember.xml"))
-            //{
-            //    XmlDocument xmlDoc = new XmlDocument();
-            //    xmlDoc.Load("remember.xml");
+            if (File.Exists("remember.xml"))
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load("remember.xml");
 
-            //    XmlNode nodeAimFrameNo8Way = xmlDoc.SelectSingleNode("config/AimFrameNo8Way");
-            //    if (nodeAimFrameNo8Way != null)
-            //    {
-            //        XmlElement xe = (XmlElement)nodeAimFrameNo8Way;//将子节点类型转换为XmlElement类型
-            //        this.txtAimFrameNo.Text = xe.GetAttribute("Value");
-            //    }
-            //    else
-            //    {
-            //        XmlNode xn1 = xmlDoc.SelectSingleNode("config");
-            //        XmlElement xe2 = xmlDoc.CreateElement("AimFrameNo8Way");//创建一个<AimFrameNo8Way>节点
-            //        xe2.SetAttribute("Value", this.txtAimFrameNo.Text);//设置该节点Value属性
-            //        xn1.AppendChild(xe2);
-            //    }
-            //    xmlDoc.Save("config.xml");
-            //}
-            //else
-            //{
-            //    XmlTextWriter writer = new XmlTextWriter("remember.xml", null);
-            //    writer.Formatting = Formatting.Indented;
-            //    writer.WriteStartDocument();
-            //    writer.WriteStartElement("config");
-            //    writer.WriteStartElement("AimFrameNo8Way");
-            //    writer.WriteAttributeString("Value", this.txtAimFrameNo.Text);
+                XmlNode nodeTerminalSmall = xmlDoc.SelectSingleNode("config/GetSectionTerminalSmall");
+                if (nodeTerminalSmall != null)
+                {
+                    this.txtTerminalSmall.Text = nodeTerminalSmall.InnerText.Trim();
+                }
+                else
+                {
+                    XmlNode xn1 = xmlDoc.SelectSingleNode("config");
+                    XmlElement xe2 = xmlDoc.CreateElement("GetSectionTerminalSmall");//创建一个<AimFrameNo8Way>节点
+                    xe2.InnerText = this.txtTerminalSmall.Text;
+                    xn1.AppendChild(xe2);
+                }
 
-            //    writer.WriteEndElement();
-            //    writer.WriteEndElement();
-            //    writer.WriteEndDocument();
-            //    writer.Flush();
-            //    writer.Close();
-            //}
+                XmlNode nodeTerminalBig = xmlDoc.SelectSingleNode("config/GetSectionTerminalBig");
+                if (nodeTerminalBig != null)
+                {
+                    this.txtTerminalBig.Text = nodeTerminalBig.InnerText.Trim();
+                }
+                else
+                {
+                    XmlNode xn1 = xmlDoc.SelectSingleNode("config");
+                    XmlElement xe2 = xmlDoc.CreateElement("GetSectionTerminalBig");//创建一个<AimFrameNo8Way>节点
+                    xe2.InnerText = this.txtTerminalBig.Text;
+                    xn1.AppendChild(xe2);
+                }
+                xmlDoc.Save("remember.xml");
+            }
+            else
+            {
+                XmlTextWriter writer = new XmlTextWriter("remember.xml", null);
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartDocument();
+                writer.WriteStartElement("config");
+                writer.WriteStartElement("GetSectionTerminalSmall");
+                writer.WriteEndElement();
+                writer.WriteStartElement("GetSectionTerminalBig");
+                writer.WriteEndElement();
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+                writer.Flush();
+                writer.Close();
+            }
         }
 
         private void btnEnter_Click(object sender, RoutedEventArgs e)
@@ -172,6 +184,22 @@ namespace BrokenRailMonitorViaWiFi
                     return;
                 }
             }
+            if (File.Exists("remember.xml"))
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load("remember.xml");
+                XmlNode nodeTerminalSmall = xmlDoc.SelectSingleNode("config/GetSectionTerminalSmall");
+                if (nodeTerminalSmall != null)
+                {
+                    nodeTerminalSmall.InnerText = this.txtTerminalSmall.Text;
+                }
+                XmlNode nodeTerminalBig = xmlDoc.SelectSingleNode("config/GetSectionTerminalBig");
+                if (nodeTerminalBig != null)
+                {
+                    nodeTerminalBig.InnerText = this.txtTerminalBig.Text;
+                }
+                xmlDoc.Save("remember.xml");
+            }
             this.DialogResult = true;
             this.Close();
         }
@@ -230,6 +258,21 @@ namespace BrokenRailMonitorViaWiFi
                 MessageBox.Show(ee.Message);
                 throw;
             }
+        }
+
+        private void txtTerminalSmall_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.txtTerminalSmall.SelectAll();
+        }
+
+        private void txtTerminalBig_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.txtTerminalBig.SelectAll();
+        }
+
+        private void getSectionWin_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.txtTerminalSmall.Focus();
         }
     }
 }
