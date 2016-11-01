@@ -124,7 +124,7 @@
                     <chart:Title Text="轨1左信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="4300000000"  Interval="400000000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="430000000"  Interval="40000000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
@@ -139,7 +139,7 @@
                     <chart:Title Text="轨1右信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="4300000000"  Interval="400000000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="430000000"  Interval="40000000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
@@ -154,7 +154,7 @@
                     <chart:Title Text="轨2左信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="4300000000"  Interval="400000000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="430000000"  Interval="40000000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
@@ -169,7 +169,7 @@
                     <chart:Title Text="轨2右信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="4300000000"  Interval="400000000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="430000000"  Interval="40000000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>

@@ -104,8 +104,8 @@ namespace BrokenRailMonitorViaWiFi
         public MainWindow()
         {
             InitializeComponent();
-            _getAllRailInfoTimer.Tick += getAllRailInfoTimer_Tick;
-            _getAllRailInfoTimer.Interval = new TimeSpan(0, 0, 20);
+            //_getAllRailInfoTimer.Tick += getAllRailInfoTimer_Tick;
+            //_getAllRailInfoTimer.Interval = new TimeSpan(0, 0, 20);
 
             WaitReceiveTimer.Tick += WaitReceiveTimer_Tick;
             WaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
@@ -1282,15 +1282,51 @@ namespace BrokenRailMonitorViaWiFi
 
         private void miGetAllRailInfo_Click(object sender, RoutedEventArgs e)
         {
-            if (_getAllRailInfoTimer.IsEnabled)
+            //if (_getAllRailInfoTimer.IsEnabled)
+            //{
+            //    _getAllRailInfoTimer.Stop();
+            //    this.miGetAllRailInfo.Header = "获取所有终端铁轨信息";
+            //}
+            //else
+            //{
+            //    _getAllRailInfoTimer.Start();
+            //    this.miGetAllRailInfo.Header = "停止获取所有终端铁轨信息";
+            //}
+            try
             {
-                _getAllRailInfoTimer.Stop();
-                this.miGetAllRailInfo.Header = "获取所有终端铁轨信息";
+                if (_4GPointIndex.Count == 0)
+                {
+                    MessageBox.Show("系统中不包含4G点，请检查config文档！");
+                }
+                else
+                {
+                    for (int i = 0; i < _4GPointIndex.Count; i++)
+                    {
+                        Socket socket = this.MasterControlList[_4GPointIndex[i]].GetNearest4GTerminalSocket(true);
+                        byte[] sendData;
+                        if (i == _4GPointIndex.Count - 1)
+                        {
+                            //获取从1到ff的广播数据，当循环到最后一个的时候，目的地址不再是4G点的前一个终端，而是整个终端列表中的最后一个终端。
+                            sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[this.MasterControlList.Count - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, 0 });
+                        }
+                        else
+                        {
+                            sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[_4GPointIndex[i + 1] - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, 0 });
+                        }
+                        if (socket != null)
+                        {
+                            socket.Send(sendData, SocketFlags.None);
+                        }
+                        else
+                        {
+                            MessageBox.Show(this.MasterControlList[_4GPointIndex[i]].Find4GErrorMsg, "来自终端" + this.MasterControlList[_4GPointIndex[i]].TerminalNumber + "的消息：");
+                        }
+                    }
+                }
             }
-            else
+            catch (Exception ee)
             {
-                _getAllRailInfoTimer.Start();
-                this.miGetAllRailInfo.Header = "停止获取所有终端铁轨信息";
+                MessageBox.Show(ee.Message);
             }
         }
         private void getAllRailInfoTimer_Tick(object sender, EventArgs e)
