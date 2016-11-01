@@ -315,8 +315,9 @@ namespace BrokenRailMonitorViaWiFi
                     i++;
                 }
 
-                chartRail1Temprature.Series.Clear();
+                chartTemprature.Series.Clear();
                 DataSeries dataSeries = new DataSeries();
+                dataSeries.LegendText = "轨1温度";
                 dataSeries.RenderAs = RenderAs.Line;
                 dataSeries.XValueType = ChartValueTypes.DateTime;
                 DataPoint dataPoint;
@@ -325,13 +326,14 @@ namespace BrokenRailMonitorViaWiFi
                     dataPoint = new DataPoint();
                     dataPoint.XValue = _dateTimeList[k];
                     dataPoint.YValue = _rail1Temprature[k];
-                    dataPoint.MarkerSize = 8;
+                    dataPoint.MarkerEnabled = false;
                     dataSeries.DataPoints.Add(dataPoint);
-                }
-                chartRail1Temprature.Series.Add(dataSeries);
 
-                chartTerminalTemprature.Series.Clear();
+                }
+                chartTemprature.Series.Add(dataSeries);
+                
                 dataSeries = new DataSeries();
+                dataSeries.LegendText = "终端温度";
                 dataSeries.RenderAs = RenderAs.Line;
                 dataSeries.XValueType = ChartValueTypes.DateTime;
                 DataPoint dataPoint1;
@@ -340,13 +342,13 @@ namespace BrokenRailMonitorViaWiFi
                     dataPoint1 = new DataPoint();
                     dataPoint1.XValue = _dateTimeList[k];
                     dataPoint1.YValue = _terminalTemprature[k];
-                    dataPoint1.MarkerSize = 8;
+                    dataPoint1.MarkerEnabled = false;
                     dataSeries.DataPoints.Add(dataPoint1);
                 }
-                chartTerminalTemprature.Series.Add(dataSeries);
-
-                chartRail2Temprature.Series.Clear();
+                chartTemprature.Series.Add(dataSeries);
+                
                 dataSeries = new DataSeries();
+                dataSeries.LegendText = "轨2温度";
                 dataSeries.RenderAs = RenderAs.Line;
                 dataSeries.XValueType = ChartValueTypes.DateTime;
                 DataPoint dataPoint2;
@@ -355,10 +357,10 @@ namespace BrokenRailMonitorViaWiFi
                     dataPoint2 = new DataPoint();
                     dataPoint2.XValue = _dateTimeList[k];
                     dataPoint2.YValue = _rail2Temprature[k];
-                    dataPoint2.MarkerSize = 8;
+                    dataPoint2.MarkerEnabled = false;
                     dataSeries.DataPoints.Add(dataPoint2);
                 }
-                chartRail2Temprature.Series.Add(dataSeries);
+                chartTemprature.Series.Add(dataSeries);
 
                 chartRail1Stress.Series.Clear();
                 dataSeries = new DataSeries();
@@ -370,7 +372,7 @@ namespace BrokenRailMonitorViaWiFi
                     dataPointStress1 = new DataPoint();
                     dataPointStress1.XValue = _dateTimeList[k];
                     dataPointStress1.YValue = _rail1Stress[k];
-                    dataPointStress1.MarkerSize = 8;
+                    dataPointStress1.MarkerEnabled = false;
                     dataSeries.DataPoints.Add(dataPointStress1);
                 }
                 chartRail1Stress.Series.Add(dataSeries);
@@ -385,7 +387,7 @@ namespace BrokenRailMonitorViaWiFi
                     dataPointStress2 = new DataPoint();
                     dataPointStress2.XValue = _dateTimeList[k];
                     dataPointStress2.YValue = _rail2Stress[k];
-                    dataPointStress2.MarkerSize = 8;
+                    dataPointStress2.MarkerEnabled = false;
                     dataSeries.DataPoints.Add(dataPointStress2);
                 }
                 chartRail2Stress.Series.Add(dataSeries);
@@ -402,7 +404,7 @@ namespace BrokenRailMonitorViaWiFi
                         dPRail1LeftSigAmp = new DataPoint();
                         dPRail1LeftSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
                         dPRail1LeftSigAmp.YValue = _rail1LeftSigAmpList[j][k];
-                        dPRail1LeftSigAmp.MarkerSize = 8;
+                        dPRail1LeftSigAmp.MarkerEnabled = false;
                         dataSeries.DataPoints.Add(dPRail1LeftSigAmp);
                     }
                 }
@@ -420,7 +422,7 @@ namespace BrokenRailMonitorViaWiFi
                         dPRail1RightSigAmp = new DataPoint();
                         dPRail1RightSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
                         dPRail1RightSigAmp.YValue = _rail1RightSigAmpList[j][k];
-                        dPRail1RightSigAmp.MarkerSize = 8;
+                        dPRail1RightSigAmp.MarkerEnabled = false;
                         dataSeries.DataPoints.Add(dPRail1RightSigAmp);
                     }
                 }
@@ -438,7 +440,7 @@ namespace BrokenRailMonitorViaWiFi
                         dPRail2LeftSigAmp = new DataPoint();
                         dPRail2LeftSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
                         dPRail2LeftSigAmp.YValue = _rail2LeftSigAmpList[j][k];
-                        dPRail2LeftSigAmp.MarkerSize = 8;
+                        dPRail2LeftSigAmp.MarkerEnabled = false;
                         dataSeries.DataPoints.Add(dPRail2LeftSigAmp);
                     }
                 }
@@ -456,7 +458,7 @@ namespace BrokenRailMonitorViaWiFi
                         dPRail2RightSigAmp = new DataPoint();
                         dPRail2RightSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
                         dPRail2RightSigAmp.YValue = _rail2RightSigAmpList[j][k];
-                        dPRail2RightSigAmp.MarkerSize = 8;
+                        dPRail2RightSigAmp.MarkerEnabled = false;
                         dataSeries.DataPoints.Add(dPRail2RightSigAmp);
                     }
                 }
@@ -482,6 +484,20 @@ namespace BrokenRailMonitorViaWiFi
             //lineChart.HideIndicator();
             //root.Children.RemoveAt(10);
         }
+        private void chartTemprature_Rendered(object sender, EventArgs e)
+        {
+            var c = sender as Chart;
+            var legend = c.Legends[0];
+            var root = legend.Parent as Grid;
+            //移除水印
+            if (root != null)
+            {
+                root.Children.RemoveAt(11);
+            }
+
+            //lineChart.HideIndicator();
+            //root.Children.RemoveAt(10);
+        }
 
         private void Window_Closed(object sender, EventArgs e)
         {
@@ -492,9 +508,9 @@ namespace BrokenRailMonitorViaWiFi
         {
             if (_charts.Count == 0)
             {
-                _charts.Add(chartRail1Temprature);
-                _charts.Add(chartTerminalTemprature);
-                _charts.Add(chartRail2Temprature);
+                _charts.Add(chartTemprature);
+                _charts.Add(chartRail1ThisAmplitude);
+                _charts.Add(chartRail2ThisAmplitude);
                 _charts.Add(chartRail1Stress);
                 _charts.Add(chartRail2Stress);
                 _charts.Add(chartRail1LeftSignalAmplitude);
@@ -518,8 +534,8 @@ namespace BrokenRailMonitorViaWiFi
                 MessageBox.Show("没有图表被选中！");
                 return;
             }
-            _originChartWidth = chartRail1Temprature.ActualWidth;
-            _originChartHeight = chartRail1Temprature.ActualHeight;
+            _originChartWidth = chartTemprature.ActualWidth;
+            _originChartHeight = chartTemprature.ActualHeight;
             this.gridChart.Children.Clear();
             _fullScreenWin = new FullScreenChartWindow();
             _fullScreenWin.Closed += fullScreenWin_Closed;

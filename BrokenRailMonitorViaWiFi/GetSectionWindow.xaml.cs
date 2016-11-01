@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Xml;
 
 namespace BrokenRailMonitorViaWiFi
 {
@@ -67,6 +69,41 @@ namespace BrokenRailMonitorViaWiFi
         public GetSectionWindow()
         {
             InitializeComponent();
+            //if (File.Exists("remember.xml"))
+            //{
+            //    XmlDocument xmlDoc = new XmlDocument();
+            //    xmlDoc.Load("remember.xml");
+
+            //    XmlNode nodeAimFrameNo8Way = xmlDoc.SelectSingleNode("config/AimFrameNo8Way");
+            //    if (nodeAimFrameNo8Way != null)
+            //    {
+            //        XmlElement xe = (XmlElement)nodeAimFrameNo8Way;//将子节点类型转换为XmlElement类型
+            //        this.txtAimFrameNo.Text = xe.GetAttribute("Value");
+            //    }
+            //    else
+            //    {
+            //        XmlNode xn1 = xmlDoc.SelectSingleNode("config");
+            //        XmlElement xe2 = xmlDoc.CreateElement("AimFrameNo8Way");//创建一个<AimFrameNo8Way>节点
+            //        xe2.SetAttribute("Value", this.txtAimFrameNo.Text);//设置该节点Value属性
+            //        xn1.AppendChild(xe2);
+            //    }
+            //    xmlDoc.Save("config.xml");
+            //}
+            //else
+            //{
+            //    XmlTextWriter writer = new XmlTextWriter("remember.xml", null);
+            //    writer.Formatting = Formatting.Indented;
+            //    writer.WriteStartDocument();
+            //    writer.WriteStartElement("config");
+            //    writer.WriteStartElement("AimFrameNo8Way");
+            //    writer.WriteAttributeString("Value", this.txtAimFrameNo.Text);
+
+            //    writer.WriteEndElement();
+            //    writer.WriteEndElement();
+            //    writer.WriteEndDocument();
+            //    writer.Flush();
+            //    writer.Close();
+            //}
         }
 
         private void btnEnter_Click(object sender, RoutedEventArgs e)
