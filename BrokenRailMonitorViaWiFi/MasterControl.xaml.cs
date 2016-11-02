@@ -161,6 +161,11 @@ namespace BrokenRailMonitorViaWiFi
         {
             try
             {
+                if (_mainWin != null)
+                {
+                    _mainWin.WaitingRingEnable();
+                    _mainWin.WaitReceiveTimer.Start();
+                }
                 byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf5, new byte[2] { 0, 0 });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
@@ -170,6 +175,11 @@ namespace BrokenRailMonitorViaWiFi
                 }
                 else
                 {
+                    if (_mainWin != null)
+                    {
+                        _mainWin.WaitingRingDisable();
+                        _mainWin.WaitReceiveTimer.Stop();
+                    }
                     MessageBox.Show(Find4GErrorMsg);
                 }
             }

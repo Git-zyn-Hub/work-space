@@ -632,6 +632,11 @@ namespace BrokenRailMonitorViaWiFi
                                         break;
                                     case 0xf5:
                                         {
+                                            this.Dispatcher.Invoke(new Action(() =>
+                                            {
+                                                this.WaitReceiveTimer.Stop();
+                                                this.WaitingRingDisable();
+                                            }));
                                             checkDirectory();
                                             initialFileConfig(actualReceive[7]);
                                             string fileName = System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName + @"\DataTerminal" + actualReceive[7].ToString("D3") + ".xml";
@@ -1048,7 +1053,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             catch (Exception ee)
             {
-                socketDisconnect();
+                //socketDisconnect();
                 MessageBox.Show("Socket监听线程异常：" + ee.Message);
             }
         }
@@ -1270,8 +1275,11 @@ namespace BrokenRailMonitorViaWiFi
             _socketAcceptThread.Abort();
             CloseAcceptSocket();
             _socketMain = null;
-            this.miConnect.Header = "连接";
-            this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                this.miConnect.Header = "连接";
+                this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
+            }));
         }
         //private void miRailInitial_Click(object sender, RoutedEventArgs e)
         //{
@@ -1331,8 +1339,14 @@ namespace BrokenRailMonitorViaWiFi
         {
             try
             {
+                this.WaitingRingEnable();
+                this.WaitReceiveTimer.Start();
+
                 if (_4GPointIndex.Count == 0)
                 {
+                    this.WaitingRingDisable();
+                    this.WaitReceiveTimer.Stop();
+
                     MessageBox.Show("系统中不包含4G点，请检查config文档！");
                     _getAllRailInfoTimer.Stop();
                     this.miGetAllRailInfo.Header = "获取所有终端铁轨信息";
@@ -1359,6 +1373,9 @@ namespace BrokenRailMonitorViaWiFi
                         }
                         else
                         {
+                            this.WaitingRingDisable();
+                            this.WaitReceiveTimer.Stop();
+
                             MessageBox.Show(this.MasterControlList[_4GPointIndex[i]].Find4GErrorMsg, "来自终端" + this.MasterControlList[_4GPointIndex[i]].TerminalNumber + "的消息：");
                         }
                     }
