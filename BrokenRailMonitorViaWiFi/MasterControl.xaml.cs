@@ -165,6 +165,7 @@ namespace BrokenRailMonitorViaWiFi
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
                 {
+                    _mainWin.DecideDelayOrNot();
                     socketGet.Send(sendData, SocketFlags.None);
                 }
                 else
@@ -206,6 +207,7 @@ namespace BrokenRailMonitorViaWiFi
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
                 {
+                    _mainWin.DecideDelayOrNot();
                     socketGet.Send(sendData, SocketFlags.None);
                 }
                 else
@@ -232,6 +234,7 @@ namespace BrokenRailMonitorViaWiFi
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
                 {
+                    _mainWin.DecideDelayOrNot();
                     socketGet.Send(sendData, SocketFlags.None);
                 }
                 else
@@ -270,6 +273,7 @@ namespace BrokenRailMonitorViaWiFi
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
                 {
+                    _mainWin.DecideDelayOrNot();
                     socketGet.Send(sendData, SocketFlags.None);
                 }
                 else
@@ -302,6 +306,7 @@ namespace BrokenRailMonitorViaWiFi
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
                 {
+                    _mainWin.DecideDelayOrNot();
                     socketGet.Send(sendData, SocketFlags.None);
                 }
                 else

@@ -51,6 +51,7 @@ namespace BrokenRailMonitorViaWiFi
         private List<int> _socketRegister = new List<int>();
         private List<int> _4GPointIndex = new List<int>();
         private Dictionary<int, bool> _terminalsReceiveFlag;
+        private List<int> _sendTime = new List<int>();
 
         public List<int> SocketRegister
         {
@@ -122,6 +123,7 @@ namespace BrokenRailMonitorViaWiFi
             {
                 this.MasterControlList.Clear();
                 _4GPointIndex.Clear();
+                _sendTime.Clear();
                 string fileName = System.Environment.CurrentDirectory + @"\config.xml";
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(fileName);
@@ -145,6 +147,13 @@ namespace BrokenRailMonitorViaWiFi
                     MasterControl oneMasterControl = new MasterControl(this);
                     oneMasterControl.lblNumber.Content = terminalNo;
                     this.MasterControlList.Add(oneMasterControl);
+
+                    //根据终端号计算发射占用无线串口的时机
+                    int t = 4 + (terminalNo % 5) * 15;
+                    if (!FindIntInSendTime(t))
+                    {
+                        _sendTime.Add(t);
+                    }
 
                     XmlNode is4GNode = device.SelectSingleNode("Is4G");
                     string innerTextIs4G = is4GNode.InnerText.Trim();
@@ -300,6 +309,7 @@ namespace BrokenRailMonitorViaWiFi
                                 }
                                 finally
                                 {
+                                    closeSocket();
                                     miConnect_Click(this, null);
                                 }
                                 foreach (var item in MasterControlList)
@@ -1253,6 +1263,16 @@ namespace BrokenRailMonitorViaWiFi
             this.miConnect.Header = "连接";
             this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
         }
+
+        private void closeSocket()
+        {
+            _socketMain.Close();
+            _socketAcceptThread.Abort();
+            CloseAcceptSocket();
+            _socketMain = null;
+            this.miConnect.Header = "连接";
+            this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
+        }
         //private void miRailInitial_Click(object sender, RoutedEventArgs e)
         //{
         //    try
@@ -1334,6 +1354,7 @@ namespace BrokenRailMonitorViaWiFi
                         }
                         if (socket != null)
                         {
+                            DecideDelayOrNot();
                             socket.Send(sendData, SocketFlags.None);
                         }
                         else
@@ -1420,6 +1441,7 @@ namespace BrokenRailMonitorViaWiFi
                         }
                         if (socket != null)
                         {
+                            DecideDelayOrNot();
                             socket.Send(sendData, SocketFlags.None);
                         }
                         else
@@ -1473,6 +1495,7 @@ namespace BrokenRailMonitorViaWiFi
 
                         if (socket != null)
                         {
+                            DecideDelayOrNot();
                             socket.Send(sendData, SocketFlags.None);
                         }
                         else
@@ -1501,6 +1524,7 @@ namespace BrokenRailMonitorViaWiFi
                                 }
                                 if (socket != null)
                                 {
+                                    DecideDelayOrNot();
                                     socket.Send(sendData, SocketFlags.None);
                                 }
                                 else
@@ -1530,6 +1554,7 @@ namespace BrokenRailMonitorViaWiFi
 
                             if (socket != null)
                             {
+                                DecideDelayOrNot();
                                 socket.Send(sendData, SocketFlags.None);
                             }
                             else
@@ -1627,6 +1652,30 @@ namespace BrokenRailMonitorViaWiFi
                 i++;
             }
             return -1;
+        }
+        public void DecideDelayOrNot()
+        {
+            DateTime now = System.DateTime.Now;
+            int totalSecondToNow = now.Hour * 3600 + now.Minute * 60 + now.Second;
+            int timeIn75Second = totalSecondToNow % 75;
+
+            if (FindIntInSendTime(timeIn75Second))
+            {
+                Thread.Sleep(2000);
+                this.dataShowUserCtrl.AddShowData("延时2秒发送指令！", DataLevel.Warning);
+            }
+        }
+
+        public bool FindIntInSendTime(int destInt)
+        {
+            foreach (var item in _sendTime)
+            {
+                if (item == destInt)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void WaitingRingEnable()
