@@ -711,6 +711,21 @@ namespace BrokenRailMonitorViaWiFi
                                                     xeOnOff2.InnerText = actualReceive[53].ToString();
                                                     xeStress2.InnerText = actualReceive[54].ToString() + "-" + actualReceive[55].ToString();
                                                     xeTemprature2.InnerText = actualReceive[56].ToString() + "-" + actualReceive[57].ToString();
+                                                    if (actualReceive[56] == 1)
+                                                    {
+                                                        this.Dispatcher.Invoke(new Action(() =>
+                                                        {
+                                                            this.dataShowUserCtrl.AddShowData(actualReceive[7].ToString() + "号终端收到非相邻终端发来的超声信号！", DataLevel.Warning);
+                                                        }));
+                                                    }
+                                                    else if (actualReceive[56] == 0)
+                                                    {
+
+                                                    }
+                                                    else
+                                                    {
+                                                        MessageBox.Show("'收到非相邻终端发来的超声信号'位收到未定义数据！");
+                                                    }
                                                     xeThisAmplitude2.InnerText = actualReceive[58].ToString() + "-" + actualReceive[59].ToString();
                                                     strSignalAmplitude = "";
                                                     for (int i = 60; i < 76; i++)
@@ -1261,12 +1276,12 @@ namespace BrokenRailMonitorViaWiFi
         private void socketDisconnect()
         {
             _socketListeningThread.Abort();
-            _socketMain.Close();
-            _socketAcceptThread.Abort();
-            CloseAcceptSocket();
-            _socketMain = null;
-            this.miConnect.Header = "连接";
-            this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
+            //_socketMain.Close();
+            //_socketAcceptThread.Abort();
+            //CloseAcceptSocket();
+            //_socketMain = null;
+            //this.miConnect.Header = "连接";
+            //this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
         }
 
         private void closeSocket()
@@ -1328,6 +1343,7 @@ namespace BrokenRailMonitorViaWiFi
                     {
                         _timeToWaitTimer.Stop();
                         _getAllRailInfoTimer.Start();
+                        getAllRailInfoTimer_Tick(sender, e);
                         this.miGetAllRailInfo.Header = "停止获取所有终端铁轨信息";
                     };
                     _timeToWaitTimer.Interval = new TimeSpan(0, 0, timeToSend);
