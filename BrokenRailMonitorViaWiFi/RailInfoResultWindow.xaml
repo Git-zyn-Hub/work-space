@@ -64,7 +64,7 @@
                     <chart:Title Text="轨1本端幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="65535" Interval="6000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="4096" Interval="410"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
@@ -79,7 +79,7 @@
                     <chart:Title Text="轨2本端幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="65535" Interval="6000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="4096" Interval="410"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>

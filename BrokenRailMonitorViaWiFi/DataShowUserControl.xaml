@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
              mc:Ignorable="d" 
              d:DesignHeight="100" d:DesignWidth="500">
-    <ScrollViewer x:Name="scrollViewer" VerticalScrollBarVisibility="Auto">
+    <ScrollViewer x:Name="scrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
         <StackPanel x:Name="stpContainer">
 
         </StackPanel>
