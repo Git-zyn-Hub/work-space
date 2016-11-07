@@ -29,6 +29,11 @@
                 <local:Rail x:Name="rail2Right" Margin="2,0,50,0"/>
             </StackPanel>
         </StackPanel>
+        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
+            <Label>一共</Label>
+            <TextBlock x:Name="txtDataCount" Padding="5"></TextBlock>
+            <Label>条数据</Label>
+        </StackPanel>
         <Grid x:Name="gridChart" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
@@ -124,7 +129,7 @@
                     <chart:Title Text="轨1左信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="430000000"  Interval="40000000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="100"  Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
@@ -139,7 +144,7 @@
                     <chart:Title Text="轨1右信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="430000000"  Interval="40000000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="100"  Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
@@ -154,7 +159,7 @@
                     <chart:Title Text="轨2左信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="430000000"  Interval="40000000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="100"  Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
@@ -169,7 +174,7 @@
                     <chart:Title Text="轨2右信号幅值"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="430000000"  Interval="40000000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="100"  Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>

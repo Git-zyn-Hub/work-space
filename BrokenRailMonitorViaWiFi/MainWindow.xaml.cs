@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -1636,6 +1637,69 @@ namespace BrokenRailMonitorViaWiFi
             catch (Exception ee)
             {
                 MessageBox.Show(ee.Message);
+            }
+        }
+
+        private void miViewHistory_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                DateTime now = System.DateTime.Now;
+                string directoryName = now.ToString("yyyy") + "\\" + now.ToString("yyyy-MM");
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                openFileDialog.InitialDirectory = System.Environment.CurrentDirectory + @"\DataRecord\" + directoryName;
+                openFileDialog.Filter = "xml files(*.xml)|*.xml";
+                openFileDialog.RestoreDirectory = true;
+                openFileDialog.FilterIndex = 1;
+                if (openFileDialog.ShowDialog().Value == true)
+                {
+                    try
+                    {
+                        string fName = openFileDialog.FileName;
+                        int index = fName.LastIndexOf("\\");
+                        string fileNameJudge = fName.Substring(index + 1, 12);
+                        string strTerminalNo = fName.Substring(index + 13, 3);
+                        int terminalNo = 0;
+                        if (fileNameJudge == "DataTerminal")
+                        {
+                            if (int.TryParse(strTerminalNo, out terminalNo))
+                            {
+                                RailInfoResultWindow railInfoResultWin = RailInfoResultWindow.GetInstance(terminalNo);
+                                int indexOfMaster = findMasterControlIndex(terminalNo);
+                                if (indexOfMaster == -1)
+                                {
+                                    MessageBox.Show("读取的终端号在终端集合中不存在！");
+                                    return;
+                                }
+                                else
+                                {
+                                    railInfoResultWin.MasterCtrl = this.MasterControlList[indexOfMaster];
+                                }
+                                railInfoResultWin.FileName = fName;
+                                railInfoResultWin.RefreshResult();
+                                railInfoResultWin.Show();
+                            }
+                            else
+                            {
+                                MessageBox.Show("终端号无法转换！更改文件名时请保留前15位！");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("文件名发生改变，无法获得历史数据的终端号！\r\n更改文件名时请保留前15位");
+                            return;
+                        }
+                    }
+                    catch (Exception ee)
+                    {
+                        MessageBox.Show("文件打开异常！" + ee.Message);
+                    }
+                }
+            }
+            catch (Exception ee)
+            {
+                MessageBox.Show("读取文件异常！" + ee.Message);
             }
         }
         private void checkDirectory()
