@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using BrokenRailMonitorViaWiFi.Windows;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -592,33 +593,66 @@ namespace BrokenRailMonitorViaWiFi
                                                 {
                                                     if (masterControl.TerminalNumber == terminalNo)
                                                     {
-                                                        if (masterControl.NeighbourSmall != actualReceive[8])
+                                                        if (i == 0 || i == 1)
+                                                        {
+                                                            if (0 != actualReceive[8])
+                                                            {
+                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻小终端不为0！\r\n终端没有次级相邻小终端应填0");
+                                                                isError = true;
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            if (MasterControlList[i - 1].NeighbourSmall != actualReceive[8])
+                                                            {
+                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻小终端不匹配！");
+                                                                isError = true;
+                                                            }
+                                                        }
+                                                        if (masterControl.NeighbourSmall != actualReceive[9])
                                                         {
                                                             MessageBox.Show(terminalNo.ToString() + "号终端相邻小终端不匹配！");
                                                             isError = true;
                                                         }
-                                                        if (masterControl.NeighbourBig != actualReceive[9])
+                                                        if (masterControl.NeighbourBig != actualReceive[10])
                                                         {
                                                             MessageBox.Show(terminalNo.ToString() + "号终端相邻大终端不匹配！");
                                                             isError = true;
                                                         }
-                                                        if (actualReceive[10] != (masterControl.Is4G ? 1 : 0))
+                                                        if (i == count - 2 || i == count - 1)
                                                         {
-                                                            MessageBox.Show(terminalNo.ToString() + "号终端Is4G不匹配！");
-                                                            isError = true;
+                                                            if (0xff != actualReceive[11])
+                                                            {
+                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻大终端不为255！\r\n终端没有次级相邻大终端应填255");
+                                                                isError = true;
+                                                            }
                                                         }
-                                                        if (actualReceive[11] != (masterControl.IsEnd ? 1 : 0))
+                                                        else
                                                         {
-                                                            MessageBox.Show(terminalNo.ToString() + "号终端IsEnd不匹配！");
-                                                            isError = true;
+                                                            if (MasterControlList[i + 1].NeighbourBig != actualReceive[11])
+                                                            {
+                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻大终端不匹配！");
+                                                                isError = true;
+                                                            }
                                                         }
                                                         if (!isError)
                                                         {
-                                                            PointInfoResultWindow onePIRWin = new PointInfoResultWindow(masterControl.TerminalNumber,
-                                                                masterControl.NeighbourSmall, masterControl.NeighbourBig,
-                                                                masterControl.Is4G, masterControl.IsEnd);
-                                                            onePIRWin.Owner = this;
-                                                            onePIRWin.ShowDialog();
+                                                            bool flashIsValid = false;
+                                                            if (actualReceive[12] == 1)
+                                                            {
+                                                                flashIsValid = true;
+                                                            }
+                                                            else if (actualReceive[12] == 0)
+                                                            {
+                                                                flashIsValid = false;
+                                                            }
+                                                            else
+                                                            {
+                                                                MessageBox.Show("‘Flash是否有效’字段收到未定义数据。按照无效处理！");
+                                                            }
+                                                            PointConfigInfoWindow onePCIWin = new PointConfigInfoWindow(terminalNo, actualReceive[8], actualReceive[9], actualReceive[10], actualReceive[11], flashIsValid);
+                                                            onePCIWin.Owner = this;
+                                                            onePCIWin.ShowDialog();
                                                         }
                                                         break;
                                                     }

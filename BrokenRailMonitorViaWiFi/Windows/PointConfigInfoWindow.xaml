@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi.Windows"
         mc:Ignorable="d"
-        Title="单点配置信息反馈" Height="300" Width="300"
+        Title="单点配置信息" Height="300" Width="300"
         ResizeMode="NoResize" Loaded="Window_Loaded" WindowStartupLocation="CenterOwner">
 
     <Grid>
