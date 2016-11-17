@@ -605,18 +605,21 @@ namespace BrokenRailMonitorViaWiFi
                                                         {
                                                             if (MasterControlList[i - 1].NeighbourSmall != actualReceive[8])
                                                             {
-                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻小终端不匹配！");
+                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻小终端不匹配！\r\nconfig.xml配置文件中为"
+                                                                    + MasterControlList[i - 1].NeighbourSmall.ToString() + "收到的为" + actualReceive[8].ToString());
                                                                 isError = true;
                                                             }
                                                         }
                                                         if (masterControl.NeighbourSmall != actualReceive[9])
                                                         {
-                                                            MessageBox.Show(terminalNo.ToString() + "号终端相邻小终端不匹配！");
+                                                            MessageBox.Show(terminalNo.ToString() + "号终端相邻小终端不匹配！\r\nconfig.xml配置文件中为"
+                                                                    + masterControl.NeighbourSmall.ToString() + "收到的为" + actualReceive[9].ToString());
                                                             isError = true;
                                                         }
                                                         if (masterControl.NeighbourBig != actualReceive[10])
                                                         {
-                                                            MessageBox.Show(terminalNo.ToString() + "号终端相邻大终端不匹配！");
+                                                            MessageBox.Show(terminalNo.ToString() + "号终端相邻大终端不匹配！\r\nconfig.xml配置文件中为"
+                                                                    + masterControl.NeighbourBig.ToString() + "收到的为" + actualReceive[10].ToString());
                                                             isError = true;
                                                         }
                                                         if (i == count - 2 || i == count - 1)
@@ -631,7 +634,8 @@ namespace BrokenRailMonitorViaWiFi
                                                         {
                                                             if (MasterControlList[i + 1].NeighbourBig != actualReceive[11])
                                                             {
-                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻大终端不匹配！");
+                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻大终端不匹配！\r\nconfig.xml配置文件中为"
+                                                                    + MasterControlList[i + 1].NeighbourBig.ToString() + "收到的为" + actualReceive[11].ToString());
                                                                 isError = true;
                                                             }
                                                         }
