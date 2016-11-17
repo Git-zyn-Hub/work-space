@@ -93,6 +93,9 @@
       <DependentUpon>SignalSendConfigWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ValidationRules.cs" />
+    <Compile Include="Windows\InitialInfoConfigWindow.xaml.cs">
+      <DependentUpon>InitialInfoConfigWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\ThresholdSettingWindow.xaml.cs">
       <DependentUpon>ThresholdSettingWindow.xaml</DependentUpon>
     </Compile>
@@ -141,6 +144,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="SignalSendConfigWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\InitialInfoConfigWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

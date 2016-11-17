@@ -213,7 +213,20 @@ namespace BrokenRailMonitorViaWiFi
         {
             try
             {
-                byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf0, new byte[5] { (byte)_terminalNumber, (byte)NeighbourSmall, (byte)NeighbourBig, (byte)(Is4G ? 1 : 0), (byte)(IsEnd ? 1 : 0) });
+                InitialInfoConfigWindow newInitialInfoConfigWin = new InitialInfoConfigWindow();
+
+                if (_mainWin != null)
+                {
+                    newInitialInfoConfigWin.Owner = _mainWin;
+                }
+                if (!newInitialInfoConfigWin.ShowDialog().Value)
+                {
+                    return;
+                }
+
+                byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf0, new byte[6] { (byte)newInitialInfoConfigWin.TerminalNo,
+                    (byte)newInitialInfoConfigWin.NeighbourSmallSecondary, (byte)newInitialInfoConfigWin.NeighbourSmall,
+                    (byte)newInitialInfoConfigWin.NeighbourBig, (byte)newInitialInfoConfigWin.NeighbourBigSecondary,0x00 });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
                 {
