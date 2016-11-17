@@ -218,6 +218,39 @@ namespace BrokenRailMonitorViaWiFi
                 if (_mainWin != null)
                 {
                     newInitialInfoConfigWin.Owner = _mainWin;
+                    //初始化默认的终端号。
+                    newInitialInfoConfigWin.TerminalNo = this._terminalNumber;
+                    int index = _mainWin.FindMasterControlIndex(this._terminalNumber);
+                    if (index == 0)
+                    {
+                        newInitialInfoConfigWin.NeighbourSmallSecondary = 0;
+                        newInitialInfoConfigWin.NeighbourSmall = 0;
+                    }
+                    else if (index == 1)
+                    {
+                        newInitialInfoConfigWin.NeighbourSmallSecondary = 0;
+                        newInitialInfoConfigWin.NeighbourSmall = _mainWin.MasterControlList[0].TerminalNumber;
+                    }
+                    else
+                    {
+                        newInitialInfoConfigWin.NeighbourSmallSecondary = _mainWin.MasterControlList[index - 2].TerminalNumber;
+                        newInitialInfoConfigWin.NeighbourSmall = _mainWin.MasterControlList[index - 1].TerminalNumber;
+                    }
+                    if (index == _mainWin.MasterControlList.Count - 2)
+                    {
+                        newInitialInfoConfigWin.NeighbourBig = _mainWin.MasterControlList[_mainWin.MasterControlList.Count - 1].TerminalNumber;
+                        newInitialInfoConfigWin.NeighbourBigSecondary = 0xff;
+                    }
+                    else if (index == _mainWin.MasterControlList.Count - 1)
+                    {
+                        newInitialInfoConfigWin.NeighbourBig = 0xff;
+                        newInitialInfoConfigWin.NeighbourBigSecondary = 0xff;
+                    }
+                    else
+                    {
+                        newInitialInfoConfigWin.NeighbourBig = _mainWin.MasterControlList[index + 1].TerminalNumber;
+                        newInitialInfoConfigWin.NeighbourBigSecondary = _mainWin.MasterControlList[index + 2].TerminalNumber;
+                    }
                 }
                 if (!newInitialInfoConfigWin.ShowDialog().Value)
                 {

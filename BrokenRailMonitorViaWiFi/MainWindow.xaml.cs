@@ -757,7 +757,7 @@ namespace BrokenRailMonitorViaWiFi
                                             this.Dispatcher.Invoke(new Action(() =>
                                             {
                                                 RailInfoResultWindow railInfoResultWin = RailInfoResultWindow.GetInstance(actualReceive[7]);
-                                                int index = findMasterControlIndex(actualReceive[7]);
+                                                int index = FindMasterControlIndex(actualReceive[7]);
                                                 if (index == -1)
                                                 {
                                                     MessageBox.Show("收到的终端号在终端集合中不存在！");
@@ -804,7 +804,7 @@ namespace BrokenRailMonitorViaWiFi
                                                 if (contentLength == 3)
                                                 {
                                                     //如果只有一个终端的数据就不存在两个终端数据冲突的情况。
-                                                    int index = findMasterControlIndex(bytesOnOffContent[0]);
+                                                    int index = FindMasterControlIndex(bytesOnOffContent[0]);
                                                     if (_terminalsReceiveFlag != null)
                                                     {
                                                         _terminalsReceiveFlag[bytesOnOffContent[0]] = true;
@@ -854,7 +854,7 @@ namespace BrokenRailMonitorViaWiFi
                                                     //如果有多个终端的数据，需要处理冲突。
                                                     for (int i = 0; i < contentLength - 3; i++, i++, i++)
                                                     {
-                                                        int index = findMasterControlIndex(bytesOnOffContent[i]);
+                                                        int index = FindMasterControlIndex(bytesOnOffContent[i]);
                                                         if (_terminalsReceiveFlag != null)
                                                         {
                                                             _terminalsReceiveFlag[bytesOnOffContent[i]] = true;
@@ -907,7 +907,7 @@ namespace BrokenRailMonitorViaWiFi
                                                         }
                                                         if (i == (contentLength - 6))
                                                         {
-                                                            int indexLastTerminal = findMasterControlIndex(bytesOnOffContent[i + 3]);
+                                                            int indexLastTerminal = FindMasterControlIndex(bytesOnOffContent[i + 3]);
                                                             if (_terminalsReceiveFlag != null)
                                                             {
                                                                 _terminalsReceiveFlag[bytesOnOffContent[i + 3]] = true;
@@ -971,7 +971,7 @@ namespace BrokenRailMonitorViaWiFi
                                                         }
                                                         if (i == (contentLength - 6))
                                                         {
-                                                            int indexLastTerminal = findMasterControlIndex(bytesOnOffContent[i + 3]);
+                                                            int indexLastTerminal = FindMasterControlIndex(bytesOnOffContent[i + 3]);
                                                             if (indexLastTerminal != MasterControlList.Count - 1)
                                                             {
                                                                 //最后一个终端没有右边的铁轨
@@ -1625,8 +1625,8 @@ namespace BrokenRailMonitorViaWiFi
                         }
                     }
                 }
-                int terminalStartIndex = findMasterControlIndex(newGetSectionWin.TerminalSmall);
-                int terminalEndIndex = findMasterControlIndex(newGetSectionWin.TerminalBig);
+                int terminalStartIndex = FindMasterControlIndex(newGetSectionWin.TerminalSmall);
+                int terminalEndIndex = FindMasterControlIndex(newGetSectionWin.TerminalBig);
                 _terminalsReceiveFlag = new Dictionary<int, bool>();
                 for (int i = terminalStartIndex; i <= terminalEndIndex; i++)
                 {
@@ -1665,7 +1665,7 @@ namespace BrokenRailMonitorViaWiFi
                             if (int.TryParse(strTerminalNo, out terminalNo))
                             {
                                 RailInfoResultWindow railInfoResultWin = RailInfoResultWindow.GetInstance(terminalNo);
-                                int indexOfMaster = findMasterControlIndex(terminalNo);
+                                int indexOfMaster = FindMasterControlIndex(terminalNo);
                                 if (indexOfMaster == -1)
                                 {
                                     MessageBox.Show("读取的终端号在终端集合中不存在！");
@@ -1737,7 +1737,7 @@ namespace BrokenRailMonitorViaWiFi
         /// </summary>
         /// <param name="terminalNo">终端号</param>
         /// <returns>如果找到返回索引，否则返回-1</returns>
-        private int findMasterControlIndex(int terminalNo)
+        public int FindMasterControlIndex(int terminalNo)
         {
             int i = 0;
             foreach (var item in this.MasterControlList)

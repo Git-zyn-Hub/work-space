@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace BrokenRailMonitorViaWiFi.Windows
     /// <summary>
     /// Interaction logic for InitialInfoConfigWindow.xaml
     /// </summary>
-    public partial class InitialInfoConfigWindow : Window
+    public partial class InitialInfoConfigWindow : Window, INotifyPropertyChanged
     {
         private int _neighbourSmallSecondary;
         private int _neighbourSmall;
@@ -34,7 +35,11 @@ namespace BrokenRailMonitorViaWiFi.Windows
 
             set
             {
-                _neighbourSmallSecondary = value;
+                if (_neighbourSmallSecondary != value)
+                {
+                    _neighbourSmallSecondary = value;
+                    OnPropertyChanged("NeighbourSmallSecondary");
+                }
             }
         }
 
@@ -47,7 +52,11 @@ namespace BrokenRailMonitorViaWiFi.Windows
 
             set
             {
-                _neighbourSmall = value;
+                if (_neighbourSmall != value)
+                {
+                    _neighbourSmall = value;
+                    OnPropertyChanged("NeighbourSmall");
+                }
             }
         }
 
@@ -60,7 +69,11 @@ namespace BrokenRailMonitorViaWiFi.Windows
 
             set
             {
-                _terminalNo = value;
+                if (_terminalNo != value)
+                {
+                    _terminalNo = value;
+                    OnPropertyChanged("TerminalNo");
+                }
             }
         }
 
@@ -73,7 +86,11 @@ namespace BrokenRailMonitorViaWiFi.Windows
 
             set
             {
-                _neighbourBig = value;
+                if (_neighbourBig != value)
+                {
+                    _neighbourBig = value;
+                    OnPropertyChanged("NeighbourBig");
+                }
             }
         }
 
@@ -86,7 +103,11 @@ namespace BrokenRailMonitorViaWiFi.Windows
 
             set
             {
-                _neighbourBigSecondary = value;
+                if (_neighbourBigSecondary != value)
+                {
+                    _neighbourBigSecondary = value;
+                    OnPropertyChanged("NeighbourBigSecondary");
+                }
             }
         }
 
@@ -229,5 +250,17 @@ namespace BrokenRailMonitorViaWiFi.Windows
                 throw;
             }
         }
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+        }
+
+        #endregion
     }
 }
