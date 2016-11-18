@@ -37,4 +37,29 @@ namespace BrokenRailMonitorViaWiFi
             return result;
         }
     }
+    public class ValidationRuleFrom0To4095 : ValidationRule
+    {
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get { return _errorMessage; }
+            set { _errorMessage = value; }
+        }
+
+        public override ValidationResult Validate(object value, CultureInfo cultureInfo)
+        {
+            ValidationResult result = new ValidationResult(true, null);
+            string inputString = (value ?? string.Empty).ToString();
+
+            int parseResult = -1;
+            if (string.IsNullOrEmpty(inputString)
+                || !int.TryParse(inputString, out parseResult)
+                || parseResult < 0
+                || parseResult > 4095)
+            {
+                result = new ValidationResult(false, this.ErrorMessage);
+            }
+            return result;
+        }
+    }
 }

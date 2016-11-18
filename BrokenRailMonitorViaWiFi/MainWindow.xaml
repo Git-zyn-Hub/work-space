@@ -32,6 +32,7 @@
                     <MenuItem x:Name="miGetOneSectionInfo" Header="获取某段铁轨信息" Click="miGetOneSectionInfo_Click"></MenuItem>
                     <!--<MenuItem x:Name="miGetAllDevicesSignalAmplitude" Header="获取所有终端信号幅值" Click="miGetAllDevicesSignalAmplitude_Click"></MenuItem>-->
                     <MenuItem x:Name="miRealTimeConfig" Header="实时时钟配置" Click="miRealTimeConfig_Click"></MenuItem>
+                    <MenuItem x:Name="miEraseFlash" Header="擦除Flash" Click="miEraseFlash_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem x:Name="miViewHistory" Header="回看历史" FontSize="15" Click="miViewHistory_Click"></MenuItem>
             </Menu>

@@ -93,6 +93,9 @@
       <DependentUpon>SignalSendConfigWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ValidationRules.cs" />
+    <Compile Include="Windows\EraseFlashWindow.xaml.cs">
+      <DependentUpon>EraseFlashWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\InitialInfoConfigWindow.xaml.cs">
       <DependentUpon>InitialInfoConfigWindow.xaml</DependentUpon>
     </Compile>
@@ -147,6 +150,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="SignalSendConfigWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\EraseFlashWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

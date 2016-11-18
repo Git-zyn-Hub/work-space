@@ -1740,6 +1740,47 @@ namespace BrokenRailMonitorViaWiFi
                 MessageBox.Show("读取文件异常！" + ee.Message);
             }
         }
+
+        private void miEraseFlash_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                EraseFlashWindow newEraseFlashWin = new EraseFlashWindow(this.MasterControlList);
+                newEraseFlashWin.Owner = this;
+                if (!newEraseFlashWin.ShowDialog().Value)
+                {
+                    return;
+                }
+                if (_4GPointIndex.Count == 0)
+                {
+                    MessageBox.Show("系统中不包含4G点，请检查config文档！");
+                }
+                else
+                {
+                    //默认使用第一个4G点发送数据。多播没有分段，如果改成每个终端都是4G点需要重写逻辑。
+                    Socket socket = this.MasterControlList[_4GPointIndex[0]].GetNearest4GTerminalSocket(true);
+
+                    byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)newEraseFlashWin.TerminalBig, 0x57, new byte[5] {
+                    (byte)newEraseFlashWin.TerminalSmall,
+                    (byte)((newEraseFlashWin.StartSectorNo & 0xff00)>>8), (byte)(newEraseFlashWin.StartSectorNo&0xff),
+                    (byte)((newEraseFlashWin.EndSectorNo&0xff00)>>8), (byte)(newEraseFlashWin.EndSectorNo&0xff) });
+                    if (socket != null)
+                    {
+                        DecideDelayOrNot();
+                        socket.Send(sendData, SocketFlags.None);
+                    }
+                    else
+                    {
+                        MessageBox.Show(this.MasterControlList[_4GPointIndex[0]].Find4GErrorMsg, "来自终端" + this.MasterControlList[_4GPointIndex[0]].TerminalNumber + "的消息：");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
         private void checkDirectory()
         {
             if (!Directory.Exists(System.Environment.CurrentDirectory + @"\DataRecord"))
