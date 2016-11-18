@@ -559,7 +559,7 @@ namespace BrokenRailMonitorViaWiFi
                                                 //    this.dataShowUserCtrl.AddShowData("超声信号发射通报指令，4G终端已接收！", DataLevel.Normal);
                                                 //    break;
                                                 case 0xf4:
-                                                    this.dataShowUserCtrl.AddShowData("超声信号发射配置指令，4G终端已接收！", DataLevel.Normal);
+                                                    this.dataShowUserCtrl.AddShowData("获取Flash里存储的铁轨历史信息指令，4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 case 0xf5:
                                                     this.dataShowUserCtrl.AddShowData("获取单点铁轨信息指令，4G终端已接收！", DataLevel.Normal);
@@ -667,6 +667,144 @@ namespace BrokenRailMonitorViaWiFi
                                                     i++;
                                                 }
                                             }));
+                                        }
+                                        break;
+                                    case 0xf4:
+                                        {
+                                            checkDirectory();
+                                            int length = (actualReceive[2] << 8) + actualReceive[3];
+                                            if (length == 10 && actualReceive[7] == 0xff)
+                                            {
+                                                //接收数据结束。
+                                            }
+                                            else if ((length - 10) % 84 == 0)
+                                            {
+                                                int dataCount = (length - 10) / 84;
+                                                if (dataCount != 0)
+                                                {
+                                                    initialFileConfig(actualReceive[7]);
+                                                    string fileName = System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName + @"\DataTerminal" + actualReceive[7].ToString("D3") + ".xml";
+                                                    if (File.Exists(fileName))
+                                                    {
+                                                        XmlDocument xmlDoc = new XmlDocument();
+                                                        xmlDoc.Load(fileName);
+                                                        XmlNode xn1 = xmlDoc.SelectSingleNode("Datas");
+                                                        if (xn1 != null)
+                                                        {
+                                                            for (int j = 0; j < dataCount; j++)
+                                                            {
+                                                                //写入xml文件格式。
+                                                                XmlElement xeData = xmlDoc.CreateElement("Data");//创建一个<Data>节点
+                                                                xn1.AppendChild(xeData);
+                                                                XmlElement xeTime = xmlDoc.CreateElement("Time");
+                                                                xeData.AppendChild(xeTime);
+                                                                XmlElement xeRail1 = xmlDoc.CreateElement("Rail1");
+                                                                xeData.AppendChild(xeRail1);
+                                                                XmlElement xeOnOff1 = xmlDoc.CreateElement("OnOff");
+                                                                xeRail1.AppendChild(xeOnOff1);
+                                                                XmlElement xeStress1 = xmlDoc.CreateElement("Stress");
+                                                                xeRail1.AppendChild(xeStress1);
+                                                                XmlElement xeTemprature1 = xmlDoc.CreateElement("Temprature");
+                                                                xeRail1.AppendChild(xeTemprature1);
+                                                                XmlElement xeThisAmplitude1 = xmlDoc.CreateElement("ThisAmplitude");
+                                                                xeRail1.AppendChild(xeThisAmplitude1);
+                                                                XmlElement xeSignalAmplitude1Left = xmlDoc.CreateElement("SignalAmplitudeLeft");
+                                                                xeRail1.AppendChild(xeSignalAmplitude1Left);
+                                                                XmlElement xeSignalAmplitude1Right = xmlDoc.CreateElement("SignalAmplitudeRight");
+                                                                xeRail1.AppendChild(xeSignalAmplitude1Right);
+                                                                XmlElement xeRail2 = xmlDoc.CreateElement("Rail2");
+                                                                xeData.AppendChild(xeRail2);
+                                                                XmlElement xeOnOff2 = xmlDoc.CreateElement("OnOff");
+                                                                xeRail2.AppendChild(xeOnOff2);
+                                                                XmlElement xeStress2 = xmlDoc.CreateElement("Stress");
+                                                                xeRail2.AppendChild(xeStress2);
+                                                                XmlElement xeTemprature2 = xmlDoc.CreateElement("Temprature");
+                                                                xeRail2.AppendChild(xeTemprature2);
+                                                                XmlElement xeThisAmplitude2 = xmlDoc.CreateElement("ThisAmplitude");
+                                                                xeRail2.AppendChild(xeThisAmplitude2);
+                                                                XmlElement xeSignalAmplitude2Left = xmlDoc.CreateElement("SignalAmplitudeLeft");
+                                                                xeRail2.AppendChild(xeSignalAmplitude2Left);
+                                                                XmlElement xeSignalAmplitude2Right = xmlDoc.CreateElement("SignalAmplitudeRight");
+                                                                xeRail2.AppendChild(xeSignalAmplitude2Right);
+
+                                                                //写入数据。
+                                                                xeTime.InnerText = actualReceive[8 + j * 84].ToString() + "-" + actualReceive[9 + j * 84].ToString() + "-" +
+                                                                                   actualReceive[10 + j * 84].ToString() + "-" + actualReceive[11 + j * 84].ToString() + "-" +
+                                                                                   actualReceive[12 + j * 84].ToString() + "-" + actualReceive[13 + j * 84].ToString();
+                                                                xeOnOff1.InnerText = actualReceive[14 + j * 84].ToString();
+                                                                xeStress1.InnerText = actualReceive[16 + j * 84].ToString() + "-" + actualReceive[17 + j * 84].ToString();
+                                                                xeTemprature1.InnerText = actualReceive[20 + j * 84].ToString() + "-" + actualReceive[21 + j * 84].ToString();
+                                                                xeThisAmplitude1.InnerText = actualReceive[24 + j * 84].ToString() + "-" + actualReceive[25 + j * 84].ToString();
+                                                                string strSignalAmplitude = "";
+                                                                for (int i = 28 + j * 84; i < 44 + j * 84; i++)
+                                                                {
+                                                                    strSignalAmplitude += actualReceive[i].ToString();
+                                                                    if (i == 43 + j * 84)
+                                                                    {
+                                                                        continue;
+                                                                    }
+                                                                    strSignalAmplitude += "-";
+                                                                }
+                                                                xeSignalAmplitude1Left.InnerText = strSignalAmplitude;
+                                                                strSignalAmplitude = "";
+                                                                for (int i = 44 + j * 84; i < 60 + j * 84; i++)
+                                                                {
+                                                                    strSignalAmplitude += actualReceive[i].ToString();
+                                                                    if (i == 59 + j * 84)
+                                                                    {
+                                                                        continue;
+                                                                    }
+                                                                    strSignalAmplitude += "-";
+                                                                }
+                                                                xeSignalAmplitude1Right.InnerText = strSignalAmplitude;
+                                                                xeOnOff2.InnerText = actualReceive[15 + j * 84].ToString();
+                                                                xeStress2.InnerText = actualReceive[18 + j * 84].ToString() + "-" + actualReceive[19 + j * 84].ToString();
+                                                                xeTemprature2.InnerText = actualReceive[22 + j * 84].ToString() + "-" + actualReceive[23 + j * 84].ToString();
+                                                                //第二个温度前一字节还表示收到了非相邻终端发来的超声信号吗？
+                                                                //if (actualReceive[56] == 1)
+                                                                //{
+                                                                //    this.Dispatcher.Invoke(new Action(() =>
+                                                                //    {
+                                                                //        this.dataShowUserCtrl.AddShowData(actualReceive[7].ToString() + "号终端收到非相邻终端发来的超声信号！", DataLevel.Warning);
+                                                                //    }));
+                                                                //}
+                                                                //else if (actualReceive[56] == 0)
+                                                                //{
+
+                                                                //}
+                                                                //else
+                                                                //{
+                                                                //    MessageBox.Show("'收到非相邻终端发来的超声信号'位收到未定义数据！");
+                                                                //}
+                                                                xeThisAmplitude2.InnerText = actualReceive[26 + j * 84].ToString() + "-" + actualReceive[27 + j * 84].ToString();
+                                                                strSignalAmplitude = "";
+                                                                for (int i = 60 + j * 84; i < 76 + j * 84; i++)
+                                                                {
+                                                                    strSignalAmplitude += actualReceive[i].ToString();
+                                                                    if (i == 75 + j * 84)
+                                                                    {
+                                                                        continue;
+                                                                    }
+                                                                    strSignalAmplitude += "-";
+                                                                }
+                                                                xeSignalAmplitude2Left.InnerText = strSignalAmplitude;
+                                                                strSignalAmplitude = "";
+                                                                for (int i = 76 + j * 84; i < 92 + j * 84; i++)
+                                                                {
+                                                                    strSignalAmplitude += actualReceive[i].ToString();
+                                                                    if (i == 91 + j * 84)
+                                                                    {
+                                                                        continue;
+                                                                    }
+                                                                    strSignalAmplitude += "-";
+                                                                }
+                                                                xeSignalAmplitude2Right.InnerText = strSignalAmplitude;
+                                                            }
+                                                        }
+                                                        xmlDoc.Save(fileName);
+                                                    }
+                                                }
+                                            }
                                         }
                                         break;
                                     case 0xf5:
