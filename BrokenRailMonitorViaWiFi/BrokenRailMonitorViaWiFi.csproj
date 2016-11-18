@@ -39,6 +39,12 @@
     <ApplicationIcon>train_rail.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MaterialDesignColors">
+      <HintPath>DLL\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf">
+      <HintPath>DLL\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -95,6 +101,9 @@
     <Compile Include="ValidationRules.cs" />
     <Compile Include="Windows\EraseFlashWindow.xaml.cs">
       <DependentUpon>EraseFlashWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\GetHistoryWindow.xaml.cs">
+      <DependentUpon>GetHistoryWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\InitialInfoConfigWindow.xaml.cs">
       <DependentUpon>InitialInfoConfigWindow.xaml</DependentUpon>
@@ -154,6 +163,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\EraseFlashWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\GetHistoryWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -22,7 +22,7 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
             <!--<Button x:Name="btnSet" HorizontalAlignment="Left" Width="70" Click="btnSet_Click" Height="30">设置</Button>-->
-            <Menu x:Name="menu" Height="25" Width="260" HorizontalAlignment="Left">
+            <Menu x:Name="menu" Height="25" Width="230" HorizontalAlignment="Left">
                 <MenuItem x:Name="miConnect" Header="连接" FontSize="15" Click="miConnect_Click"></MenuItem>
                 <MenuItem x:Name="miRefreshDevices" Header="刷新设备" FontSize="15" Click="miRefreshDevices_Click"></MenuItem>
                 <MenuItem x:Name="miCommand" Header="指令" FontSize="15">
@@ -34,7 +34,10 @@
                     <MenuItem x:Name="miRealTimeConfig" Header="实时时钟配置" Click="miRealTimeConfig_Click"></MenuItem>
                     <MenuItem x:Name="miEraseFlash" Header="擦除Flash" Click="miEraseFlash_Click"></MenuItem>
                 </MenuItem>
-                <MenuItem x:Name="miViewHistory" Header="回看历史" FontSize="15" Click="miViewHistory_Click"></MenuItem>
+                <MenuItem Header="历史" FontSize="15">
+                    <MenuItem x:Name="miGetHistory" Header="获取历史" Click="miGetHistory_Click"></MenuItem>
+                    <MenuItem x:Name="miViewHistory" Header="回看历史" Click="miViewHistory_Click"></MenuItem>
+                </MenuItem>
             </Menu>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
                 <Ellipse x:Name="elpIndicator" Fill="Green" Height="15" Width="15"></Ellipse>
