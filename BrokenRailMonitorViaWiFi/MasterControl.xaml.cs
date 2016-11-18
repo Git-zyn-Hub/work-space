@@ -376,6 +376,34 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
+        private void miGetHistory_Click(object sender, RoutedEventArgs e)
+        {
+            GetHistoryWindow newGetHistoryWin = new GetHistoryWindow();
+            if (_mainWin != null)
+            {
+                newGetHistoryWin.Owner = this._mainWin;
+            }
+            if (!newGetHistoryWin.ShowDialog().Value)
+            {
+                return;
+            }
+            byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf4,
+                new byte[12] { (byte)newGetHistoryWin.YearStart, (byte)newGetHistoryWin.MonthStart, (byte)newGetHistoryWin.DayStart,
+                               (byte)newGetHistoryWin.HourStart,(byte)newGetHistoryWin.MinuteStart,(byte)newGetHistoryWin.SecondStart,
+                               (byte)newGetHistoryWin.YearEnd,(byte)newGetHistoryWin.MonthEnd,(byte)newGetHistoryWin.DayEnd,
+                               (byte)newGetHistoryWin.HourEnd,(byte)newGetHistoryWin.MinuteEnd,(byte)newGetHistoryWin.SecondEnd });
+            Socket socketGet = GetNearest4GTerminalSocket(true);
+            if (socketGet != null)
+            {
+                _mainWin.DecideDelayOrNot();
+                socketGet.Send(sendData, SocketFlags.None);
+            }
+            else
+            {
+                MessageBox.Show(Find4GErrorMsg);
+            }
+        }
+
         public Socket GetNearest4GTerminalSocket(bool isForward)
         {
             if (this.Is4G)

@@ -1678,16 +1678,6 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
-        private void miGetHistory_Click(object sender, RoutedEventArgs e)
-        {
-            GetHistoryWindow newGetHistoryWin = new GetHistoryWindow();
-            newGetHistoryWin.Owner = this;
-            if (!newGetHistoryWin.ShowDialog().Value)
-            {
-                return;
-            }
-        }
-
         private void miViewHistory_Click(object sender, RoutedEventArgs e)
         {
             try
