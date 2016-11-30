@@ -39,7 +39,7 @@
             <Label Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Padding="0">次级相邻大终端</Label>
             <Border BorderThickness="1 0 1 1" BorderBrush="LightBlue" Grid.Row="1" Grid.Column="0">
                 <TextBox x:Name="txtNeighbourSmallSecondary" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                      KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                      KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" GotFocus="txtNeighbourSmallSecondary_GotFocus" Style="{DynamicResource ErrorInputStyle}">
                     <Binding Path="NeighbourSmallSecondary" ElementName="initialInfoConfigWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
                             <root:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
@@ -49,7 +49,7 @@
             </Border>
             <Border BorderThickness="0 0 1 1" BorderBrush="LightBlue" Grid.Row="1" Grid.Column="1">
                 <TextBox x:Name="txtNeighbourSmall" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                      KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                      KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" GotFocus="txtNeighbourSmall_GotFocus"  Style="{DynamicResource ErrorInputStyle}">
                     <Binding Path="NeighbourSmall" ElementName="initialInfoConfigWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
                             <root:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
@@ -59,7 +59,7 @@
             </Border>
             <Border BorderThickness="0 0 1 1" BorderBrush="LightBlue" Grid.Row="1" Grid.Column="2">
                 <TextBox x:Name="txtTerminalNo" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                      KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                      KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" GotFocus="txtTerminalNo_GotFocus"  Style="{DynamicResource ErrorInputStyle}">
                     <Binding Path="TerminalNo" ElementName="initialInfoConfigWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
                             <root:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
@@ -69,7 +69,7 @@
             </Border>
             <Border BorderThickness="0 0 1 1" BorderBrush="LightBlue" Grid.Row="1" Grid.Column="3">
                 <TextBox x:Name="txtNeighbourBig" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                      KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                      KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" GotFocus="txtNeighbourBig_GotFocus" Style="{DynamicResource ErrorInputStyle}">
                     <Binding Path="NeighbourBig" ElementName="initialInfoConfigWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
                             <root:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
@@ -79,7 +79,7 @@
             </Border>
             <Border BorderThickness="0 0 1 1" BorderBrush="LightBlue" Grid.Row="1" Grid.Column="4">
                 <TextBox x:Name="txtNeighbourBigSecondary" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"
-                      KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" Style="{DynamicResource ErrorInputStyle}">
+                      KeyDown="TextBox_KeyDown" TextChanged="TextBox_TextChanged" GotFocus="txtNeighbourBigSecondary_GotFocus"  Style="{DynamicResource ErrorInputStyle}">
                     <Binding Path="NeighbourBigSecondary" ElementName="initialInfoConfigWin" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                         <Binding.ValidationRules>
                             <root:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />

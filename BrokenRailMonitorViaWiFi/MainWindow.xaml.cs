@@ -564,9 +564,9 @@ namespace BrokenRailMonitorViaWiFi
                                                 case 0xf5:
                                                     this.dataShowUserCtrl.AddShowData("获取单点铁轨信息指令，4G终端已接收！", DataLevel.Normal);
                                                     break;
-                                                //case 0x56:
-                                                //    this.dataShowUserCtrl.AddShowData("获取所有终端铁轨信息指令，4G终端已接收！", DataLevel.Normal);
-                                                //    break;
+                                                case 0x56:
+                                                    this.dataShowUserCtrl.AddShowData("擦除flash指令，4G终端已接收！", DataLevel.Normal);
+                                                    break;
                                                 case 0x55:
                                                     this.dataShowUserCtrl.AddShowData("获取某段铁轨信息，4G终端已接收！", DataLevel.Normal);
                                                     break;
@@ -1898,7 +1898,7 @@ namespace BrokenRailMonitorViaWiFi
                     //默认使用第一个4G点发送数据。多播没有分段，如果改成每个终端都是4G点需要重写逻辑。
                     Socket socket = this.MasterControlList[_4GPointIndex[0]].GetNearest4GTerminalSocket(true);
 
-                    byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)newEraseFlashWin.TerminalBig, 0x57, new byte[5] {
+                    byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)newEraseFlashWin.TerminalBig, 0x56, new byte[5] {
                     (byte)newEraseFlashWin.TerminalSmall,
                     (byte)((newEraseFlashWin.StartSectorNo & 0xff00)>>8), (byte)(newEraseFlashWin.StartSectorNo&0xff),
                     (byte)((newEraseFlashWin.EndSectorNo&0xff00)>>8), (byte)(newEraseFlashWin.EndSectorNo&0xff) });

@@ -278,6 +278,16 @@ namespace BrokenRailMonitorViaWiFi.Windows
             this.txtTerminalBig.SelectAll();
         }
 
+        private void txtStartSector_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.txtStartSector.SelectAll();
+        }
+
+        private void txtEndSector_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.txtEndSector.SelectAll();
+        }
+
         private void eraseFlashWin_Loaded(object sender, RoutedEventArgs e)
         {
             this.txtTerminalSmall.Focus();

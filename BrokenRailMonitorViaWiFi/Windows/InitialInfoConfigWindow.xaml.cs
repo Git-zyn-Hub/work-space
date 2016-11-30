@@ -262,5 +262,30 @@ namespace BrokenRailMonitorViaWiFi.Windows
         }
 
         #endregion
+
+        private void txtNeighbourSmallSecondary_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.txtNeighbourSmallSecondary.SelectAll();
+        }
+
+        private void txtNeighbourSmall_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.txtNeighbourSmall.SelectAll();
+        }
+
+        private void txtTerminalNo_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.txtTerminalNo.SelectAll();
+        }
+
+        private void txtNeighbourBig_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.txtNeighbourBig.SelectAll();
+        }
+
+        private void txtNeighbourBigSecondary_GotFocus(object sender, RoutedEventArgs e)
+        {
+            this.txtNeighbourBigSecondary.SelectAll();
+        }
     }
 }

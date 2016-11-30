@@ -18,6 +18,7 @@
             <RowDefinition Height="100*"/>
             <RowDefinition Height="100*"/>
             <RowDefinition Height="120*"/>
+            <RowDefinition Height="3"/>
             <RowDefinition Height="120*"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
@@ -62,6 +63,7 @@
         <local:ModernProgressRing x:Name="modernProgressRing" Grid.RowSpan="5" IsActive="False" Width="100" Height="100" Panel.ZIndex="100"
                                   Style="{StaticResource CircleProgressRingStyle}" >
         </local:ModernProgressRing>
-        <local:DataShowUserControl x:Name="dataShowUserCtrl" Grid.Row="4"></local:DataShowUserControl>
+        <GridSplitter Grid.Row="4" Background="AntiqueWhite" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
+        <local:DataShowUserControl x:Name="dataShowUserCtrl" Grid.Row="5"></local:DataShowUserControl>
     </Grid>
 </Window>

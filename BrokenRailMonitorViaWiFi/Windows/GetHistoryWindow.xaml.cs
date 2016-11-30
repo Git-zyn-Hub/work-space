@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Xml;
 
 namespace BrokenRailMonitorViaWiFi.Windows
 {
@@ -34,6 +36,106 @@ namespace BrokenRailMonitorViaWiFi.Windows
         public GetHistoryWindow()
         {
             InitializeComponent();
+            try
+            {
+                if (File.Exists("remember.xml"))
+                {
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.Load("remember.xml");
+
+                    XmlNode nodeDayStart = xmlDoc.SelectSingleNode("config/GetHistoryDayStart");
+                    if (nodeDayStart != null)
+                    {
+                        DateTime result;
+                        if (DateTime.TryParse(nodeDayStart.InnerText.Trim(), out result))
+                        {
+                            this.dpStartDate.SelectedDate = result;
+                        }
+                    }
+                    else
+                    {
+                        XmlNode xn1 = xmlDoc.SelectSingleNode("config");
+                        XmlElement xe2 = xmlDoc.CreateElement("GetHistoryDayStart");//创建一个<AimFrameNo8Way>节点
+                        xe2.InnerText = this.dpStartDate.SelectedDate.ToString();
+                        xn1.AppendChild(xe2);
+                    }
+
+                    XmlNode nodeTimeStart = xmlDoc.SelectSingleNode("config/GetHistoryTimeStart");
+                    if (nodeTimeStart != null)
+                    {
+                        DateTime result;
+                        if (DateTime.TryParse(nodeTimeStart.InnerText.Trim(), out result))
+                        {
+                            this.tpStartTime.SelectedTime = result;
+                        }
+                    }
+                    else
+                    {
+                        XmlNode xn1 = xmlDoc.SelectSingleNode("config");
+                        XmlElement xe2 = xmlDoc.CreateElement("GetHistoryTimeStart");//创建一个<AimFrameNo8Way>节点
+                        xe2.InnerText = this.tpStartTime.SelectedTime.ToString();
+                        xn1.AppendChild(xe2);
+                    }
+
+                    XmlNode nodeDayEnd = xmlDoc.SelectSingleNode("config/GetHistoryDayEnd");
+                    if (nodeDayEnd != null)
+                    {
+                        DateTime result;
+                        if (DateTime.TryParse(nodeDayEnd.InnerText.Trim(), out result))
+                        {
+                            this.dpEndDate.SelectedDate = result;
+                        }
+                    }
+                    else
+                    {
+                        XmlNode xn1 = xmlDoc.SelectSingleNode("config");
+                        XmlElement xe2 = xmlDoc.CreateElement("GetHistoryDayEnd");//创建一个<AimFrameNo8Way>节点
+                        xe2.InnerText = this.dpEndDate.SelectedDate.ToString();
+                        xn1.AppendChild(xe2);
+                    }
+
+                    XmlNode nodeTimeEnd = xmlDoc.SelectSingleNode("config/GetHistoryTimeEnd");
+                    if (nodeTimeEnd != null)
+                    {
+                        DateTime result;
+                        if (DateTime.TryParse(nodeTimeEnd.InnerText.Trim(), out result))
+                        {
+                            this.tpEndTime.SelectedTime = result;
+                        }
+                    }
+                    else
+                    {
+                        XmlNode xn1 = xmlDoc.SelectSingleNode("config");
+                        XmlElement xe2 = xmlDoc.CreateElement("GetHistoryTimeEnd");//创建一个<AimFrameNo8Way>节点
+                        xe2.InnerText = this.tpEndTime.SelectedTime.ToString();
+                        xn1.AppendChild(xe2);
+                    }
+                    xmlDoc.Save("remember.xml");
+                }
+                else
+                {
+                    XmlTextWriter writer = new XmlTextWriter("remember.xml", null);
+                    writer.Formatting = Formatting.Indented;
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("config");
+                    writer.WriteStartElement("GetHistoryDayStart");
+                    writer.WriteEndElement();
+                    writer.WriteStartElement("GetHistoryTimeStart");
+                    writer.WriteEndElement();
+                    writer.WriteStartElement("GetHistoryDayEnd");
+                    writer.WriteEndElement();
+                    writer.WriteStartElement("GetHistoryTimeEnd");
+                    writer.WriteEndElement();
+                    writer.WriteEndElement();
+                    writer.WriteEndDocument();
+                    writer.Flush();
+                    writer.Close();
+                }
+            }
+            catch (Exception ee)
+            {
+                MessageBox.Show("获取历史信息窗口初始化异常：" + ee.Message);
+            }
         }
         private void btnEnter_Click(object sender, RoutedEventArgs e)
         {
@@ -70,6 +172,32 @@ namespace BrokenRailMonitorViaWiFi.Windows
                 this.HourEnd = this.tpEndTime.SelectedTime.Value.Hour;
                 this.MinuteEnd = this.tpEndTime.SelectedTime.Value.Minute;
                 this.SecondEnd = this.tpEndTime.SelectedTime.Value.Second;
+            }
+            if (File.Exists("remember.xml"))
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load("remember.xml");
+                XmlNode nodeDayStart = xmlDoc.SelectSingleNode("config/GetHistoryDayStart");
+                if (nodeDayStart != null)
+                {
+                    nodeDayStart.InnerText = this.dpStartDate.SelectedDate.ToString();
+                }
+                XmlNode nodeTimeStart = xmlDoc.SelectSingleNode("config/GetHistoryTimeStart");
+                if (nodeTimeStart != null)
+                {
+                    nodeTimeStart.InnerText = this.tpStartTime.SelectedTime.ToString();
+                }
+                XmlNode nodeDayEnd = xmlDoc.SelectSingleNode("config/GetHistoryDayEnd");
+                if (nodeDayEnd != null)
+                {
+                    nodeDayEnd.InnerText = this.dpEndDate.SelectedDate.ToString();
+                }
+                XmlNode nodeTimeEnd = xmlDoc.SelectSingleNode("config/GetHistoryTimeEnd");
+                if (nodeTimeEnd != null)
+                {
+                    nodeTimeEnd.InnerText = this.tpEndTime.SelectedTime.ToString();
+                }
+                xmlDoc.Save("remember.xml");
             }
             this.DialogResult = true;
             this.Close();
