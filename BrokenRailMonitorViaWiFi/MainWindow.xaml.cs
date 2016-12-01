@@ -571,8 +571,6 @@ namespace BrokenRailMonitorViaWiFi
                                                 case 0x55:
                                                     this.dataShowUserCtrl.AddShowData("获取某段铁轨信息，4G终端已接收！", DataLevel.Normal);
                                                     break;
-                                                case 0x58:
-                                                    break;
                                                 default:
                                                     this.dataShowUserCtrl.AddShowData("未知指令被接收！", DataLevel.Normal);
                                                     break;
