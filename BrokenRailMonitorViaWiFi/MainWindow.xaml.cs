@@ -54,6 +54,7 @@ namespace BrokenRailMonitorViaWiFi
         private List<int> _4GPointIndex = new List<int>();
         private Dictionary<int, bool> _terminalsReceiveFlag;
         private List<int> _sendTime = new List<int>();
+        private int _hit0xf4Count = 0;
 
         public List<int> SocketRegister
         {
@@ -527,10 +528,9 @@ namespace BrokenRailMonitorViaWiFi
                                         continue;
                                     }
                                 }
-                                catch (Exception)
+                                catch (Exception ee)
                                 {
-
-                                    throw;
+                                    MessageBox.Show("检查校验和异常：" + ee.Message);
                                 }
 
                             }
@@ -676,13 +676,20 @@ namespace BrokenRailMonitorViaWiFi
                                             if (length == 10 && actualReceive[7] == 0xff)
                                             {
                                                 //接收数据结束。
+                                                _hit0xf4Count = 0;
                                             }
                                             else if ((length - 10) % 84 == 0)
                                             {
                                                 int dataCount = (length - 10) / 84;
                                                 if (dataCount != 0)
                                                 {
-                                                    initialFileConfig(actualReceive[7]);
+                                                    bool isReturn = false;
+                                                    int jStartValue = 0;
+                                                    judgeRefreshFileOrNot:
+                                                    if (_hit0xf4Count == 0)
+                                                    {
+                                                        refreshFileConfig(actualReceive[7]);
+                                                    }
                                                     string fileName = System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName + @"\DataTerminal" + actualReceive[7].ToString("D3") + ".xml";
                                                     if (File.Exists(fileName))
                                                     {
@@ -691,7 +698,16 @@ namespace BrokenRailMonitorViaWiFi
                                                         XmlNode xn1 = xmlDoc.SelectSingleNode("Datas");
                                                         if (xn1 != null)
                                                         {
-                                                            for (int j = 0; j < dataCount; j++)
+                                                            int j;
+                                                            if (!isReturn)
+                                                            {
+                                                                j = 0;
+                                                            }
+                                                            else
+                                                            {
+                                                                j = jStartValue;
+                                                            }
+                                                            for (; j < dataCount; j++)
                                                             {
                                                                 //写入xml文件格式。
                                                                 XmlElement xeData = xmlDoc.CreateElement("Data");//创建一个<Data>节点
@@ -727,6 +743,18 @@ namespace BrokenRailMonitorViaWiFi
                                                                 XmlElement xeSignalAmplitude2Right = xmlDoc.CreateElement("SignalAmplitudeRight");
                                                                 xeRail2.AppendChild(xeSignalAmplitude2Right);
 
+                                                                int year = actualReceive[8 + j * 84] + 2000;
+                                                                int month = actualReceive[9 + j * 84];
+                                                                int day = actualReceive[10 + j * 84];
+                                                                string directoryName = year.ToString() + "\\" + year.ToString() + "-" + month.ToString("D2") + "\\" + year.ToString() + "-" + month.ToString("D2") + "-" + day.ToString("D2");
+                                                                if (directoryName != _directoryName)
+                                                                {
+                                                                    _directoryName = directoryName;
+                                                                    jStartValue = j;
+                                                                    isReturn = true;
+                                                                    _hit0xf4Count = 0;
+                                                                    goto judgeRefreshFileOrNot;
+                                                                }
                                                                 //写入数据。
                                                                 xeTime.InnerText = actualReceive[8 + j * 84].ToString() + "-" + actualReceive[9 + j * 84].ToString() + "-" +
                                                                                    actualReceive[10 + j * 84].ToString() + "-" + actualReceive[11 + j * 84].ToString() + "-" +
@@ -803,7 +831,12 @@ namespace BrokenRailMonitorViaWiFi
                                                         }
                                                         xmlDoc.Save(fileName);
                                                     }
+                                                    _hit0xf4Count++;
                                                 }
+                                            }
+                                            else
+                                            {
+                                                MessageBox.Show("接收到的数据内容长度不是一包长度84的整数倍！");
                                             }
                                         }
                                         break;
@@ -1949,6 +1982,28 @@ namespace BrokenRailMonitorViaWiFi
                 writer.Close();
             }
         }
+        private void refreshFileConfig(int terminalNo)
+        {
+            string fileName = System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName + @"\DataTerminal" + terminalNo.ToString("D3") + ".xml";
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+            if (!File.Exists(fileName))
+            {
+                XmlTextWriter writer = new XmlTextWriter(fileName, null);
+                writer.Formatting = Formatting.Indented;
+                writer.WriteStartDocument();
+                writer.WriteStartElement("Datas");
+                //writer.WriteAttributeString("Value", this.txtAimFrameNo.Text);
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+                writer.Flush();
+                writer.Close();
+            }
+        }
+
         /// <summary>
         /// 根据终端号寻找终端所在List的索引。
         /// </summary>
