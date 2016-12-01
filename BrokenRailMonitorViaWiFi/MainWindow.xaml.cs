@@ -55,6 +55,7 @@ namespace BrokenRailMonitorViaWiFi
         private Dictionary<int, bool> _terminalsReceiveFlag;
         private List<int> _sendTime = new List<int>();
         private int _hit0xf4Count = 0;
+        private List<string> _fileNameList = new List<string>();
 
         public List<int> SocketRegister
         {
@@ -677,6 +678,13 @@ namespace BrokenRailMonitorViaWiFi
                                             {
                                                 //接收数据结束。
                                                 _hit0xf4Count = 0;
+                                                string fileNames = String.Empty;
+                                                foreach (var item in _fileNameList)
+                                                {
+                                                    fileNames += "\r\n" + item;
+                                                }
+                                                MessageBox.Show("共写了" + _fileNameList.Count + "个文件分别为：" + fileNames);
+                                                _fileNameList.Clear();
                                             }
                                             else if ((length - 10) % 84 == 0)
                                             {
@@ -709,6 +717,27 @@ namespace BrokenRailMonitorViaWiFi
                                                             }
                                                             for (; j < dataCount; j++)
                                                             {
+                                                                int year = actualReceive[8 + j * 84] + 2000;
+                                                                int month = actualReceive[9 + j * 84];
+                                                                int day = actualReceive[10 + j * 84];
+                                                                string directoryName = year.ToString() + "\\" + year.ToString() + "-" + month.ToString("D2") + "\\" + year.ToString() + "-" + month.ToString("D2") + "-" + day.ToString("D2");
+                                                                if (directoryName != _directoryName)
+                                                                {
+                                                                    if (j != 0)
+                                                                    {
+                                                                        xmlDoc.Save(fileName);
+                                                                        if (!_fileNameList.Exists(x => x.Equals(fileName)))
+                                                                        {
+                                                                            _fileNameList.Add(fileName);
+                                                                        }
+                                                                    }
+                                                                    _directoryName = directoryName;
+                                                                    jStartValue = j;
+                                                                    isReturn = true;
+                                                                    _hit0xf4Count = 0;
+                                                                    goto judgeRefreshFileOrNot;
+                                                                }
+
                                                                 //写入xml文件格式。
                                                                 XmlElement xeData = xmlDoc.CreateElement("Data");//创建一个<Data>节点
                                                                 xn1.AppendChild(xeData);
@@ -743,18 +772,6 @@ namespace BrokenRailMonitorViaWiFi
                                                                 XmlElement xeSignalAmplitude2Right = xmlDoc.CreateElement("SignalAmplitudeRight");
                                                                 xeRail2.AppendChild(xeSignalAmplitude2Right);
 
-                                                                int year = actualReceive[8 + j * 84] + 2000;
-                                                                int month = actualReceive[9 + j * 84];
-                                                                int day = actualReceive[10 + j * 84];
-                                                                string directoryName = year.ToString() + "\\" + year.ToString() + "-" + month.ToString("D2") + "\\" + year.ToString() + "-" + month.ToString("D2") + "-" + day.ToString("D2");
-                                                                if (directoryName != _directoryName)
-                                                                {
-                                                                    _directoryName = directoryName;
-                                                                    jStartValue = j;
-                                                                    isReturn = true;
-                                                                    _hit0xf4Count = 0;
-                                                                    goto judgeRefreshFileOrNot;
-                                                                }
                                                                 //写入数据。
                                                                 xeTime.InnerText = actualReceive[8 + j * 84].ToString() + "-" + actualReceive[9 + j * 84].ToString() + "-" +
                                                                                    actualReceive[10 + j * 84].ToString() + "-" + actualReceive[11 + j * 84].ToString() + "-" +
@@ -830,6 +847,10 @@ namespace BrokenRailMonitorViaWiFi
                                                             }
                                                         }
                                                         xmlDoc.Save(fileName);
+                                                        if (!_fileNameList.Exists(x => x.Equals(fileName)))
+                                                        {
+                                                            _fileNameList.Add(fileName);
+                                                        }
                                                     }
                                                     _hit0xf4Count++;
                                                 }
