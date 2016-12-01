@@ -208,5 +208,11 @@ namespace BrokenRailMonitorViaWiFi.Windows
             this.DialogResult = false;
             this.Close();
         }
+
+        private void btnToNow_Click(object sender, RoutedEventArgs e)
+        {
+            this.dpEndDate.SelectedDate = System.DateTime.Now;
+            this.tpEndTime.SelectedTime = System.DateTime.Now;
+        }
     }
 }

@@ -40,6 +40,7 @@
                 <DatePicker x:Name="dpEndDate" Width="100" Height="25" HorizontalAlignment="Left" Margin="0 16 0 0"
                             md:HintAssist.Hint="选择日期" Language="zh-cn"></DatePicker>
                 <md:TimePicker x:Name="tpEndTime" Width="100" Height="25" HorizontalAlignment="Left" Margin="20 16 0 0" Language="zh-cn"></md:TimePicker>
+                <Button x:Name="btnToNow" Margin="10 0 0 0" Click="btnToNow_Click" Width="50" Padding="5" Height="26">现在</Button>
             </StackPanel>
         </StackPanel>
         <DockPanel Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center">

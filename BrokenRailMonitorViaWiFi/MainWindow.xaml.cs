@@ -683,7 +683,14 @@ namespace BrokenRailMonitorViaWiFi
                                                 {
                                                     fileNames += "\r\n" + item;
                                                 }
-                                                MessageBox.Show("共写了" + _fileNameList.Count + "个文件分别为：" + fileNames);
+                                                if (_fileNameList.Count == 0)
+                                                {
+                                                    MessageBox.Show("共写了" + _fileNameList.Count + "个文件");
+                                                }
+                                                else
+                                                {
+                                                    MessageBox.Show("共写了" + _fileNameList.Count + "个文件" + (_fileNameList.Count == 1 ? "为：" : "分别为：") + fileNames);
+                                                }
                                                 _fileNameList.Clear();
                                             }
                                             else if ((length - 10) % 84 == 0)
