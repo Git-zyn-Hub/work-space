@@ -57,7 +57,7 @@
                     <chart:Axis AxisMinimum="-40" AxisMaximum="80" Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
+                    <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -72,7 +72,7 @@
                     <chart:Axis AxisMinimum="0" AxisMaximum="4096" Interval="410"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
+                    <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -87,7 +87,7 @@
                     <chart:Axis AxisMinimum="0" AxisMaximum="4096" Interval="410"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
+                    <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -102,7 +102,7 @@
                     <chart:Axis AxisMinimum="0" AxisMaximum="65535" Interval="6000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
+                    <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -117,7 +117,7 @@
                     <chart:Axis AxisMinimum="0" AxisMaximum="65535" Interval="6000"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
+                    <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -132,7 +132,7 @@
                     <chart:Axis AxisMinimum="0" AxisMaximum="100"  Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
+                    <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -147,7 +147,7 @@
                     <chart:Axis AxisMinimum="0" AxisMaximum="100"  Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
+                    <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -162,7 +162,7 @@
                     <chart:Axis AxisMinimum="0" AxisMaximum="100"  Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
+                    <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
             <chart:Chart ScrollingEnabled="False" View3D="False"
@@ -177,7 +177,7 @@
                     <chart:Axis AxisMinimum="0" AxisMaximum="100"  Interval="10"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
-                    <chart:Axis Interval="5" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
+                    <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
         </Grid>

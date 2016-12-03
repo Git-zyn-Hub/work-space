@@ -294,7 +294,7 @@ namespace BrokenRailMonitorViaWiFi
                     int accumulateNumber = 0;
                     while (true)
                     {
-                        byte[] receivedBytes = new byte[2048];
+                        byte[] receivedBytes = new byte[4096];
                         int numBytes = socket.Receive(receivedBytes, SocketFlags.None);
                         //判断Socket连接是否断开
                         if (numBytes == 0)
@@ -480,12 +480,13 @@ namespace BrokenRailMonitorViaWiFi
                                         }
                                         this.Dispatcher.Invoke(new Action(() =>
                                         {
-                                            this.dataShowUserCtrl.AddShowData("收到数据  " + sb.ToString(), DataLevel.Default);
+                                            this.dataShowUserCtrl.AddShowData("收到数据  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
                                         }));
 
                                         int length = (actualReceive[2] << 8) + actualReceive[3];
-                                        if (length != actualReceive.Length)
+                                        if (length < actualReceive.Length)
                                         {
+                                            //原来是！=的时候进入判断，可能会造成unhandledLength为负值，导致数组越界。
                                             //处理粘包的情况。
                                             int unhandledLength = actualReceive.Length - length;
                                             byte[] packagePrevious = new byte[length];
@@ -515,7 +516,10 @@ namespace BrokenRailMonitorViaWiFi
                                         sumLow = checksum & 0xff;
                                         if (sumHigh != actualReceive[actualReceive.Length - 2] || sumLow != actualReceive[actualReceive.Length - 1])
                                         {
-                                            MessageBox.Show("校验和出错");
+                                            this.Dispatcher.Invoke(new Action(() =>
+                                            {
+                                                this.dataShowUserCtrl.AddShowData("校验和出错", DataLevel.Error);
+                                            }));
                                             continue;
                                         }
                                     }
@@ -523,8 +527,13 @@ namespace BrokenRailMonitorViaWiFi
                                     {
                                         this.Dispatcher.BeginInvoke(new Action(() =>
                                         {
-                                            string strReceiveBroken = encoding.GetString(actualReceive);
-                                            this.dataShowUserCtrl.AddShowData("收到拆分的错误包  " + strReceiveBroken, DataLevel.Warning);
+                                            //string strReceiveBroken = encoding.GetString(actualReceive);
+                                            StringBuilder sb = new StringBuilder(500);
+                                            for (int i = 0; i < actualReceive.Length; i++)
+                                            {
+                                                sb.Append(actualReceive[i].ToString("x2"));
+                                            }
+                                            this.dataShowUserCtrl.AddShowData("收到拆分的错误包  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Warning);
                                         }));
                                         continue;
                                     }
@@ -672,7 +681,10 @@ namespace BrokenRailMonitorViaWiFi
                                         break;
                                     case 0xf4:
                                         {
-                                            checkDirectory();
+                                            //每次检查路径都会把_directoryName置成现在的时间。会导致，每次写前一天的都会进入if (directoryName != _directoryName)判断。
+                                            //然后把_hit0xf4Count置0，就会删除上次写好的文件。
+                                            //。检查路径已经在refreshFileConfig（）里做了因此不需要在这里检查路径了。
+                                            //checkDirectory();
                                             int length = (actualReceive[2] << 8) + actualReceive[3];
                                             if (length == 10 && actualReceive[7] == 0xff)
                                             {
@@ -2016,6 +2028,10 @@ namespace BrokenRailMonitorViaWiFi
             if (File.Exists(fileName))
             {
                 File.Delete(fileName);
+            }
+            if (!Directory.Exists(System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName))
+            {
+                Directory.CreateDirectory(System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName);
             }
             if (!File.Exists(fileName))
             {
