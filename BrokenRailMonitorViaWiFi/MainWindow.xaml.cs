@@ -303,6 +303,13 @@ namespace BrokenRailMonitorViaWiFi
                             {
                                 _receiveEmptyPackageCount = 0;
                                 MessageBox.Show("与" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！");
+                                foreach (var item in MasterControlList)
+                                {
+                                    if (item.IpAndPort == socket.RemoteEndPoint.ToString())
+                                    {
+                                        _socketRegister.Remove(item.TerminalNumber);
+                                    }
+                                }
                                 try
                                 {
                                     socketDisconnect();
@@ -315,13 +322,6 @@ namespace BrokenRailMonitorViaWiFi
                                 {
                                     closeSocket();
                                     miConnect_Click(this, null);
-                                }
-                                foreach (var item in MasterControlList)
-                                {
-                                    if (item.IpAndPort == socket.RemoteEndPoint.ToString())
-                                    {
-                                        _socketRegister.Remove(item.TerminalNumber);
-                                    }
                                 }
                                 break;
                             }
@@ -428,6 +428,10 @@ namespace BrokenRailMonitorViaWiFi
                                                         item.SocketImport = socket;
                                                         //socket已经导入，注册socket。
                                                         SocketRegister.Add(intTerminalNo);
+                                                        this.Dispatcher.Invoke(new Action(() =>
+                                                        {
+                                                            this.dataShowUserCtrl.AddShowData(intTerminalNo.ToString() + "号终端4G点Socket注册", DataLevel.Normal);
+                                                        }));
                                                         break;
                                                     }
                                                 }
@@ -456,6 +460,10 @@ namespace BrokenRailMonitorViaWiFi
                                                             item.SocketImport = socket;
                                                             //socket已经导入，注册socket。
                                                             SocketRegister.Add(intTerminalNo);
+                                                            this.Dispatcher.Invoke(new Action(() =>
+                                                            {
+                                                                this.dataShowUserCtrl.AddShowData(intTerminalNo.ToString() + "号终端4G点Socket注册", DataLevel.Normal);
+                                                            }));
                                                             break;
                                                         }
                                                     }
