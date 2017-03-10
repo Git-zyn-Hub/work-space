@@ -1960,6 +1960,19 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
+        private void miExportExcel_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ExportExcel export = new ExportExcel(this.MasterControlList);
+                
+            }
+            catch (Exception ee)
+            {
+                MessageBox.Show(ee.Message);
+            }
+        }
+
         private void miEraseFlash_Click(object sender, RoutedEventArgs e)
         {
             try

@@ -39,6 +39,14 @@
     <ApplicationIcon>train_rail.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ClosedXML, Version=0.86.0.0, Culture=neutral, PublicKeyToken=fd1eb21b62ae805b, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\ClosedXML.dll</HintPath>
+    </Reference>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>DLL\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
     <Reference Include="MaterialDesignColors">
       <HintPath>DLL\MaterialDesignColors.dll</HintPath>
     </Reference>
@@ -72,6 +80,7 @@
     <Compile Include="DataShowUserControl.xaml.cs">
       <DependentUpon>DataShowUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ExportExcel.cs" />
     <Compile Include="FullScreenChartWindow.xaml.cs">
       <DependentUpon>FullScreenChartWindow.xaml</DependentUpon>
     </Compile>
@@ -219,6 +228,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Resource>
+    <Content Include="DLL\ClosedXML.dll" />
+    <Content Include="DLL\DocumentFormat.OpenXml.dll" />
     <Content Include="DLL\WPFToolkit.dll" />
     <Content Include="DLL\WPFVisifire.Charts.dll" />
   </ItemGroup>

@@ -23,7 +23,7 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
             <!--<Button x:Name="btnSet" HorizontalAlignment="Left" Width="70" Click="btnSet_Click" Height="30">设置</Button>-->
-            <Menu x:Name="menu" Height="25" Width="260" HorizontalAlignment="Left">
+            <Menu x:Name="menu" Height="25" HorizontalAlignment="Left">
                 <MenuItem x:Name="miConnect" Header="连接" FontSize="15" Click="miConnect_Click"></MenuItem>
                 <MenuItem x:Name="miRefreshDevices" Header="刷新设备" FontSize="15" Click="miRefreshDevices_Click"></MenuItem>
                 <MenuItem x:Name="miCommand" Header="指令" FontSize="15">
@@ -38,6 +38,7 @@
                 <!--<MenuItem Header="历史" FontSize="15">-->
                 <!--<MenuItem x:Name="miGetHistory" Header="获取历史" Click="miGetHistory_Click"></MenuItem>-->
                 <MenuItem x:Name="miViewHistory" Header="回看历史" Click="miViewHistory_Click" FontSize="15"></MenuItem>
+                <MenuItem x:Name="miExportExcel" Header="导出Excel" Click="miExportExcel_Click" FontSize="15"></MenuItem>
                 <!--</MenuItem>-->
             </Menu>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
