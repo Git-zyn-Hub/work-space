@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Xml;
 using Visifire.Charts;
+using Visifire.Commons;
 
 namespace BrokenRailMonitorViaWiFi
 {
@@ -476,7 +477,7 @@ namespace BrokenRailMonitorViaWiFi
                     dPRail1LeftSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
                     dPRail1LeftSigAmp.YValue = _rail1LeftSigAmpList[j][k];
                     rail1LeftMax = Math.Max(_rail1LeftSigAmpList[j][k], rail1LeftMax);
-                    dPRail1LeftSigAmp.MarkerEnabled = false;
+                    setPointMarker(dPRail1LeftSigAmp, k);
                     dataSeries.DataPoints.Add(dPRail1LeftSigAmp);
                 }
             }
@@ -497,7 +498,7 @@ namespace BrokenRailMonitorViaWiFi
                     dPRail1RightSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
                     dPRail1RightSigAmp.YValue = _rail1RightSigAmpList[j][k];
                     rail1RightMax = Math.Max(_rail1RightSigAmpList[j][k], rail1RightMax);
-                    dPRail1RightSigAmp.MarkerEnabled = false;
+                    setPointMarker(dPRail1RightSigAmp, k);
                     dataSeries.DataPoints.Add(dPRail1RightSigAmp);
                 }
             }
@@ -518,7 +519,7 @@ namespace BrokenRailMonitorViaWiFi
                     dPRail2LeftSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
                     dPRail2LeftSigAmp.YValue = _rail2LeftSigAmpList[j][k];
                     rail2LeftMax = Math.Max(_rail2LeftSigAmpList[j][k], rail2LeftMax);
-                    dPRail2LeftSigAmp.MarkerEnabled = false;
+                    setPointMarker(dPRail2LeftSigAmp, k);
                     dataSeries.DataPoints.Add(dPRail2LeftSigAmp);
                 }
             }
@@ -539,12 +540,25 @@ namespace BrokenRailMonitorViaWiFi
                     dPRail2RightSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
                     dPRail2RightSigAmp.YValue = _rail2RightSigAmpList[j][k];
                     rail2RightMax = Math.Max(_rail2RightSigAmpList[j][k], rail2RightMax);
-                    dPRail2RightSigAmp.MarkerEnabled = false;
+                    setPointMarker(dPRail2RightSigAmp, k);
                     dataSeries.DataPoints.Add(dPRail2RightSigAmp);
                 }
             }
             changeYAxisMax(chartRail2RightSignalAmplitude, rail2RightMax);
             chartRail2RightSignalAmplitude.Series.Add(dataSeries);
+        }
+
+        private void setPointMarker(DataPoint dp,int index)
+        {
+            dp.MarkerEnabled = true;
+            if (index == 0)
+            {
+                dp.MarkerType = MarkerTypes.Triangle;
+            }
+            else
+            {
+                dp.MarkerType = MarkerTypes.Circle;
+            }
         }
 
         private void changeYAxisMax(Chart chart2Change, int max)

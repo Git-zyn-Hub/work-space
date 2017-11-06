@@ -99,7 +99,7 @@
                     <chart:Title Text="轨1应力"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="65535" Interval="6000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="4000" Interval="400"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
@@ -114,7 +114,7 @@
                     <chart:Title Text="轨2应力"/>
                 </chart:Chart.Titles>
                 <chart:Chart.AxesY>
-                    <chart:Axis AxisMinimum="0" AxisMaximum="65535" Interval="6000"></chart:Axis>
+                    <chart:Axis AxisMinimum="0" AxisMaximum="4000" Interval="400"></chart:Axis>
                 </chart:Chart.AxesY>
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
