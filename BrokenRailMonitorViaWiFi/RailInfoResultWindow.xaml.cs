@@ -360,6 +360,7 @@ namespace BrokenRailMonitorViaWiFi
             DataSeries dataSeries = new DataSeries();
             dataSeries.LegendText = "轨1温度";
             dataSeries.RenderAs = RenderAs.Line;
+            dataSeries.LineThickness = 2;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dataPoint;
             for (int k = 0; k < nodeCount; k++)
@@ -376,6 +377,7 @@ namespace BrokenRailMonitorViaWiFi
             dataSeries = new DataSeries();
             dataSeries.LegendText = "终端温度";
             dataSeries.RenderAs = RenderAs.Line;
+            dataSeries.LineThickness = 2;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dataPoint1;
             for (int k = 0; k < nodeCount; k++)
@@ -391,6 +393,7 @@ namespace BrokenRailMonitorViaWiFi
             dataSeries = new DataSeries();
             dataSeries.LegendText = "轨2温度";
             dataSeries.RenderAs = RenderAs.Line;
+            dataSeries.LineThickness = 2;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dataPoint2;
             for (int k = 0; k < nodeCount; k++)
@@ -407,6 +410,7 @@ namespace BrokenRailMonitorViaWiFi
             dataSeries = new DataSeries();
             dataSeries.RenderAs = RenderAs.Line;
             dataSeries.MarkerEnabled = false;
+            dataSeries.LineThickness = 2;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dpRail1ThisAmplitude;
             for (int k = 0; k < nodeCount; k++)
@@ -421,6 +425,7 @@ namespace BrokenRailMonitorViaWiFi
             chartRail2ThisAmplitude.Series.Clear();
             dataSeries = new DataSeries();
             dataSeries.RenderAs = RenderAs.Line;
+            dataSeries.LineThickness = 2;
             dataSeries.MarkerEnabled = false;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dpRail2ThisAmplitude;
@@ -436,6 +441,7 @@ namespace BrokenRailMonitorViaWiFi
             chartRail1Stress.Series.Clear();
             dataSeries = new DataSeries();
             dataSeries.RenderAs = RenderAs.Line;
+            dataSeries.LineThickness = 2;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dataPointStress1;
             for (int k = 0; k < nodeCount; k++)
@@ -451,6 +457,7 @@ namespace BrokenRailMonitorViaWiFi
             chartRail2Stress.Series.Clear();
             dataSeries = new DataSeries();
             dataSeries.RenderAs = RenderAs.Line;
+            dataSeries.LineThickness = 2;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dataPointStress2;
             for (int k = 0; k < nodeCount; k++)
@@ -466,6 +473,7 @@ namespace BrokenRailMonitorViaWiFi
             chartRail1LeftSignalAmplitude.Series.Clear();
             dataSeries = new DataSeries();
             dataSeries.RenderAs = RenderAs.Line;
+            dataSeries.LineThickness = 2;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dPRail1LeftSigAmp;
             int rail1LeftMax = 0;
@@ -487,6 +495,7 @@ namespace BrokenRailMonitorViaWiFi
             chartRail1RightSignalAmplitude.Series.Clear();
             dataSeries = new DataSeries();
             dataSeries.RenderAs = RenderAs.Line;
+            dataSeries.LineThickness = 2;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dPRail1RightSigAmp;
             int rail1RightMax = 0;
@@ -508,6 +517,7 @@ namespace BrokenRailMonitorViaWiFi
             chartRail2LeftSignalAmplitude.Series.Clear();
             dataSeries = new DataSeries();
             dataSeries.RenderAs = RenderAs.Line;
+            dataSeries.LineThickness = 2;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dPRail2LeftSigAmp;
             int rail2LeftMax = 0;
@@ -529,6 +539,7 @@ namespace BrokenRailMonitorViaWiFi
             chartRail2RightSignalAmplitude.Series.Clear();
             dataSeries = new DataSeries();
             dataSeries.RenderAs = RenderAs.Line;
+            dataSeries.LineThickness = 2;
             dataSeries.XValueType = ChartValueTypes.DateTime;
             DataPoint dPRail2RightSigAmp;
             int rail2RightMax = 0;
