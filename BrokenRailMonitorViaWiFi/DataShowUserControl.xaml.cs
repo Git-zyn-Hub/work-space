@@ -29,7 +29,7 @@ namespace BrokenRailMonitorViaWiFi
         {
             try
             {
-                string nowTime = System.DateTime.Now.ToString("HH:mm:ss");
+                string nowTime = System.DateTime.Now.ToString("HH:mm:ss.fff");
                 TextBlock txtData = new TextBlock();
                 switch (dataLevel)
                 {
@@ -50,7 +50,7 @@ namespace BrokenRailMonitorViaWiFi
                         txtData.Foreground = new SolidColorBrush(Colors.Black);
                         break;
                 }
-                txtData.Text = nowTime + "  " + data;
+                txtData.Text = nowTime + " -> " + data;
                 this.stpContainer.Children.Add(txtData);
                 //this.scrollViewer.Focus();
                 this.scrollViewer.ScrollToEnd();

@@ -1412,22 +1412,41 @@ namespace BrokenRailMonitorViaWiFi
             try
             {
                 //IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("192.168.16.254"), 8080);
-                //IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("103.44.145.248"), 13317);
-                //_socketMain = new Socket(deviceIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                //_socketMain.Connect(deviceIP);
-                //_socketListeningThread = new Thread(socketListening);
-                //_socketListeningThread.Start();
-                IPEndPoint hostIP = new IPEndPoint(IPAddress.Any, 16479);
-                _socketMain = new Socket(hostIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                _socketMain.Bind(hostIP);
-                _socketMain.Listen(500);
-                _socketAcceptThread = new Thread(socketAccept);
-                _socketAcceptThread.IsBackground = true;
-                _socketAcceptThread.Start();
+                IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("103.44.145.248"), 23539);
+                _socketMain = new Socket(deviceIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                _socketMain.Connect(deviceIP);
+
+                this.miConnect.Header = "已连接";
+                this.miConnect.Background = new SolidColorBrush(Colors.LightGreen);
+                this.miConnect.IsEnabled = false;
+                SendData("电脑" + _socketMain.LocalEndPoint.ToString());
+
+                _socketListeningThread = new Thread(new ParameterizedThreadStart(socketListening));
+                _socketListeningThread.Start(_socketMain);
+                //IPEndPoint hostIP = new IPEndPoint(IPAddress.Any, 16479);
+                //_socketMain = new Socket(hostIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                //_socketMain.Bind(hostIP);
+                //_socketMain.Listen(500);
+                //_socketAcceptThread = new Thread(socketAccept);
+                //_socketAcceptThread.IsBackground = true;
+                //_socketAcceptThread.Start();
             }
             catch (Exception ee)
             {
                 MessageBox.Show("连接终端异常：" + ee.Message);
+            }
+        }
+        private void SendData(string data)
+        {
+            try
+            {
+                byte[] msg = Encoding.UTF8.GetBytes(data);
+                _socketMain.Send(msg, 0, msg.Length, SocketFlags.None);
+                this.dataShowUserCtrl.AddShowData(data, DataLevel.Default);
+            }
+            catch (Exception ee)
+            {
+                MessageBox.Show("发送数据异常：" + ee.Message);
             }
         }
         private void socketAccept()
@@ -1965,7 +1984,7 @@ namespace BrokenRailMonitorViaWiFi
             try
             {
                 ExportExcel export = new ExportExcel(this.MasterControlList);
-                
+
             }
             catch (Exception ee)
             {
