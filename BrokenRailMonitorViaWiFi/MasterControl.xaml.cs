@@ -172,6 +172,7 @@ namespace BrokenRailMonitorViaWiFi
                 {
                     _mainWin.DecideDelayOrNot();
                     socketGet.Send(sendData, SocketFlags.None);
+                    AppendDataMsg(sendData);
                 }
                 else
                 {
@@ -265,6 +266,7 @@ namespace BrokenRailMonitorViaWiFi
                 {
                     _mainWin.DecideDelayOrNot();
                     socketGet.Send(sendData, SocketFlags.None);
+                    AppendDataMsg(sendData);
                 }
                 else
                 {
@@ -292,6 +294,7 @@ namespace BrokenRailMonitorViaWiFi
                 {
                     _mainWin.DecideDelayOrNot();
                     socketGet.Send(sendData, SocketFlags.None);
+                    AppendDataMsg(sendData);
                 }
                 else
                 {
@@ -364,6 +367,7 @@ namespace BrokenRailMonitorViaWiFi
                 {
                     _mainWin.DecideDelayOrNot();
                     socketGet.Send(sendData, SocketFlags.None);
+                    AppendDataMsg(sendData);
                 }
                 else
                 {
@@ -397,6 +401,7 @@ namespace BrokenRailMonitorViaWiFi
             {
                 _mainWin.DecideDelayOrNot();
                 socketGet.Send(sendData, SocketFlags.None);
+                AppendDataMsg(sendData);
             }
             else
             {
@@ -517,6 +522,19 @@ namespace BrokenRailMonitorViaWiFi
         public void HideContextMenu()
         {
             this.contextMenu.Visibility = Visibility.Hidden;
+        }
+
+        public void AppendDataMsg(byte[] sendData)
+        {
+            StringBuilder sb = new StringBuilder(500);
+            for (int i = 0; i < sendData.Length; i++)
+            {
+                sb.Append(sendData[i].ToString("x2"));
+            }
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                _mainWin.dataShowUserCtrl.AddShowData("发送数据  (长度：" + sendData.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
+            }));
         }
 
         #region INotifyPropertyChanged Members
