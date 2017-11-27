@@ -531,6 +531,18 @@ namespace BrokenRailMonitorViaWiFi
                                             continue;
                                         }
                                     }
+                                    else if (actualReceive[0] == 0x55 && actualReceive[1] == 0xaa)
+                                    {
+                                        StringBuilder sb = new StringBuilder(500);
+                                        for (int i = 0; i < actualReceive.Length; i++)
+                                        {
+                                            sb.Append(actualReceive[i].ToString("x2"));
+                                        }
+                                        this.Dispatcher.Invoke(new Action(() =>
+                                        {
+                                            this.dataShowUserCtrl.AddShowData("收到指令  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
+                                        }));
+                                    }
                                     else
                                     {
                                         this.Dispatcher.BeginInvoke(new Action(() =>
@@ -1295,6 +1307,22 @@ namespace BrokenRailMonitorViaWiFi
                                     //    break;
                                     default:
                                         MessageBox.Show("收到未知数据！");
+                                        break;
+                                }
+                            }
+                            else if (actualReceive[0] == 0x55 && actualReceive[1] == 0xaa)
+                            {
+                                switch (actualReceive[5])
+                                {
+                                    case 0xa1:
+                                        {
+                                            this.Dispatcher.BeginInvoke(new Action(() =>
+                                            {
+                                                this.dataShowUserCtrl.AddShowData("为电脑分配ClientID：" + actualReceive[4].ToString(), DataLevel.Default);
+                                            }));
+                                        }
+                                        break;
+                                    default:
                                         break;
                                 }
                             }
@@ -2157,6 +2185,10 @@ namespace BrokenRailMonitorViaWiFi
         }
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            if (_socketMain != null)
+            {
+                _socketMain.Close();
+            }
             System.Environment.Exit(0);
         }
         public void AppendDataMsg(byte[] sendData)
