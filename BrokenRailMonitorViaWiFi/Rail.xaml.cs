@@ -69,6 +69,12 @@ namespace BrokenRailMonitorViaWiFi
             this.RailState = RailStates.IsDifferent;
             this.recRail.Fill = new SolidColorBrush(Colors.Orange);
         }
+
+        public void Timeout()
+        {
+            this.RailState = RailStates.IsTimeout;
+            this.recRail.Fill = new SolidColorBrush(Colors.Gray);
+        }
         private void railUserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
 
@@ -79,6 +85,7 @@ namespace BrokenRailMonitorViaWiFi
     {
         IsError,
         IsNormal,
-        IsDifferent
+        IsDifferent,
+        IsTimeout
     }
 }

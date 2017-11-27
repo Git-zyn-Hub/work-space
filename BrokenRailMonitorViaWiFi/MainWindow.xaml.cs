@@ -1149,6 +1149,13 @@ namespace BrokenRailMonitorViaWiFi
                                                                     setRail1State(index, onOff);
                                                                 }));
                                                             }
+                                                            else if (((bytesOnOffContent[i + 1] & 0xf0) >> 4) == 9 || (bytesOnOffContent[i + 4] & 0x0f) == 9)
+                                                            {
+                                                                this.Dispatcher.Invoke(new Action(() =>
+                                                                {
+                                                                    setRail1State(index, 9);
+                                                                }));
+                                                            }
                                                             else
                                                             {
                                                                 //冲突
@@ -1211,6 +1218,13 @@ namespace BrokenRailMonitorViaWiFi
                                                                 this.Dispatcher.Invoke(new Action(() =>
                                                                 {
                                                                     setRail2State(index, onOff);
+                                                                }));
+                                                            }
+                                                            else if (((bytesOnOffContent[i + 2] & 0xf0) >> 4) == 9 || (bytesOnOffContent[i + 5] & 0x0f) == 9)
+                                                            {
+                                                                this.Dispatcher.Invoke(new Action(() =>
+                                                                {
+                                                                    setRail2State(index, 9);
                                                                 }));
                                                             }
                                                             else
@@ -1377,6 +1391,16 @@ namespace BrokenRailMonitorViaWiFi
                 Rail rail = this.cvsRail1.Children[index] as Rail;
                 rail.Error();
             }
+            else if (onOff == 9)
+            {//超时
+                int tNo = MasterControlList[index].TerminalNumber;
+                int tNextNo = MasterControlList[index + 1].TerminalNumber;
+
+                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨超时！", DataLevel.Timeout);
+                this._svtThumbnail.Timeout(new int[1] { index }, 1);
+                Rail rail = this.cvsRail1.Children[index] as Rail;
+                rail.Timeout();
+            }
             else
             {
                 MessageBox.Show("收到未定义数据！");
@@ -1400,6 +1424,16 @@ namespace BrokenRailMonitorViaWiFi
                 this._svtThumbnail.Error(new int[1] { index }, 2);
                 Rail rail = this.cvsRail2.Children[index] as Rail;
                 rail.Error();
+            }
+            else if (onOff == 9)
+            {//超时
+                int tNo = MasterControlList[index].TerminalNumber;
+                int tNextNo = MasterControlList[index + 1].TerminalNumber;
+
+                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨超时！", DataLevel.Timeout);
+                this._svtThumbnail.Timeout(new int[1] { index }, 1);
+                Rail rail = this.cvsRail1.Children[index] as Rail;
+                rail.Timeout();
             }
             else
             {
