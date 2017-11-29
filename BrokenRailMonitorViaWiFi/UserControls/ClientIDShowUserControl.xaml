@@ -8,7 +8,7 @@
     <Grid>
         <Ellipse Fill="#0088ff" Height="30" Width="30">
         </Ellipse>
-        <Label VerticalAlignment="Center" HorizontalAlignment="Center"  FontSize="12" Foreground="White"
+        <Label VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold" FontSize="12" Foreground="White"
                 Content="{Binding ClientID}"></Label>
     </Grid>
 </UserControl>

@@ -80,6 +80,7 @@
     <Compile Include="DataShowUserControl.xaml.cs">
       <DependentUpon>DataShowUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Enums.cs" />
     <Compile Include="ExportExcel.cs" />
     <Compile Include="FullScreenChartWindow.xaml.cs">
       <DependentUpon>FullScreenChartWindow.xaml</DependentUpon>

@@ -40,7 +40,7 @@ namespace BrokenRailMonitorViaWiFi
         private Socket _socketMain;
         private Socket _acceptSocket;
         private Thread _socketListeningThread;
-        private Thread _socketAcceptThread;
+        //private Thread _socketAcceptThread;
         private List<MasterControl> _masterControlList = new List<MasterControl>();
         private List<Rail> _rail1List = new List<Rail>();
         private List<Rail> _rail2List = new List<Rail>();
@@ -1346,7 +1346,7 @@ namespace BrokenRailMonitorViaWiFi
                             {
                                 switch (actualReceive[5])
                                 {
-                                    case 0xa1:
+                                    case (byte)CommandType.AssignClientID:
                                         {
                                             this.Dispatcher.BeginInvoke(new Action(() =>
                                             {
@@ -2256,6 +2256,16 @@ namespace BrokenRailMonitorViaWiFi
             {
                 this.dataShowUserCtrl.AddShowData("发送数据  (长度：" + sendData.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
             }));
+        }
+
+        private void miUpload_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void miDownload_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
