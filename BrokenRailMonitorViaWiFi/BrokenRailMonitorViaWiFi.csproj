@@ -107,6 +107,9 @@
     <Compile Include="SignalSendConfigWindow.xaml.cs">
       <DependentUpon>SignalSendConfigWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\ClientIDShowUserControl.xaml.cs">
+      <DependentUpon>ClientIDShowUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ValidationRules.cs" />
     <Compile Include="Windows\EraseFlashWindow.xaml.cs">
       <DependentUpon>EraseFlashWindow.xaml</DependentUpon>
@@ -168,6 +171,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="SignalSendConfigWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ClientIDShowUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

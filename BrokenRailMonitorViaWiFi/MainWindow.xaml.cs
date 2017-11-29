@@ -251,6 +251,14 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
+        public void AppendMessage(string msg, DataLevel level)
+        {
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                this.dataShowUserCtrl.AddShowData(msg, level);
+            }));
+        }
+
         private void _svtThumbnail_MouseClickedEvent()
         {
             double offset = this._svtThumbnail.XPosition / this._svtThumbnail.CvsFollowMouseWidth * this._svtThumbnail.ScrollViewerTotalWidth;
@@ -302,12 +310,20 @@ namespace BrokenRailMonitorViaWiFi
                             if (_receiveEmptyPackageCount == 10)
                             {
                                 _receiveEmptyPackageCount = 0;
-                                MessageBox.Show("与" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！");
+                                AppendMessage("与" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！", DataLevel.Error);
                                 foreach (var item in MasterControlList)
                                 {
                                     if (item.IpAndPort == socket.RemoteEndPoint.ToString())
                                     {
                                         _socketRegister.Remove(item.TerminalNumber);
+                                        int index = FindMasterControlIndex(item.TerminalNumber);
+                                        if (index != -1)
+                                        {
+                                            this.Dispatcher.Invoke(new Action(() =>
+                                            {
+                                                MasterControlList[index].Offline();
+                                            }));
+                                        }
                                     }
                                 }
                                 try
@@ -316,12 +332,12 @@ namespace BrokenRailMonitorViaWiFi
                                 }
                                 catch (Exception ee)
                                 {
-                                    MessageBox.Show("关闭线程及Socket异常：" + ee.Message);
+                                    AppendMessage("关闭线程及Socket异常：" + ee.Message, DataLevel.Error);
                                 }
                                 finally
                                 {
                                     closeSocket();
-                                    miConnect_Click(this, null);
+                                    //miConnect_Click(this, null);
                                 }
                                 break;
                             }
@@ -423,6 +439,7 @@ namespace BrokenRailMonitorViaWiFi
                                                         MessageBox.Show("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！");
                                                         break;
                                                     }
+                                                    item.Online();
                                                     if (item.SocketImport == null || item.IpAndPort != socket.RemoteEndPoint.ToString())
                                                     {
                                                         item.SocketImport = socket;
@@ -455,6 +472,7 @@ namespace BrokenRailMonitorViaWiFi
                                                             MessageBox.Show("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！");
                                                             break;
                                                         }
+                                                        item.Online();
                                                         if (item.SocketImport == null || item.IpAndPort != socket.RemoteEndPoint.ToString())
                                                         {
                                                             item.SocketImport = socket;
@@ -1332,6 +1350,7 @@ namespace BrokenRailMonitorViaWiFi
                                         {
                                             this.Dispatcher.BeginInvoke(new Action(() =>
                                             {
+                                                this.clientIDShow.ClientID = actualReceive[4];
                                                 this.dataShowUserCtrl.AddShowData("为电脑分配ClientID：" + actualReceive[4].ToString(), DataLevel.Default);
                                             }));
                                         }
@@ -1354,7 +1373,7 @@ namespace BrokenRailMonitorViaWiFi
                         }
                         else
                         {
-                            this.Dispatcher.BeginInvoke(new Action(() =>
+                            this.Dispatcher.Invoke(new Action(() =>
                             {
                                 this.dataShowUserCtrl.AddShowData("接收数据长度小于6  " + strReceive, DataLevel.Warning);
                             }));
@@ -1369,7 +1388,7 @@ namespace BrokenRailMonitorViaWiFi
             catch (Exception ee)
             {
                 //socketDisconnect();
-                MessageBox.Show("Socket监听线程异常：" + ee.Message);
+                AppendMessage("Socket监听线程异常：" + ee.Message, DataLevel.Error);
             }
         }
 
@@ -1626,12 +1645,13 @@ namespace BrokenRailMonitorViaWiFi
         private void closeSocket()
         {
             _socketMain.Close();
-            _socketAcceptThread.Abort();
-            CloseAcceptSocket();
+            //_socketAcceptThread.Abort();
+            //CloseAcceptSocket();
             _socketMain = null;
             this.Dispatcher.Invoke(new Action(() =>
             {
                 this.miConnect.Header = "连接";
+                this.miConnect.IsEnabled = true;
                 this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
             }));
         }

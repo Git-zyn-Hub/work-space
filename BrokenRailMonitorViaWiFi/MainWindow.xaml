@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi" Closing="Window_Closing"
+        xmlns:userCtrl="clr-namespace:BrokenRailMonitorViaWiFi.UserControls"
         mc:Ignorable="d"
         Title="断轨监测" Height="600" Width="1024" MinHeight="450" MinWidth="450">
     <Window.Background>
@@ -46,6 +47,7 @@
                 <Label x:Name="lblPackageCount"></Label>
             </StackPanel>
         </DockPanel>
+        <userCtrl:ClientIDShowUserControl x:Name="clientIDShow" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"></userCtrl:ClientIDShowUserControl>
         <ScrollViewer x:Name="svContainer" Grid.Row="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
             <!--<StackPanel VerticalAlignment="Center" Height="36">-->
             <StackPanel VerticalAlignment="Bottom">
