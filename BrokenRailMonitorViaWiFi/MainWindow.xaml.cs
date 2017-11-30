@@ -314,6 +314,7 @@ namespace BrokenRailMonitorViaWiFi
                                 _receiveEmptyPackageCount = 0;
                                 AppendMessage("与" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！", DataLevel.Error);
                                 _isConnect = false;
+                                this.clientIDShow.ClientID = 0;
                                 foreach (var item in MasterControlList)
                                 {
                                     if (item.IpAndPort == socket.RemoteEndPoint.ToString())
@@ -431,6 +432,9 @@ namespace BrokenRailMonitorViaWiFi
 
                                     this.Dispatcher.Invoke(new Action(() =>
                                     {
+                                        int index = FindMasterControlIndex(intTerminalNo);
+                                        if (index != -1)
+                                            MasterControlList[index].Online();
                                         if (SocketRegister.Count == 0)
                                         {
                                             foreach (var item in MasterControlList)
@@ -442,7 +446,6 @@ namespace BrokenRailMonitorViaWiFi
                                                         AppendMessage("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！", DataLevel.Error);
                                                         break;
                                                     }
-                                                    item.Online();
                                                     if (item.SocketImport == null || item.IpAndPort != socket.RemoteEndPoint.ToString())
                                                     {
                                                         item.SocketImport = socket;
@@ -475,7 +478,6 @@ namespace BrokenRailMonitorViaWiFi
                                                             AppendMessage("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！", DataLevel.Error);
                                                             break;
                                                         }
-                                                        item.Online();
                                                         if (item.SocketImport == null || item.IpAndPort != socket.RemoteEndPoint.ToString())
                                                         {
                                                             item.SocketImport = socket;

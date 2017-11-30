@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -20,6 +21,7 @@ namespace BrokenRailMonitorViaWiFi
     /// </summary>
     public partial class DataShowUserControl : UserControl
     {
+        private bool _stopScroll = false;
         public DataShowUserControl()
         {
             InitializeComponent();
@@ -56,13 +58,79 @@ namespace BrokenRailMonitorViaWiFi
                 txtData.Text = nowTime + " -> " + data;
                 this.stpContainer.Children.Add(txtData);
                 //this.scrollViewer.Focus();
-                this.scrollViewer.ScrollToEnd();
+                ScrollControl();
             }
             catch (Exception)
             {
 
                 throw;
             }
+        }
+
+
+
+        public void ClearContainer()
+        {
+            this.stpContainer.Children.Clear();
+        }
+
+        private void ScrollControl()
+        {
+            if (!_stopScroll)
+            {
+                //自动滚动到底部
+                this.scrollViewer.ScrollToEnd();
+            }
+        }
+        private void tbtnPin_Checked(object sender, RoutedEventArgs e)
+        {
+            _stopScroll = true;
+        }
+
+        private void tbtnPin_Unchecked(object sender, RoutedEventArgs e)
+        {
+            _stopScroll = false;
+        }
+
+        private void ToggleButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            ToggleButton b = sender as ToggleButton;
+            if (b != null)
+            {
+                b.BorderThickness = new Thickness(0);
+            }
+        }
+
+        private void ToggleButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            ToggleButton b = sender as ToggleButton;
+            if (b != null)
+            {
+                b.BorderThickness = new Thickness(1);
+            }
+        }
+
+        private void Button_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Button b = sender as Button;
+            if (b != null)
+            {
+                b.BorderThickness = new Thickness(0);
+            }
+        }
+
+        private void Button_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Button b = sender as Button;
+            if (b != null)
+            {
+                b.BorderThickness = new Thickness(1);
+            }
+        }
+
+        private void btnClear_Click(object sender, RoutedEventArgs e)
+        {
+            ClearContainer();
         }
     }
 
