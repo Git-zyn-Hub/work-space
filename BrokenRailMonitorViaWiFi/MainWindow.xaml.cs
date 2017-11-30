@@ -195,18 +195,18 @@ namespace BrokenRailMonitorViaWiFi
                     {
                         if (neighbourSmall != 0)
                         {
-                            MessageBox.Show("第一个终端的NeighbourSmall标签未设置为0");
+                            AppendMessage("第一个终端的NeighbourSmall标签未设置为0", DataLevel.Warning);
                         }
                     }
                     else
                     {
                         if (MasterControlList[i - 1].TerminalNumber != neighbourSmall)
                         {
-                            MessageBox.Show("终端" + terminalNo.ToString() + "的小相邻终端不匹配，请检查配置文件");
+                            AppendMessage("终端" + terminalNo.ToString() + "的小相邻终端不匹配，请检查配置文件", DataLevel.Warning);
                         }
                         if (oneMasterControl.TerminalNumber != neighbourBigRemember)
                         {
-                            MessageBox.Show("终端" + MasterControlList[i - 1].TerminalNumber.ToString() + "的大相邻终端不匹配，请检查配置文件");
+                            AppendMessage("终端" + MasterControlList[i - 1].TerminalNumber.ToString() + "的大相邻终端不匹配，请检查配置文件", DataLevel.Warning);
                         }
                     }
                     oneMasterControl.NeighbourSmall = neighbourSmall;
@@ -228,7 +228,7 @@ namespace BrokenRailMonitorViaWiFi
                         oneMasterControl.NeighbourBig = 0xff;
                         if (!(innerTextNeighbourBig == "ff" || innerTextNeighbourBig == "FF"))
                         {
-                            MessageBox.Show("最末终端" + terminalNo.ToString() + "的大相邻终端不是ff，请检查配置文件");
+                            AppendMessage("最末终端" + terminalNo.ToString() + "的大相邻终端不是ff，请检查配置文件", DataLevel.Warning);
                         }
                     }
                     i++;
@@ -247,7 +247,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             catch (Exception ee)
             {
-                MessageBox.Show("设备初始化异常：" + ee.Message);
+                AppendMessage("设备初始化异常：" + ee.Message, DataLevel.Error);
             }
         }
 
@@ -276,7 +276,7 @@ namespace BrokenRailMonitorViaWiFi
         //{
         //    if (_serialPort1.IsOpen)
         //    {
-        //        MessageBox.Show("串口早就打开了有木有!");
+        //        AppendMessage("串口早就打开了有木有!");
         //    }
         //    else
         //    {
@@ -284,11 +284,11 @@ namespace BrokenRailMonitorViaWiFi
         //        {
         //            _serialPort1.Open();
         //            _serialPort1.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
-        //            MessageBox.Show("端口打开！");
+        //            AppendMessage("端口打开！");
         //        }
         //        catch (Exception ee)
         //        {
-        //            MessageBox.Show("端口无法打开! " + ee.Message);
+        //            AppendMessage("端口无法打开! " + ee.Message);
         //        }
         //    }
         //}
@@ -437,7 +437,7 @@ namespace BrokenRailMonitorViaWiFi
                                                 {
                                                     if (!item.Is4G)
                                                     {
-                                                        MessageBox.Show("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！");
+                                                        AppendMessage("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！", DataLevel.Error);
                                                         break;
                                                     }
                                                     item.Online();
@@ -470,7 +470,7 @@ namespace BrokenRailMonitorViaWiFi
                                                     {
                                                         if (!item.Is4G)
                                                         {
-                                                            MessageBox.Show("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！");
+                                                            AppendMessage("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！", DataLevel.Error);
                                                             break;
                                                         }
                                                         item.Online();
@@ -529,7 +529,7 @@ namespace BrokenRailMonitorViaWiFi
                                             actualReceive = new byte[length];
                                             packagePrevious.CopyTo(actualReceive, 0);
                                             goto handlePackage;
-                                            //MessageBox.Show("长度字段与实际收到长度不相等");
+                                            //AppendMessage("长度字段与实际收到长度不相等");
                                             //continue;
                                         }
                                         int checksum = 0;
@@ -579,7 +579,7 @@ namespace BrokenRailMonitorViaWiFi
                                 }
                                 catch (Exception ee)
                                 {
-                                    MessageBox.Show("检查校验和异常：" + ee.Message);
+                                    AppendMessage("检查校验和异常：" + ee.Message, DataLevel.Error);
                                 }
 
                             }
@@ -646,7 +646,7 @@ namespace BrokenRailMonitorViaWiFi
                                                         {
                                                             if (0 != actualReceive[8])
                                                             {
-                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻小终端不为0！\r\n终端没有次级相邻小终端应填0");
+                                                                AppendMessage(terminalNo.ToString() + "号终端次级相邻小终端不为0！\r\n终端没有次级相邻小终端应填0", DataLevel.Error);
                                                                 isError = true;
                                                             }
                                                         }
@@ -654,28 +654,28 @@ namespace BrokenRailMonitorViaWiFi
                                                         {
                                                             if (MasterControlList[i - 1].NeighbourSmall != actualReceive[8])
                                                             {
-                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻小终端不匹配！\r\nconfig.xml配置文件中为"
-                                                                    + MasterControlList[i - 1].NeighbourSmall.ToString() + "收到的为" + actualReceive[8].ToString());
+                                                                AppendMessage(terminalNo.ToString() + "号终端次级相邻小终端不匹配！\r\nconfig.xml配置文件中为"
+                                                                    + MasterControlList[i - 1].NeighbourSmall.ToString() + "收到的为" + actualReceive[8].ToString(), DataLevel.Error);
                                                                 isError = true;
                                                             }
                                                         }
                                                         if (masterControl.NeighbourSmall != actualReceive[9])
                                                         {
-                                                            MessageBox.Show(terminalNo.ToString() + "号终端相邻小终端不匹配！\r\nconfig.xml配置文件中为"
-                                                                    + masterControl.NeighbourSmall.ToString() + "收到的为" + actualReceive[9].ToString());
+                                                            AppendMessage(terminalNo.ToString() + "号终端相邻小终端不匹配！\r\nconfig.xml配置文件中为"
+                                                                    + masterControl.NeighbourSmall.ToString() + "收到的为" + actualReceive[9].ToString(), DataLevel.Error);
                                                             isError = true;
                                                         }
                                                         if (masterControl.NeighbourBig != actualReceive[10])
                                                         {
-                                                            MessageBox.Show(terminalNo.ToString() + "号终端相邻大终端不匹配！\r\nconfig.xml配置文件中为"
-                                                                    + masterControl.NeighbourBig.ToString() + "收到的为" + actualReceive[10].ToString());
+                                                            AppendMessage(terminalNo.ToString() + "号终端相邻大终端不匹配！\r\nconfig.xml配置文件中为"
+                                                                    + masterControl.NeighbourBig.ToString() + "收到的为" + actualReceive[10].ToString(), DataLevel.Error);
                                                             isError = true;
                                                         }
                                                         if (i == count - 2 || i == count - 1)
                                                         {
                                                             if (0xff != actualReceive[11])
                                                             {
-                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻大终端不为255！\r\n终端没有次级相邻大终端应填255");
+                                                                AppendMessage(terminalNo.ToString() + "号终端次级相邻大终端不为255！\r\n终端没有次级相邻大终端应填255", DataLevel.Error);
                                                                 isError = true;
                                                             }
                                                         }
@@ -683,8 +683,8 @@ namespace BrokenRailMonitorViaWiFi
                                                         {
                                                             if (MasterControlList[i + 1].NeighbourBig != actualReceive[11])
                                                             {
-                                                                MessageBox.Show(terminalNo.ToString() + "号终端次级相邻大终端不匹配！\r\nconfig.xml配置文件中为"
-                                                                    + MasterControlList[i + 1].NeighbourBig.ToString() + "收到的为" + actualReceive[11].ToString());
+                                                                AppendMessage(terminalNo.ToString() + "号终端次级相邻大终端不匹配！\r\nconfig.xml配置文件中为"
+                                                                    + MasterControlList[i + 1].NeighbourBig.ToString() + "收到的为" + actualReceive[11].ToString(), DataLevel.Error);
                                                                 isError = true;
                                                             }
                                                         }
@@ -701,7 +701,7 @@ namespace BrokenRailMonitorViaWiFi
                                                             }
                                                             else
                                                             {
-                                                                MessageBox.Show("‘Flash是否有效’字段收到未定义数据。按照无效处理！");
+                                                                AppendMessage("‘Flash是否有效’字段收到未定义数据。按照无效处理！", DataLevel.Error);
                                                             }
                                                             PointConfigInfoWindow onePCIWin = new PointConfigInfoWindow(terminalNo, actualReceive[8], actualReceive[9], actualReceive[10], actualReceive[11], flashIsValid);
                                                             onePCIWin.Owner = this;
@@ -711,7 +711,7 @@ namespace BrokenRailMonitorViaWiFi
                                                     }
                                                     if (count - 1 == i)
                                                     {
-                                                        MessageBox.Show(terminalNo.ToString() + "号终端不存在");
+                                                        AppendMessage(terminalNo.ToString() + "号终端不存在", DataLevel.Error);
                                                     }
                                                     i++;
                                                 }
@@ -736,11 +736,11 @@ namespace BrokenRailMonitorViaWiFi
                                                 }
                                                 if (_fileNameList.Count == 0)
                                                 {
-                                                    MessageBox.Show("共写了" + _fileNameList.Count + "个文件");
+                                                    AppendMessage("共写了" + _fileNameList.Count + "个文件", DataLevel.Default);
                                                 }
                                                 else
                                                 {
-                                                    MessageBox.Show("共写了" + _fileNameList.Count + "个文件" + (_fileNameList.Count == 1 ? "为：" : "分别为：") + fileNames);
+                                                    AppendMessage("共写了" + _fileNameList.Count + "个文件" + (_fileNameList.Count == 1 ? "为：" : "分别为：") + fileNames, DataLevel.Default);
                                                 }
                                                 _fileNameList.Clear();
                                             }
@@ -877,7 +877,7 @@ namespace BrokenRailMonitorViaWiFi
                                                                 //}
                                                                 //else
                                                                 //{
-                                                                //    MessageBox.Show("'收到非相邻终端发来的超声信号'位收到未定义数据！");
+                                                                //    AppendMessage("'收到非相邻终端发来的超声信号'位收到未定义数据！");
                                                                 //}
                                                                 xeThisAmplitude2.InnerText = actualReceive[26 + j * 84].ToString() + "-" + actualReceive[27 + j * 84].ToString();
                                                                 strSignalAmplitude = "";
@@ -915,7 +915,7 @@ namespace BrokenRailMonitorViaWiFi
                                             }
                                             else
                                             {
-                                                MessageBox.Show("接收到的数据内容长度不是一包长度84的整数倍！");
+                                                AppendMessage("接收到的数据内容长度不是一包长度84的整数倍！", DataLevel.Error);
                                             }
                                         }
                                         break;
@@ -1013,7 +1013,7 @@ namespace BrokenRailMonitorViaWiFi
                                                     }
                                                     else
                                                     {
-                                                        MessageBox.Show("'收到非相邻终端发来的超声信号'位收到未定义数据！");
+                                                        AppendMessage("'收到非相邻终端发来的超声信号'位收到未定义数据！", DataLevel.Error);
                                                     }
                                                     xeThisAmplitude2.InnerText = actualReceive[58].ToString() + "-" + actualReceive[59].ToString();
                                                     strSignalAmplitude = "";
@@ -1048,7 +1048,7 @@ namespace BrokenRailMonitorViaWiFi
                                                 int index = FindMasterControlIndex(actualReceive[7]);
                                                 if (index == -1)
                                                 {
-                                                    MessageBox.Show("收到的终端号在终端集合中不存在！");
+                                                    AppendMessage("收到的终端号在终端集合中不存在！", DataLevel.Error);
                                                     return;
                                                 }
                                                 else
@@ -1065,7 +1065,7 @@ namespace BrokenRailMonitorViaWiFi
                                         {
                                             if (this._svtThumbnail == null)
                                             {
-                                                MessageBox.Show("设备及铁轨未初始化！");
+                                                AppendMessage("设备及铁轨未初始化！", DataLevel.Error);
                                                 return;
                                             }
 
@@ -1316,7 +1316,7 @@ namespace BrokenRailMonitorViaWiFi
                                             }
                                             else
                                             {
-                                                MessageBox.Show("发送数据内容的长度错误，应该是3的倍数");
+                                                AppendMessage("发送数据内容的长度错误，应该是3的倍数", DataLevel.Error);
                                             }
                                         }
                                         break;
@@ -1335,11 +1335,11 @@ namespace BrokenRailMonitorViaWiFi
                                     //case 0xf7:
                                     //    {
                                     //        int errorTerminalNo = actualReceive[7];
-                                    //        MessageBox.Show(errorTerminalNo.ToString() + " 号终端回应超时！");
+                                    //        AppendMessage(errorTerminalNo.ToString() + " 号终端回应超时！");
                                     //    }
                                     //    break;
                                     default:
-                                        MessageBox.Show("收到未知数据！");
+                                        AppendMessage("收到未知数据！", DataLevel.Error);
                                         break;
                                 }
                             }
@@ -1362,7 +1362,7 @@ namespace BrokenRailMonitorViaWiFi
                             }
                             else
                             {
-                                MessageBox.Show("收到的数据帧头不对！");
+                                AppendMessage("收到的数据帧头不对！", DataLevel.Error);
                             }
                             if (packageUnhandled.Length != 0)
                             {
@@ -1423,7 +1423,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             else
             {
-                MessageBox.Show("收到未定义数据！");
+                AppendMessage("收到未定义数据！", DataLevel.Error);
             }
         }
 
@@ -1457,7 +1457,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             else
             {
-                MessageBox.Show("收到未定义数据！");
+                AppendMessage("收到未定义数据！", DataLevel.Error);
             }
         }
         //public void SettingWinClose()
@@ -1516,7 +1516,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             catch (Exception ee)
             {
-                MessageBox.Show("连接终端异常：" + ee.Message);
+                AppendMessage("连接终端异常：" + ee.Message, DataLevel.Error);
             }
         }
         private void SendData(string data)
@@ -1529,7 +1529,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             catch (Exception ee)
             {
-                MessageBox.Show("发送数据异常：" + ee.Message);
+                AppendMessage("发送数据异常：" + ee.Message, DataLevel.Error);
             }
         }
         private void socketAccept()
@@ -1557,7 +1557,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             catch (Exception ee)
             {
-                MessageBox.Show("Socket接收异常：" + ee.Message);
+                AppendMessage("Socket接收异常：" + ee.Message, DataLevel.Error);
             }
             //finally
             //{
@@ -1603,7 +1603,7 @@ namespace BrokenRailMonitorViaWiFi
                 int length = (actualReceive[2] << 8) + actualReceive[3];
                 if (length != actualReceive.Length)
                 {
-                    MessageBox.Show("长度字段与实际收到长度不相等");
+                    AppendMessage("长度字段与实际收到长度不相等", DataLevel.Error);
                     return;
                 }
                 int checksum = 0;
@@ -1617,7 +1617,7 @@ namespace BrokenRailMonitorViaWiFi
                 sumLow = checksum & 0xff;
                 if (sumHigh != actualReceive[actualReceive.Length - 2] || sumLow != actualReceive[actualReceive.Length - 1])
                 {
-                    MessageBox.Show("校验和出错");
+                    AppendMessage("校验和出错", DataLevel.Error);
                     return;
                 }
             }
@@ -1666,7 +1666,7 @@ namespace BrokenRailMonitorViaWiFi
         //    }
         //    catch (Exception ee)
         //    {
-        //        MessageBox.Show(ee.Message);
+        //        AppendMessage(ee.Message);
         //    }
         //}
 
@@ -1676,12 +1676,12 @@ namespace BrokenRailMonitorViaWiFi
         //    {
         //        byte[] sendData = SendDataPackage.PackageSendData(0xff, 0xff, 0xf0, new byte[2] { 0, 0 });
         //        _socketMain.Send(sendData, SocketFlags.None);
-        //        //MessageBox.Show(this.svContainer.ScrollableWidth.ToString() + "," + this.ActualWidth.ToString());
+        //        //AppendMessage(this.svContainer.ScrollableWidth.ToString() + "," + this.ActualWidth.ToString());
         //        //this.svContainer.ScrollToHorizontalOffset(9736);
         //    }
         //    catch (Exception ee)
         //    {
-        //        MessageBox.Show(ee.Message);
+        //        AppendMessage(ee.Message);
         //    }
         //}
 
@@ -1724,7 +1724,7 @@ namespace BrokenRailMonitorViaWiFi
                     this.WaitingRingDisable();
                     this.WaitReceiveTimer.Stop();
 
-                    MessageBox.Show("系统中不包含4G点，请检查config文档！");
+                    AppendMessage("系统中不包含4G点，请检查config文档！", DataLevel.Error);
                     _getAllRailInfoTimer.Stop();
                     this.miGetAllRailInfo.Header = "获取所有终端铁轨信息";
                 }
@@ -1754,14 +1754,14 @@ namespace BrokenRailMonitorViaWiFi
                             this.WaitingRingDisable();
                             this.WaitReceiveTimer.Stop();
 
-                            MessageBox.Show(this.MasterControlList[_4GPointIndex[i]].Find4GErrorMsg, "来自终端" + this.MasterControlList[_4GPointIndex[i]].TerminalNumber + "的消息：");
+                            AppendMessage("来自终端" + this.MasterControlList[_4GPointIndex[i]].TerminalNumber + "的消息：" + this.MasterControlList[_4GPointIndex[i]].Find4GErrorMsg, DataLevel.Error);
                         }
                     }
                 }
             }
             catch (Exception ee)
             {
-                MessageBox.Show(ee.Message);
+                AppendMessage(ee.Message, DataLevel.Error);
             }
         }
 
@@ -1769,7 +1769,7 @@ namespace BrokenRailMonitorViaWiFi
         {
             this.WaitingRingDisable();
             this.WaitReceiveTimer.Stop();
-            MessageBox.Show("超过20秒未收到数据，连接可能已断开！");
+            AppendMessage("超过20秒未收到数据，连接可能已断开！", DataLevel.Error);
         }
         private void multicastWaitReceiveTimer_Tick(object sender, EventArgs e)
         {
@@ -1785,7 +1785,7 @@ namespace BrokenRailMonitorViaWiFi
             if (notReceiveNo != string.Empty)
             {
                 notReceiveNo = notReceiveNo.Substring(0, notReceiveNo.Length - 1);
-                MessageBox.Show("超过20秒未收到" + notReceiveNo + "号终端的数据，终端物理链路可能已断开！");
+                AppendMessage("超过20秒未收到" + notReceiveNo + "号终端的数据，终端物理链路可能已断开！", DataLevel.Error);
             }
         }
         //private void miGetAllDevicesSignalAmplitude_Click(object sender, RoutedEventArgs e)
@@ -1797,7 +1797,7 @@ namespace BrokenRailMonitorViaWiFi
         //    }
         //    catch (Exception ee)
         //    {
-        //        MessageBox.Show(ee.Message);
+        //        AppendMessage(ee.Message);
         //    }
         //}
 
@@ -1817,7 +1817,7 @@ namespace BrokenRailMonitorViaWiFi
                 byte second = (byte)dtNow.Second;
                 if (_4GPointIndex.Count == 0)
                 {
-                    MessageBox.Show("系统中不包含4G点，请检查config文档！");
+                    AppendMessage("系统中不包含4G点，请检查config文档！", DataLevel.Error);
                 }
                 else
                 {
@@ -1842,14 +1842,14 @@ namespace BrokenRailMonitorViaWiFi
                         }
                         else
                         {
-                            MessageBox.Show(this.MasterControlList[_4GPointIndex[i]].Find4GErrorMsg, "来自终端" + this.MasterControlList[_4GPointIndex[i]].TerminalNumber + "的消息：");
+                            AppendMessage("来自终端" + this.MasterControlList[_4GPointIndex[i]].TerminalNumber + "的消息：" + this.MasterControlList[_4GPointIndex[i]].Find4GErrorMsg, DataLevel.Error);
                         }
                     }
                 }
             }
             catch (Exception ee)
             {
-                MessageBox.Show(ee.Message);
+                AppendMessage(ee.Message, DataLevel.Error);
             }
         }
         private void miGetOneSectionInfo_Click(object sender, RoutedEventArgs e)
@@ -1879,7 +1879,7 @@ namespace BrokenRailMonitorViaWiFi
                 {
                     this.WaitingRingDisable();
                     this.WaitReceiveTimer.Stop();
-                    MessageBox.Show("系统中不包含4G点，请检查config文档！");
+                    AppendMessage("系统中不包含4G点，请检查config文档！", DataLevel.Error);
                     return;
                 }
                 else
@@ -1899,7 +1899,7 @@ namespace BrokenRailMonitorViaWiFi
                         {
                             this.WaitingRingDisable();
                             this.WaitReceiveTimer.Stop();
-                            MessageBox.Show(this.MasterControlList[_4GPointIndex[0]].Find4GErrorMsg, "来自终端" + this.MasterControlList[_4GPointIndex[0]].TerminalNumber + "的消息：");
+                            AppendMessage("来自终端" + this.MasterControlList[_4GPointIndex[0]].TerminalNumber + "的消息：" + this.MasterControlList[_4GPointIndex[0]].Find4GErrorMsg, DataLevel.Error);
                             return;
                         }
                     }
@@ -1929,7 +1929,7 @@ namespace BrokenRailMonitorViaWiFi
                                 {
                                     this.WaitingRingDisable();
                                     this.WaitReceiveTimer.Stop();
-                                    MessageBox.Show(this.MasterControlList[include4GIndex[i]].Find4GErrorMsg, "来自终端" + this.MasterControlList[include4GIndex[i]].TerminalNumber + "的消息：");
+                                    AppendMessage("来自终端" + this.MasterControlList[include4GIndex[i]].TerminalNumber + "的消息：" + this.MasterControlList[include4GIndex[i]].Find4GErrorMsg, DataLevel.Error);
                                     return;
                                 }
                             }
@@ -1960,7 +1960,7 @@ namespace BrokenRailMonitorViaWiFi
                             {
                                 this.WaitingRingDisable();
                                 this.WaitReceiveTimer.Stop();
-                                MessageBox.Show(this.MasterControlList[previous4GPointIndex].Find4GErrorMsg, "来自终端" + this.MasterControlList[previous4GPointIndex].TerminalNumber + "的消息：");
+                                AppendMessage("来自终端" + this.MasterControlList[previous4GPointIndex].TerminalNumber + "的消息：" + this.MasterControlList[previous4GPointIndex].Find4GErrorMsg, DataLevel.Error);
                                 return;
                             }
                             for (int i = 0; i < include4GIndex.Count; i++)
@@ -1984,7 +1984,7 @@ namespace BrokenRailMonitorViaWiFi
                                 {
                                     this.WaitingRingDisable();
                                     this.WaitReceiveTimer.Stop();
-                                    MessageBox.Show(this.MasterControlList[include4GIndex[i]].Find4GErrorMsg, "来自终端" + this.MasterControlList[include4GIndex[i]].TerminalNumber + "的消息：");
+                                    AppendMessage("来自终端" + this.MasterControlList[include4GIndex[i]].TerminalNumber + "的消息：" + this.MasterControlList[include4GIndex[i]].Find4GErrorMsg, DataLevel.Error);
                                     return;
                                 }
                             }
@@ -2002,7 +2002,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             catch (Exception ee)
             {
-                MessageBox.Show(ee.Message);
+                AppendMessage(ee.Message, DataLevel.Error);
             }
         }
 
@@ -2034,7 +2034,7 @@ namespace BrokenRailMonitorViaWiFi
                                 int indexOfMaster = FindMasterControlIndex(terminalNo);
                                 if (indexOfMaster == -1)
                                 {
-                                    MessageBox.Show("读取的终端号在终端集合中不存在！");
+                                    AppendMessage("读取的终端号在终端集合中不存在！", DataLevel.Error);
                                     return;
                                 }
                                 else
@@ -2047,25 +2047,25 @@ namespace BrokenRailMonitorViaWiFi
                             }
                             else
                             {
-                                MessageBox.Show("终端号无法转换！更改文件名时请保留前15位！");
+                                AppendMessage("终端号无法转换！更改文件名时请保留前15位！", DataLevel.Error);
                                 return;
                             }
                         }
                         else
                         {
-                            MessageBox.Show("文件名发生改变，无法获得历史数据的终端号！\r\n更改文件名时请保留前15位");
+                            AppendMessage("文件名发生改变，无法获得历史数据的终端号！\r\n更改文件名时请保留前15位", DataLevel.Error);
                             return;
                         }
                     }
                     catch (Exception ee)
                     {
-                        MessageBox.Show("文件打开异常！" + ee.Message);
+                        AppendMessage("文件打开异常！" + ee.Message, DataLevel.Error);
                     }
                 }
             }
             catch (Exception ee)
             {
-                MessageBox.Show("读取文件异常！" + ee.Message);
+                AppendMessage("读取文件异常！" + ee.Message, DataLevel.Error);
             }
         }
 
@@ -2078,7 +2078,7 @@ namespace BrokenRailMonitorViaWiFi
             }
             catch (Exception ee)
             {
-                MessageBox.Show(ee.Message);
+                AppendMessage(ee.Message, DataLevel.Error);
             }
         }
 
@@ -2094,7 +2094,7 @@ namespace BrokenRailMonitorViaWiFi
                 }
                 if (_4GPointIndex.Count == 0)
                 {
-                    MessageBox.Show("系统中不包含4G点，请检查config文档！");
+                    AppendMessage("系统中不包含4G点，请检查config文档！", DataLevel.Error);
                 }
                 else
                 {
@@ -2113,7 +2113,7 @@ namespace BrokenRailMonitorViaWiFi
                     }
                     else
                     {
-                        MessageBox.Show(this.MasterControlList[_4GPointIndex[0]].Find4GErrorMsg, "来自终端" + this.MasterControlList[_4GPointIndex[0]].TerminalNumber + "的消息：");
+                        AppendMessage("来自终端" + this.MasterControlList[_4GPointIndex[0]].TerminalNumber + "的消息：" + this.MasterControlList[_4GPointIndex[0]].Find4GErrorMsg, DataLevel.Error);
                     }
                 }
             }
