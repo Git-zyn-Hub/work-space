@@ -34,7 +34,6 @@ namespace BrokenRailMonitorViaWiFi
         private static readonly int MasterControlWidth = 26;
         private static readonly int RailWidth = 104;
         //private Window _container;
-        private SendDataPackage _sendDataPackage = new SendDataPackage();
         private ScrollViewerThumbnail _svtThumbnail;
         private string _directoryName;
         private Socket _socketMain;
@@ -56,6 +55,7 @@ namespace BrokenRailMonitorViaWiFi
         private List<int> _sendTime = new List<int>();
         private int _hit0xf4Count = 0;
         private List<string> _fileNameList = new List<string>();
+        private bool _isConnect = false;
 
         public List<int> SocketRegister
         {
@@ -311,6 +311,7 @@ namespace BrokenRailMonitorViaWiFi
                             {
                                 _receiveEmptyPackageCount = 0;
                                 AppendMessage("与" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！", DataLevel.Error);
+                                _isConnect = false;
                                 foreach (var item in MasterControlList)
                                 {
                                     if (item.IpAndPort == socket.RemoteEndPoint.ToString())
@@ -1497,6 +1498,7 @@ namespace BrokenRailMonitorViaWiFi
                 _socketMain = new Socket(deviceIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 _socketMain.Connect(deviceIP);
 
+                _isConnect = true;
                 this.miConnect.Header = "已连接";
                 this.miConnect.Background = new SolidColorBrush(Colors.LightGreen);
                 this.miConnect.IsEnabled = false;
@@ -1659,7 +1661,7 @@ namespace BrokenRailMonitorViaWiFi
         //{
         //    try
         //    {
-        //        byte[] sendData = _sendDataPackage.PackageSendData(0xff, 0xff, 0xf6, new byte[2] { 0, 0 });
+        //        byte[] sendData = SendDataPackage.PackageSendData(0xff, 0xff, 0xf6, new byte[2] { 0, 0 });
         //        _socketMain.Send(sendData, SocketFlags.None);
         //    }
         //    catch (Exception ee)
@@ -1672,7 +1674,7 @@ namespace BrokenRailMonitorViaWiFi
         //{
         //    try
         //    {
-        //        byte[] sendData = _sendDataPackage.PackageSendData(0xff, 0xff, 0xf0, new byte[2] { 0, 0 });
+        //        byte[] sendData = SendDataPackage.PackageSendData(0xff, 0xff, 0xf0, new byte[2] { 0, 0 });
         //        _socketMain.Send(sendData, SocketFlags.None);
         //        //MessageBox.Show(this.svContainer.ScrollableWidth.ToString() + "," + this.ActualWidth.ToString());
         //        //this.svContainer.ScrollToHorizontalOffset(9736);
@@ -1735,11 +1737,11 @@ namespace BrokenRailMonitorViaWiFi
                         if (i == _4GPointIndex.Count - 1)
                         {
                             //获取从1到ff的广播数据，当循环到最后一个的时候，目的地址不再是4G点的前一个终端，而是整个终端列表中的最后一个终端。
-                            sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[this.MasterControlList.Count - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, 0 });
+                            sendData = SendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[this.MasterControlList.Count - 1].TerminalNumber, (byte)CommandType.GetOneSectionInfo, new byte[2] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, 0 });
                         }
                         else
                         {
-                            sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[_4GPointIndex[i + 1] - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, 0 });
+                            sendData = SendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[_4GPointIndex[i + 1] - 1].TerminalNumber, (byte)CommandType.GetOneSectionInfo, new byte[2] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, 0 });
                         }
                         if (socket != null)
                         {
@@ -1790,7 +1792,7 @@ namespace BrokenRailMonitorViaWiFi
         //{
         //    try
         //    {
-        //        byte[] sendData = _sendDataPackage.PackageSendData(0xff, 0xff, 0xf4, new byte[2] { 0, 0 });
+        //        byte[] sendData = SendDataPackage.PackageSendData(0xff, 0xff, 0xf4, new byte[2] { 0, 0 });
         //        _socketMain.Send(sendData, SocketFlags.None);
         //    }
         //    catch (Exception ee)
@@ -1826,11 +1828,11 @@ namespace BrokenRailMonitorViaWiFi
                         if (i == _4GPointIndex.Count - 1)
                         {
                             //获取从1到ff的广播数据，当循环到最后一个的时候，目的地址不再是4G点的前一个终端，而是整个终端列表中的最后一个终端。
-                            sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[this.MasterControlList.Count - 1].TerminalNumber, 0x52, new byte[7] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, year, month, day, hour, minute, second });
+                            sendData = SendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[this.MasterControlList.Count - 1].TerminalNumber, 0x52, new byte[7] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, year, month, day, hour, minute, second });
                         }
                         else
                         {
-                            sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[_4GPointIndex[i + 1] - 1].TerminalNumber, 0x52, new byte[7] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, year, month, day, hour, minute, second });
+                            sendData = SendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[_4GPointIndex[i + 1] - 1].TerminalNumber, 0x52, new byte[7] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, year, month, day, hour, minute, second });
                         }
                         if (socket != null)
                         {
@@ -1885,7 +1887,7 @@ namespace BrokenRailMonitorViaWiFi
                     if (include4GIndex.Count == 0)
                     {
                         Socket socket = this.MasterControlList[_4GPointIndex[0]].GetNearest4GTerminalSocket(true);
-                        byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)newGetSectionWin.TerminalSmall, 0 });
+                        byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)newGetSectionWin.TerminalSmall, 0 });
 
                         if (socket != null)
                         {
@@ -1911,11 +1913,11 @@ namespace BrokenRailMonitorViaWiFi
                                 byte[] sendData;
                                 if (i == include4GIndex.Count - 1)
                                 {
-                                    sendData = _sendDataPackage.PackageSendData(0xff, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
+                                    sendData = SendDataPackage.PackageSendData(0xff, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
                                 }
                                 else
                                 {
-                                    sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[i + 1] - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
+                                    sendData = SendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[i + 1] - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
                                 }
                                 if (socket != null)
                                 {
@@ -1946,7 +1948,7 @@ namespace BrokenRailMonitorViaWiFi
                             }
                             Socket socket = this.MasterControlList[previous4GPointIndex].GetNearest4GTerminalSocket(true);
                             byte[] sendData;
-                            sendData = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[0] - 1].TerminalNumber, 0x55, new byte[2] { (byte)newGetSectionWin.TerminalSmall, 0 });
+                            sendData = SendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[0] - 1].TerminalNumber, 0x55, new byte[2] { (byte)newGetSectionWin.TerminalSmall, 0 });
 
                             if (socket != null)
                             {
@@ -1967,11 +1969,11 @@ namespace BrokenRailMonitorViaWiFi
                                 byte[] sendData1;
                                 if (i == include4GIndex.Count - 1)
                                 {
-                                    sendData1 = _sendDataPackage.PackageSendData(0xff, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
+                                    sendData1 = SendDataPackage.PackageSendData(0xff, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
                                 }
                                 else
                                 {
-                                    sendData1 = _sendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[i + 1] - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
+                                    sendData1 = SendDataPackage.PackageSendData(0xff, (byte)this.MasterControlList[include4GIndex[i + 1] - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
                                 }
                                 if (socketAnother != null)
                                 {
@@ -2099,7 +2101,7 @@ namespace BrokenRailMonitorViaWiFi
                     //默认使用第一个4G点发送数据。多播没有分段，如果改成每个终端都是4G点需要重写逻辑。
                     Socket socket = this.MasterControlList[_4GPointIndex[0]].GetNearest4GTerminalSocket(true);
 
-                    byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)newEraseFlashWin.TerminalBig, 0x56, new byte[5] {
+                    byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)newEraseFlashWin.TerminalBig, 0x56, new byte[5] {
                     (byte)newEraseFlashWin.TerminalSmall,
                     (byte)((newEraseFlashWin.StartSectorNo & 0xff00)>>8), (byte)(newEraseFlashWin.StartSectorNo&0xff),
                     (byte)((newEraseFlashWin.EndSectorNo&0xff00)>>8), (byte)(newEraseFlashWin.EndSectorNo&0xff) });
@@ -2266,6 +2268,23 @@ namespace BrokenRailMonitorViaWiFi
         private void miDownload_Click(object sender, RoutedEventArgs e)
         {
 
+            if (!_isConnect)
+            {
+                AppendMessage("请先连接！", DataLevel.Error);
+                return;
+            }
+            byte[] sendData;
+            sendData = SendDataPackage.PackageSendData((byte)this.clientIDShow.ClientID,
+                    (byte)0xff, (byte)CommandType.RequestConfig, new byte[] { 0x48, 0x5f });
+            if (_socketMain != null)
+            {
+                DecideDelayOrNot();
+                _socketMain.Send(sendData, SocketFlags.None);
+                AppendDataMsg(sendData);
+            }
+            else
+            {
+            }
         }
     }
 }

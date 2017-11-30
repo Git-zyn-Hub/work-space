@@ -33,7 +33,6 @@ namespace BrokenRailMonitorViaWiFi
         private bool _isEnd;
         private string _ipAndPort;
         private string _find4GErrorMsg;
-        private SendDataPackage _sendDataPackage = new SendDataPackage();
         private MainWindow _mainWin;
         public static readonly DependencyProperty Is4GProperty = DependencyProperty.Register("Is4G", typeof(bool), typeof(MasterControl), new PropertyMetadata(false, OnIs4GChanged));
         private DispatcherTimer _offlineTimer;
@@ -177,7 +176,7 @@ namespace BrokenRailMonitorViaWiFi
                     _mainWin.WaitingRingEnable();
                     _mainWin.WaitReceiveTimer.Start();
                 }
-                byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf5, new byte[2] { 0, 0 });
+                byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, (byte)CommandType.GetPointRailInfo, new byte[2] { 0, 0 });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
                 {
@@ -207,7 +206,7 @@ namespace BrokenRailMonitorViaWiFi
         //    {
         //        if (SocketImport != null)
         //        {
-        //            byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf3, new byte[2] { 0, 0 });
+        //            byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf3, new byte[2] { 0, 0 });
         //            SocketImport.Send(sendData, SocketFlags.None);
         //        }
         //        else
@@ -269,7 +268,7 @@ namespace BrokenRailMonitorViaWiFi
                     return;
                 }
 
-                byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf0, new byte[6] { (byte)newInitialInfoConfigWin.TerminalNo,
+                byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)_terminalNumber,(byte)CommandType.ConfigInitialInfo, new byte[6] { (byte)newInitialInfoConfigWin.TerminalNo,
                     (byte)newInitialInfoConfigWin.NeighbourSmallSecondary, (byte)newInitialInfoConfigWin.NeighbourSmall,
                     (byte)newInitialInfoConfigWin.NeighbourBig, (byte)newInitialInfoConfigWin.NeighbourBigSecondary,0x00 });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
@@ -299,7 +298,7 @@ namespace BrokenRailMonitorViaWiFi
                     _mainWin.WaitingRingEnable();
                     _mainWin.WaitReceiveTimer.Start();
                 }
-                byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf1, new byte[1] { (byte)_terminalNumber });
+                byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, (byte)CommandType.ReadPointInfo, new byte[1] { (byte)_terminalNumber });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
                 {
@@ -337,7 +336,7 @@ namespace BrokenRailMonitorViaWiFi
                 {
                     return;
                 }
-                byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf4,
+                byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf4,
                     new byte[4] { (byte)newSignalSendConfigWin.SendInterval,(byte)newSignalSendConfigWin.SendTimeOpportunity,
                                       (byte)newSignalSendConfigWin.NeighbourSmallOpportunity,(byte)newSignalSendConfigWin.NeighbourBigOpportunity  });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
@@ -371,7 +370,7 @@ namespace BrokenRailMonitorViaWiFi
                 {
                     return;
                 }
-                byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf2,
+                byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, (byte)CommandType.ThresholdSetting,
                     new byte[2] { (byte)newThresholdSettingWin.ThresholdRail1, (byte)newThresholdSettingWin.ThresholdRail2 });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
@@ -402,7 +401,7 @@ namespace BrokenRailMonitorViaWiFi
             {
                 return;
             }
-            byte[] sendData = _sendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, 0xf4,
+            byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, (byte)CommandType.GetHistory,
                 new byte[12] { (byte)newGetHistoryWin.YearStart, (byte)newGetHistoryWin.MonthStart, (byte)newGetHistoryWin.DayStart,
                                (byte)newGetHistoryWin.HourStart,(byte)newGetHistoryWin.MinuteStart,(byte)newGetHistoryWin.SecondStart,
                                (byte)newGetHistoryWin.YearEnd,(byte)newGetHistoryWin.MonthEnd,(byte)newGetHistoryWin.DayEnd,
