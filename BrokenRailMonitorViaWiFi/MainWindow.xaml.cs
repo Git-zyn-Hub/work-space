@@ -39,7 +39,7 @@ namespace BrokenRailMonitorViaWiFi
         private Socket _socketMain;
         private Socket _acceptSocket;
         private Thread _socketListeningThread;
-        //private Thread _socketAcceptThread;
+        private Thread _socketFileRecvThread;
         private List<MasterControl> _masterControlList = new List<MasterControl>();
         private List<Rail> _rail1List = new List<Rail>();
         private List<Rail> _rail2List = new List<Rail>();
@@ -56,6 +56,8 @@ namespace BrokenRailMonitorViaWiFi
         private int _hit0xf4Count = 0;
         private List<string> _fileNameList = new List<string>();
         private bool _isConnect = false;
+        private const String _serverIP = "103.44.145.248";
+        private const int _fileReceivePort = 23955;
 
         public List<int> SocketRegister
         {
@@ -2262,12 +2264,67 @@ namespace BrokenRailMonitorViaWiFi
 
         private void miUpload_Click(object sender, RoutedEventArgs e)
         {
+            if (!_isConnect)
+            {
+                AppendMessage("请先连接！", DataLevel.Error);
+                return;
+            }
+            byte[] sendData;
+            sendData = SendDataPackage.PackageSendData((byte)this.clientIDShow.ClientID,
+                    (byte)0xff, (byte)CommandType.UploadConfig, new byte[0]);
+            if (_socketMain != null)
+            {
+                _socketMain.Send(sendData, SocketFlags.None);
+                AppendDataMsg(sendData);
+            }
+            else
+            {
+            }
 
+            IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse(_serverIP), _fileReceivePort);
+            TcpClient client = new TcpClient();
+            client.Connect(deviceIP);
+
+            AppendMessage("Start sending file...", DataLevel.Normal);
+            NetworkStream stream = client.GetStream();
+
+            //创建文件流  
+            string filePath = Environment.CurrentDirectory + "//config.xml";
+            FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+
+            byte[] fileBuffer = new byte[1024];
+            //每次传输1KB  
+
+            int bytesRead;
+            int totalBytes = 0;
+
+            //将文件流转写入网络流  
+            try
+            {
+                do
+                {
+                    //Thread.Sleep(10);//模拟远程传输视觉效果,暂停10秒  
+                    bytesRead = fs.Read(fileBuffer, 0, fileBuffer.Length);
+                    stream.Write(fileBuffer, 0, bytesRead);
+                    totalBytes += bytesRead;
+                } while (bytesRead > 0);
+                AppendMessage(string.Format("Total {0} bytes sent ,Done!", totalBytes), DataLevel.Error);
+            }
+            catch (Exception ex)
+            {
+                AppendMessage(ex.Message, DataLevel.Error);
+            }
+            finally
+            {
+                stream.Dispose();
+                fs.Dispose();
+                client.Close();
+                //listener.Stop();
+            }
         }
 
         private void miDownload_Click(object sender, RoutedEventArgs e)
         {
-
             if (!_isConnect)
             {
                 AppendMessage("请先连接！", DataLevel.Error);
@@ -2278,12 +2335,87 @@ namespace BrokenRailMonitorViaWiFi
                     (byte)0xff, (byte)CommandType.RequestConfig, new byte[] { 0x48, 0x5f });
             if (_socketMain != null)
             {
-                DecideDelayOrNot();
                 _socketMain.Send(sendData, SocketFlags.None);
                 AppendDataMsg(sendData);
             }
             else
             {
+            }
+            Thread.Sleep(100);
+
+            IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse(_serverIP), _fileReceivePort);
+            Socket socket = new Socket(deviceIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            socket.Connect(deviceIP);
+
+
+            _socketFileRecvThread = new Thread(new ParameterizedThreadStart(socketRecvFileListening));
+            _socketFileRecvThread.Start(socket);
+        }
+
+        int totalBytes = 0;
+        private void socketRecvFileListening(object oSocket)
+        {
+            try
+            {
+                Socket socket = oSocket as Socket;
+                if (socket != null)
+                {
+                    while (true)
+                    {
+                        byte[] receivedBytes = new byte[1024];
+                        int numBytes = socket.Receive(receivedBytes, SocketFlags.None);
+
+                        //判断Socket连接是否断开
+                        if (numBytes == 0)
+                        {
+                            socket.Shutdown(SocketShutdown.Both);
+                            socket.Close();
+                            totalBytes = 0;
+                            this.Dispatcher.Invoke(new Action(() =>
+                            {
+                                AppendMessage("File server close.", DataLevel.Error);
+                                devicesInitial();
+                            }));
+                            break;
+                        }
+                        else
+                        {
+                            string path = Environment.CurrentDirectory + "//config.xml";
+                            if (totalBytes == 0)
+                            {
+                                if (File.Exists(path))
+                                {
+                                    File.Delete(path);
+                                }
+                            }
+
+                            string msg = Encoding.UTF8.GetString(receivedBytes, 0, numBytes);
+
+                            //从缓存Buffer中读入到文件流中  
+                            FileStream fs = null;
+                            if (totalBytes == 0)
+                            {
+                                fs = new FileStream(path, FileMode.CreateNew, FileAccess.Write);
+                            }
+                            else
+                            {
+                                fs = new FileStream(path, FileMode.Append, FileAccess.Write);
+                            }
+                            fs.Write(receivedBytes, 0, numBytes);
+                            //清空缓冲区、关闭流
+                            fs.Flush();
+                            fs.Close();
+
+                            totalBytes += numBytes;
+                            AppendMessage(string.Format("Receiving {0}", msg), DataLevel.Default);
+                            AppendMessage(string.Format("Receiving {0} bytes ...", totalBytes), DataLevel.Default);
+                        }
+                    }
+                }
+            }
+            catch (Exception ee)
+            {
+                AppendMessage("接收文件异常:" + ee.Message, DataLevel.Error);
             }
         }
     }
