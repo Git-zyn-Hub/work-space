@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi" Closing="Window_Closing"
         xmlns:userCtrl="clr-namespace:BrokenRailMonitorViaWiFi.UserControls"
-        mc:Ignorable="d"
+        mc:Ignorable="d" Loaded="Window_Loaded"
         Title="断轨监测" Height="600" Width="1024" MinHeight="450" MinWidth="450">
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">

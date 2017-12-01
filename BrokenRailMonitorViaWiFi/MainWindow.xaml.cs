@@ -312,9 +312,12 @@ namespace BrokenRailMonitorViaWiFi
                             if (_receiveEmptyPackageCount == 10)
                             {
                                 _receiveEmptyPackageCount = 0;
-                                AppendMessage("与" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！", DataLevel.Error);
+                                AppendMessage("与服务器" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！", DataLevel.Error);
                                 _isConnect = false;
-                                this.clientIDShow.ClientID = 0;
+                                this.Dispatcher.Invoke(new Action(() =>
+                                {
+                                    this.clientIDShow.ClientID = 0;
+                                }));
                                 foreach (var item in MasterControlList)
                                 {
                                     if (item.IpAndPort == socket.RemoteEndPoint.ToString())
@@ -597,31 +600,31 @@ namespace BrokenRailMonitorViaWiFi
                                             switch (actualReceive[7])
                                             {
                                                 case 0xf0:
-                                                    this.dataShowUserCtrl.AddShowData("初始信息配置指令，4G终端已接收！", DataLevel.Normal);
+                                                    this.dataShowUserCtrl.AddShowData("初始信息配置指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 case 0xf1:
-                                                    this.dataShowUserCtrl.AddShowData("读取单点配置信息指令，4G终端已接收！", DataLevel.Normal);
+                                                    this.dataShowUserCtrl.AddShowData("读取单点配置信息指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 case 0xf2:
-                                                    this.dataShowUserCtrl.AddShowData("设置门限指令，4G终端已接收！", DataLevel.Normal);
+                                                    this.dataShowUserCtrl.AddShowData("设置门限指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 case 0x52:
-                                                    this.dataShowUserCtrl.AddShowData("实时时钟配置指令，4G终端已接收！", DataLevel.Normal);
+                                                    this.dataShowUserCtrl.AddShowData("实时时钟配置指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 //case 0xf3:
                                                 //    this.dataShowUserCtrl.AddShowData("超声信号发射通报指令，4G终端已接收！", DataLevel.Normal);
                                                 //    break;
                                                 case 0xf4:
-                                                    this.dataShowUserCtrl.AddShowData("获取Flash里存储的铁轨历史信息指令，4G终端已接收！", DataLevel.Normal);
+                                                    this.dataShowUserCtrl.AddShowData("获取Flash里存储的铁轨历史信息指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 case 0xf5:
-                                                    this.dataShowUserCtrl.AddShowData("获取单点铁轨信息指令，4G终端已接收！", DataLevel.Normal);
+                                                    this.dataShowUserCtrl.AddShowData("获取单点铁轨信息指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 case 0x56:
-                                                    this.dataShowUserCtrl.AddShowData("擦除flash指令，4G终端已接收！", DataLevel.Normal);
+                                                    this.dataShowUserCtrl.AddShowData("擦除flash指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 case 0x55:
-                                                    this.dataShowUserCtrl.AddShowData("获取某段铁轨信息，4G终端已接收！", DataLevel.Normal);
+                                                    this.dataShowUserCtrl.AddShowData("获取某段铁轨信息，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
                                                     break;
                                                 default:
                                                     this.dataShowUserCtrl.AddShowData("未知指令被接收！", DataLevel.Normal);
@@ -2419,6 +2422,11 @@ namespace BrokenRailMonitorViaWiFi
             {
                 AppendMessage("接收文件异常:" + ee.Message, DataLevel.Error);
             }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            devicesInitial();
         }
     }
 }
