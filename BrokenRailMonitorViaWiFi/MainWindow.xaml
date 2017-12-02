@@ -9,8 +9,8 @@
         Title="断轨监测" Height="600" Width="1024" MinHeight="450" MinWidth="450">
     <Window.Background>
         <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-            <GradientStop Color="#FF00ccff" Offset="1"/>
-            <GradientStop Color="#FFFFF503"/>
+            <GradientStop Color="#ff1a0530" Offset="0"/>
+            <GradientStop Color="#FF6e229e" Offset="1"/>
         </LinearGradientBrush>
     </Window.Background>
     <Grid x:Name="gridMain">
@@ -47,8 +47,8 @@
                 <!--</MenuItem>-->
             </Menu>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
-                <Ellipse x:Name="elpIndicator" Fill="Green" Height="15" Width="15"></Ellipse>
-                <Label x:Name="lblPackageCount"></Label>
+                <Ellipse x:Name="elpIndicator" Fill="LightGreen" Height="15" Width="15"></Ellipse>
+                <Label x:Name="lblPackageCount" Foreground="White"></Label>
             </StackPanel>
         </DockPanel>
         <userCtrl:ClientIDShowUserControl x:Name="clientIDShow" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"></userCtrl:ClientIDShowUserControl>

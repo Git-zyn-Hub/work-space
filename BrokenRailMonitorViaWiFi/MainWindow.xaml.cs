@@ -127,6 +127,10 @@ namespace BrokenRailMonitorViaWiFi
         {
             try
             {
+                foreach (var item in MasterControlList)
+                {
+                    item.Dispose();
+                }
                 this.MasterControlList.Clear();
                 _4GPointIndex.Clear();
                 _sendTime.Clear();
@@ -360,14 +364,14 @@ namespace BrokenRailMonitorViaWiFi
                         {
                             this.lblPackageCount.Content = _packageCount.ToString();
                             bool isWhite = (this.elpIndicator.Fill as SolidColorBrush).Color.Equals(Colors.White);
-                            bool isGreen = (this.elpIndicator.Fill as SolidColorBrush).Color.Equals(Colors.Green);
+                            bool isGreen = (this.elpIndicator.Fill as SolidColorBrush).Color.Equals(Colors.LightGreen);
                             if (isGreen)
                             {
                                 this.elpIndicator.Fill = new SolidColorBrush(Colors.White);
                             }
                             else if (isWhite)
                             {
-                                this.elpIndicator.Fill = new SolidColorBrush(Colors.Green);
+                                this.elpIndicator.Fill = new SolidColorBrush(Colors.LightGreen);
                             }
                         }));
 
@@ -2297,7 +2301,7 @@ namespace BrokenRailMonitorViaWiFi
             string filePath = Environment.CurrentDirectory + "//config.xml";
             FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
 
-            byte[] fileBuffer = new byte[1024];
+            byte[] fileBuffer = new byte[1030];
             //每次传输1KB  
 
             int bytesRead;
@@ -2312,6 +2316,7 @@ namespace BrokenRailMonitorViaWiFi
                     bytesRead = fs.Read(fileBuffer, 0, fileBuffer.Length);
                     stream.Write(fileBuffer, 0, bytesRead);
                     totalBytes += bytesRead;
+                    AppendMessage(string.Format("sending {0} bytes", bytesRead), DataLevel.Normal);
                 } while (bytesRead > 0);
                 AppendMessage(string.Format("Total {0} bytes sent ,Done!", totalBytes), DataLevel.Error);
             }

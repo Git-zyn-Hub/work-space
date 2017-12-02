@@ -36,14 +36,14 @@ namespace BrokenRailMonitorViaWiFi
                 switch (dataLevel)
                 {
                     case DataLevel.Default:
-                        txtData.Foreground = new SolidColorBrush(Colors.Black);
+                        txtData.Foreground = new SolidColorBrush(Colors.White);
                         break;
                     case DataLevel.Normal:
                         txtData.Foreground = new SolidColorBrush(Colors.LightGreen);
                         break;
                     case DataLevel.Warning:
                         txtData.Foreground = new SolidColorBrush(Colors.Orange);
-                        txtData.FontWeight = FontWeights.Bold;
+                        //txtData.FontWeight = FontWeights.Bold;
                         break;
                     case DataLevel.Error:
                         txtData.Foreground = new SolidColorBrush(Colors.Red);
@@ -52,7 +52,7 @@ namespace BrokenRailMonitorViaWiFi
                         txtData.Foreground = new SolidColorBrush(Colors.Gray);
                         break;
                     default:
-                        txtData.Foreground = new SolidColorBrush(Colors.Black);
+                        txtData.Foreground = new SolidColorBrush(Colors.White);
                         break;
                 }
                 txtData.Text = nowTime + " -> " + data;

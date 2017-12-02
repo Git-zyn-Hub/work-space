@@ -557,7 +557,7 @@ namespace BrokenRailMonitorViaWiFi
             {
                 _offlineTimer.Start();
             }
-            this.path4G.Fill = new SolidColorBrush(Colors.Green);
+            this.path4G.Fill = new SolidColorBrush(Colors.LightGreen);
         }
 
         public void Offline()
@@ -565,6 +565,22 @@ namespace BrokenRailMonitorViaWiFi
             this.path4G.Fill = new SolidColorBrush(Colors.Red);
             if (_offlineTimer.IsEnabled)
                 _offlineTimer.Stop();
+        }
+        public void Dispose()
+        {
+            try
+            {
+                if (_offlineTimer.IsEnabled)
+                    _offlineTimer.Stop();
+                //if (Terminal != null)
+                //{
+                //    Terminal.Dispose();
+                //}
+            }
+            finally
+            {
+                _offlineTimer = null;
+            }
         }
 
         #region INotifyPropertyChanged Members

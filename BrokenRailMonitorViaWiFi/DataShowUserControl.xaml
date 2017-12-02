@@ -94,7 +94,7 @@
             <ToggleButton.ToolTip>
                 固定
             </ToggleButton.ToolTip>
-            <Path Fill="Black" Width="10" Height="13" Stretch="Fill" Data="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z"
+            <Path Fill="Orange" Width="10" Height="13" Stretch="Fill" Data="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z"
                                                RenderTransformOrigin="0.5,0.5">
                 <Path.RenderTransform>
                     <TransformGroup>
@@ -109,7 +109,7 @@
             <Button.ToolTip>
                 清空
             </Button.ToolTip>
-            <Path Margin="0" Fill="Black" Height="11" Width="11"
+            <Path Margin="0" Fill="Red" Height="11" Width="11"
                   VerticalAlignment="Top" HorizontalAlignment="Left"
                   Data="M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z"
                   Stretch="Fill"></Path>
