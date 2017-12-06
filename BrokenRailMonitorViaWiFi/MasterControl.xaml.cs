@@ -69,7 +69,14 @@ namespace BrokenRailMonitorViaWiFi
             set
             {
                 _socketImport = value;
-                IpAndPort = _socketImport.RemoteEndPoint.ToString();
+                if (_socketImport != null)
+                {
+                    IpAndPort = _socketImport.RemoteEndPoint.ToString();
+                }
+                else
+                {
+                    IpAndPort = string.Empty;
+                }
             }
         }
 
@@ -268,7 +275,7 @@ namespace BrokenRailMonitorViaWiFi
                     return;
                 }
 
-                byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)_terminalNumber,(byte)CommandType.ConfigInitialInfo, new byte[6] { (byte)newInitialInfoConfigWin.TerminalNo,
+                byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, (byte)CommandType.ConfigInitialInfo, new byte[6] { (byte)newInitialInfoConfigWin.TerminalNo,
                     (byte)newInitialInfoConfigWin.NeighbourSmallSecondary, (byte)newInitialInfoConfigWin.NeighbourSmall,
                     (byte)newInitialInfoConfigWin.NeighbourBig, (byte)newInitialInfoConfigWin.NeighbourBigSecondary,0x00 });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
@@ -570,16 +577,20 @@ namespace BrokenRailMonitorViaWiFi
         {
             try
             {
-                if (_offlineTimer.IsEnabled)
+                if (_offlineTimer != null && _offlineTimer.IsEnabled)
                     _offlineTimer.Stop();
+                if (this.SocketImport != null)
+                {
+                    this.SocketImport = null;
+                }
                 //if (Terminal != null)
                 //{
                 //    Terminal.Dispose();
                 //}
             }
-            finally
+            catch
             {
-                _offlineTimer = null;
+                throw;
             }
         }
 

@@ -305,6 +305,10 @@ namespace BrokenRailMonitorViaWiFi
                     {//断的
                         this.rail1Left.Error();
                     }
+                    else if (onOffRail1Left == 9)
+                    {
+                        this.rail1Left.Timeout();
+                    }
                     else
                     {
                         MessageBox.Show("解析出未定义数据！");
@@ -317,6 +321,10 @@ namespace BrokenRailMonitorViaWiFi
                     else if (onOffRail1Right == 7)
                     {//断的
                         this.rail1Right.Error();
+                    }
+                    else if (onOffRail1Right == 9)
+                    {
+                        this.rail1Right.Timeout();
                     }
                     else
                     {
@@ -335,6 +343,10 @@ namespace BrokenRailMonitorViaWiFi
                     {//断的
                         this.rail2Left.Error();
                     }
+                    else if (onOffRail2Left == 9)
+                    {
+                        this.rail2Left.Timeout();
+                    }
                     else
                     {
                         MessageBox.Show("解析出未定义数据！");
@@ -347,6 +359,10 @@ namespace BrokenRailMonitorViaWiFi
                     else if (onOffRail2Right == 7)
                     {//断的
                         this.rail2Right.Error();
+                    }
+                    else if (onOffRail2Right == 9)
+                    {
+                        this.rail2Right.Timeout();
                     }
                     else
                     {
@@ -559,7 +575,7 @@ namespace BrokenRailMonitorViaWiFi
             chartRail2RightSignalAmplitude.Series.Add(dataSeries);
         }
 
-        private void setPointMarker(DataPoint dp,int index)
+        private void setPointMarker(DataPoint dp, int index)
         {
             dp.MarkerEnabled = true;
             if (index == 0)

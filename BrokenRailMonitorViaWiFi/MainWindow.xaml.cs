@@ -335,6 +335,7 @@ namespace BrokenRailMonitorViaWiFi
                                                 MasterControlList[index].Offline();
                                             }));
                                         }
+                                        item.Dispose();
                                     }
                                 }
                                 try
