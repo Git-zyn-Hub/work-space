@@ -1462,9 +1462,9 @@ namespace BrokenRailMonitorViaWiFi
                 int tNo = MasterControlList[index].TerminalNumber;
                 int tNextNo = MasterControlList[index + 1].TerminalNumber;
 
-                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨超时！", DataLevel.Timeout);
-                this._svtThumbnail.Timeout(new int[1] { index }, 1);
-                Rail rail = this.cvsRail1.Children[index] as Rail;
+                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨超时！", DataLevel.Timeout);
+                this._svtThumbnail.Timeout(new int[1] { index }, 2);
+                Rail rail = this.cvsRail2.Children[index] as Rail;
                 rail.Timeout();
             }
             else
