@@ -306,8 +306,12 @@ namespace BrokenRailMonitorViaWiFi
                         this.rail1Left.Error();
                     }
                     else if (onOffRail1Left == 9)
-                    {
+                    {//超时
                         this.rail1Left.Timeout();
+                    }
+                    else if (onOffRail1Left == 0x0a)
+                    {//持续干扰
+                        this.rail1Left.ContinuousInterference();
                     }
                     else
                     {
@@ -323,8 +327,12 @@ namespace BrokenRailMonitorViaWiFi
                         this.rail1Right.Error();
                     }
                     else if (onOffRail1Right == 9)
-                    {
+                    {//超时
                         this.rail1Right.Timeout();
+                    }
+                    else if (onOffRail1Right == 0x0a)
+                    {//持续干扰
+                        this.rail1Right.ContinuousInterference();
                     }
                     else
                     {
@@ -344,8 +352,12 @@ namespace BrokenRailMonitorViaWiFi
                         this.rail2Left.Error();
                     }
                     else if (onOffRail2Left == 9)
-                    {
+                    {//超时
                         this.rail2Left.Timeout();
+                    }
+                    else if (onOffRail2Left == 0x0a)
+                    {//持续干扰
+                        this.rail2Left.ContinuousInterference();
                     }
                     else
                     {
@@ -361,8 +373,12 @@ namespace BrokenRailMonitorViaWiFi
                         this.rail2Right.Error();
                     }
                     else if (onOffRail2Right == 9)
-                    {
+                    {//超时
                         this.rail2Right.Timeout();
+                    }
+                    else if (onOffRail2Right == 0x0a)
+                    {//持续干扰
+                        this.rail2Right.ContinuousInterference();
                     }
                     else
                     {

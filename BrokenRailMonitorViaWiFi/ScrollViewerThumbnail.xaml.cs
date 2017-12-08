@@ -276,6 +276,24 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
+        public void ContinuousInterference(int[] differentNo, int whichRail)
+        {
+            if (whichRail == 1)
+            {
+                for (int i = 0; i < differentNo.Length; i++)
+                {
+                    _rails1[differentNo[i]].Fill = new SolidColorBrush(Colors.LightBlue);
+                }
+            }
+            else if (whichRail == 2)
+            {
+                for (int i = 0; i < differentNo.Length; i++)
+                {
+                    _rails2[differentNo[i]].Fill = new SolidColorBrush(Colors.LightBlue);
+                }
+            }
+        }
+
         #region INotifyPropertyChanged Members
 
         public event PropertyChangedEventHandler PropertyChanged;

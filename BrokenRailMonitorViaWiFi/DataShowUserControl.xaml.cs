@@ -51,6 +51,9 @@ namespace BrokenRailMonitorViaWiFi
                     case DataLevel.Timeout:
                         txtData.Foreground = new SolidColorBrush(Colors.Gray);
                         break;
+                    case DataLevel.ContinuousInterference:
+                        txtData.Foreground = new SolidColorBrush(Colors.LightBlue);
+                        break;
                     default:
                         txtData.Foreground = new SolidColorBrush(Colors.White);
                         break;
@@ -140,6 +143,7 @@ namespace BrokenRailMonitorViaWiFi
         Normal,
         Warning,
         Error,
-        Timeout
+        Timeout,
+        ContinuousInterference
     }
 }

@@ -1433,6 +1433,16 @@ namespace BrokenRailMonitorViaWiFi
                 Rail rail = this.cvsRail1.Children[index] as Rail;
                 rail.Timeout();
             }
+            else if (onOff == 0x0a)
+            {//持续干扰
+                int tNo = MasterControlList[index].TerminalNumber;
+                int tNextNo = MasterControlList[index + 1].TerminalNumber;
+
+                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨持续干扰！", DataLevel.ContinuousInterference);
+                this._svtThumbnail.ContinuousInterference(new int[1] { index }, 1);
+                Rail rail = this.cvsRail1.Children[index] as Rail;
+                rail.ContinuousInterference();
+            }
             else
             {
                 AppendMessage("收到未定义数据！", DataLevel.Error);
@@ -1466,6 +1476,16 @@ namespace BrokenRailMonitorViaWiFi
                 this._svtThumbnail.Timeout(new int[1] { index }, 2);
                 Rail rail = this.cvsRail2.Children[index] as Rail;
                 rail.Timeout();
+            }
+            else if (onOff == 0x0a)
+            {//持续干扰
+                int tNo = MasterControlList[index].TerminalNumber;
+                int tNextNo = MasterControlList[index + 1].TerminalNumber;
+
+                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨持续干扰！", DataLevel.ContinuousInterference);
+                this._svtThumbnail.ContinuousInterference(new int[1] { index }, 2);
+                Rail rail = this.cvsRail2.Children[index] as Rail;
+                rail.ContinuousInterference();
             }
             else
             {
