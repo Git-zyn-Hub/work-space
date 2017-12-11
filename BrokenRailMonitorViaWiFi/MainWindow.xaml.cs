@@ -58,6 +58,7 @@ namespace BrokenRailMonitorViaWiFi
         private bool _isConnect = false;
         private const String _serverIP = "103.44.145.248";
         private const int _fileReceivePort = 23955;
+        private bool _isSubscribingAllRailInfo = false;
 
         public List<int> SocketRegister
         {
@@ -112,8 +113,8 @@ namespace BrokenRailMonitorViaWiFi
         public MainWindow()
         {
             InitializeComponent();
-            _getAllRailInfoTimer.Tick += getAllRailInfoTimer_Tick;
-            _getAllRailInfoTimer.Interval = new TimeSpan(0, 0, 75);
+            //_getAllRailInfoTimer.Tick += getAllRailInfoTimer_Tick;
+            //_getAllRailInfoTimer.Interval = new TimeSpan(0, 0, 75);
 
             WaitReceiveTimer.Tick += WaitReceiveTimer_Tick;
             WaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
@@ -313,11 +314,15 @@ namespace BrokenRailMonitorViaWiFi
                         //判断Socket连接是否断开
                         if (numBytes == 0)
                         {
-                            if (_receiveEmptyPackageCount == 10)
+                            if (_receiveEmptyPackageCount == 1)
                             {
                                 _receiveEmptyPackageCount = 0;
                                 AppendMessage("与服务器" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！", DataLevel.Error);
                                 _isConnect = false;
+                                if (_timeToWaitTimer.IsEnabled)
+                                {
+                                    _timeToWaitTimer.Stop();
+                                }
                                 this.Dispatcher.Invoke(new Action(() =>
                                 {
                                     this.clientIDShow.ClientID = 0;
@@ -1492,6 +1497,22 @@ namespace BrokenRailMonitorViaWiFi
                 AppendMessage("收到未定义数据！", DataLevel.Error);
             }
         }
+
+        private void errorAllRails()
+        {
+            foreach (var item in _rail1List)
+            {
+                item.Error();
+            }
+            foreach (var item in cvsRail2.Children)
+            {
+                Rail rail2 = item as Rail;
+                if (rail2 != null)
+                {
+                    rail2.Error();
+                }
+            }
+        }
         //public void SettingWinClose()
         //{
         //    this._container.Close();
@@ -1722,7 +1743,7 @@ namespace BrokenRailMonitorViaWiFi
             if (_getAllRailInfoTimer.IsEnabled)
             {
                 _getAllRailInfoTimer.Stop();
-                this.miGetAllRailInfo.Header = "获取所有终端铁轨信息";
+                //this.miGetAllRailInfo.Header = "获取所有终端铁轨信息";
             }
             else
             {
@@ -1737,7 +1758,7 @@ namespace BrokenRailMonitorViaWiFi
                         _timeToWaitTimer.Stop();
                         _getAllRailInfoTimer.Start();
                         getAllRailInfoTimer_Tick(sender, e);
-                        this.miGetAllRailInfo.Header = "停止获取所有终端铁轨信息";
+                        //this.miGetAllRailInfo.Header = "停止获取所有终端铁轨信息";
                     };
                     _timeToWaitTimer.Interval = new TimeSpan(0, 0, timeToSend);
                     _timeToWaitTimer.Start();
@@ -1758,7 +1779,7 @@ namespace BrokenRailMonitorViaWiFi
 
                     AppendMessage("系统中不包含4G点，请检查config文档！", DataLevel.Error);
                     _getAllRailInfoTimer.Stop();
-                    this.miGetAllRailInfo.Header = "获取所有终端铁轨信息";
+                    //this.miGetAllRailInfo.Header = "获取所有终端铁轨信息";
                 }
                 else
                 {
@@ -1794,6 +1815,43 @@ namespace BrokenRailMonitorViaWiFi
             catch (Exception ee)
             {
                 AppendMessage(ee.Message, DataLevel.Error);
+            }
+        }
+
+        private void miSubscribeAllRailInfo_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!_isConnect)
+                {
+                    AppendMessage("请先连接！", DataLevel.Error);
+                    return;
+                }
+                byte[] sendData;
+                if (_isSubscribingAllRailInfo)
+                {
+                    sendData = SendDataPackage.PackageSendData((byte)this.clientIDShow.ClientID,
+                            (byte)0xff, (byte)CommandType.SubscribeAllRailInfo, new byte[1] { 0xff });
+                    this.miSubscribeAllRailInfo.Header = "订阅所有终端铁轨信息";
+                    errorAllRails();
+                    _isSubscribingAllRailInfo = false;
+                }
+                else
+                {
+                    sendData = SendDataPackage.PackageSendData((byte)this.clientIDShow.ClientID,
+                            (byte)0xff, (byte)CommandType.SubscribeAllRailInfo, new byte[1] { 0 });
+                    this.miSubscribeAllRailInfo.Header = "取消订阅所有终端铁轨信息";
+                    _isSubscribingAllRailInfo = true;
+                }
+                if (_socketMain != null)
+                {
+                    _socketMain.Send(sendData, SocketFlags.None);
+                    AppendDataMsg(sendData);
+                }
+            }
+            catch (Exception ee)
+            {
+                MessageBox.Show("" + ee.Message);
             }
         }
 

@@ -34,7 +34,7 @@
                 <MenuItem x:Name="miCommand" Header="指令" FontSize="15">
                     <!--<MenuItem x:Name="miRailInitial" Header="初始化" Click="miRailInitial_Click"></MenuItem>-->
                     <!--<MenuItem x:Name="miTimeBaseCorrect" Header="发射时基校准" Click="miTimeBaseCorrect_Click"></MenuItem>-->
-                    <MenuItem x:Name="miGetAllRailInfo" Header="获取所有终端铁轨信息" Click="miGetAllRailInfo_Click"></MenuItem>
+                    <MenuItem x:Name="miSubscribeAllRailInfo" Header="订阅所有终端铁轨信息" Click="miSubscribeAllRailInfo_Click"></MenuItem>
                     <MenuItem x:Name="miGetOneSectionInfo" Header="获取某段铁轨信息" Click="miGetOneSectionInfo_Click"></MenuItem>
                     <!--<MenuItem x:Name="miGetAllDevicesSignalAmplitude" Header="获取所有终端信号幅值" Click="miGetAllDevicesSignalAmplitude_Click"></MenuItem>-->
                     <MenuItem x:Name="miRealTimeConfig" Header="实时时钟配置" Click="miRealTimeConfig_Click"></MenuItem>
