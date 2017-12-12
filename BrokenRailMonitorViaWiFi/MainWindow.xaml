@@ -59,7 +59,7 @@
                 </Canvas>
                 <Canvas x:Name="cvsDevices" Height="36" Margin="20,0">
                 </Canvas>
-                <Canvas x:Name="cvsRail2" Height="36" Margin="20,0">
+                <Canvas x:Name="cvsRail2" Height="50" Margin="20,0">
                 </Canvas>
             </StackPanel>
             <!--</StackPanel>-->

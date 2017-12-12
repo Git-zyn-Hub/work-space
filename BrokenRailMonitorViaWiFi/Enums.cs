@@ -23,4 +23,10 @@ namespace BrokenRailMonitorViaWiFi
         EraseFlash = 0x56,
         ErrorReport = 0x88
     }
+
+    public enum RailNo
+    {
+        Rail1,
+        Rail2
+    }
 }

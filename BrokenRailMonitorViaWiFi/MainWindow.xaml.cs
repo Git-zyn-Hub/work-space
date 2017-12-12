@@ -177,6 +177,8 @@ namespace BrokenRailMonitorViaWiFi
 
                     Rail rail1 = new Rail(terminalNo);
                     Rail rail2 = new Rail(terminalNo);
+                    rail1.WhichRail = RailNo.Rail1;
+                    rail2.WhichRail = RailNo.Rail2;
                     this._rail1List.Add(rail1);
                     this._rail2List.Add(rail2);
                     this.cvsDevices.Children.Add(this.MasterControlList[this.MasterControlList.Count - 1]);
@@ -1096,17 +1098,18 @@ namespace BrokenRailMonitorViaWiFi
                                             {
                                                 bytesOnOffContent[i - 7] = actualReceive[i];
                                             }
-                                            for (int i = 0; i < bytesOnOffContent.Length; i += 3)
+                                            for (int i = 0; i < bytesOnOffContent.Length; i += 10)
                                             {
-                                                bytesTemp[i] = bytesOnOffContent[bytesOnOffContent.Length - i - 3];
-                                                bytesTemp[i + 1] = bytesOnOffContent[bytesOnOffContent.Length - i - 2];
-                                                bytesTemp[i + 2] = bytesOnOffContent[bytesOnOffContent.Length - i - 1];
+                                                for (int j = 0; j < 10; j++)
+                                                {
+                                                    bytesTemp[i + j] = bytesOnOffContent[bytesOnOffContent.Length - i - (10 - j)];
+                                                }
                                             }
                                             bytesTemp.CopyTo(bytesOnOffContent, 0);
                                             int contentLength = bytesOnOffContent.Length;
-                                            if (contentLength % 3 == 0)
+                                            if (contentLength % 10 == 0)
                                             {
-                                                if (contentLength == 3)
+                                                if (contentLength == 10)
                                                 {
                                                     //如果只有一个终端的数据就不存在两个终端数据冲突的情况。
                                                     int index = FindMasterControlIndex(bytesOnOffContent[0]);
@@ -1333,7 +1336,7 @@ namespace BrokenRailMonitorViaWiFi
                                             }
                                             else
                                             {
-                                                AppendMessage("发送数据内容的长度错误，应该是3的倍数", DataLevel.Error);
+                                                AppendMessage("发送数据内容的长度错误，应该是10的倍数", DataLevel.Error);
                                             }
                                         }
                                         break;

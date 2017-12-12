@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,10 +19,13 @@ namespace BrokenRailMonitorViaWiFi
     /// <summary>
     /// Interaction logic for Rail.xaml
     /// </summary>
-    public partial class Rail : UserControl
+    public partial class Rail : UserControl,INotifyPropertyChanged
     {
         private readonly int _railNumber;
         private RailStates _railState = RailStates.IsError;
+        private RailNo _whichRail;
+        private int _railStress;
+        private int _railTemperature;
         public int RailNumber
         {
             get
@@ -43,14 +47,67 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
+        public RailNo WhichRail
+        {
+            get
+            {
+                return _whichRail;
+            }
+
+            set
+            {
+                if (_whichRail != value)
+                {
+                    _whichRail = value;
+                    OnPropertyChanged("WhichRail");
+                }
+            }
+        }
+
+        public int RailStress
+        {
+            get
+            {
+                return _railStress;
+            }
+
+            set
+            {
+                if (_railStress != value)
+                {
+                    _railStress = value;
+                    OnPropertyChanged("RailStress");
+                }
+            }
+        }
+
+        public int RailTemperature
+        {
+            get
+            {
+                return _railTemperature;
+            }
+
+            set
+            {
+                if (_railTemperature != value)
+                {
+                    _railTemperature = value;
+                    OnPropertyChanged("RailTemperature");
+                }
+            }
+        }
+
         public Rail()
         {
             InitializeComponent();
+            this.DataContext = this;
         }
         public Rail(int railNumber)
         {
             InitializeComponent();
             this._railNumber = railNumber;
+            this.DataContext = this;
         }
         public void Error()
         {
@@ -85,6 +142,18 @@ namespace BrokenRailMonitorViaWiFi
         {
 
         }
+        
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+        }
+
+        #endregion
     }
 
     public enum RailStates
