@@ -6,6 +6,10 @@
              xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
              x:Name="masterUserControl"
              mc:Ignorable="d" Height="26" Width="26">
+    <UserControl.Resources>
+        <local:Stress2TextConverter x:Key="stress2TextConverter"/>
+        <local:Temperature2TextConverter x:Key="temperature2TextConverter"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.ContextMenu>
             <ContextMenu x:Name="contextMenu">
@@ -18,6 +22,14 @@
                 <!--<MenuItem x:Name="miGetPointSignalAmplitude" Header="获取单点信号幅值" Click="miGetPointSignalAmplitude_Click"></MenuItem>-->
             </ContextMenu>
         </Grid.ContextMenu>
+        <StackPanel Orientation="Horizontal" Width="100" HorizontalAlignment="Center" Margin="-50,-55,-50,55">
+            <TextBlock Foreground="White" Background="AntiqueWhite" Width="50" Text="{Binding Rail1Stress, Converter={StaticResource stress2TextConverter}}" Padding="5"></TextBlock>
+            <TextBlock Foreground="White" Background="AntiqueWhite" Width="50" Text="{Binding Rail1Temperature, Converter={StaticResource temperature2TextConverter}}" Padding="5"></TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Width="100" HorizontalAlignment="Center" Margin="-50,55,-50,-55">
+            <TextBlock Foreground="White" Background="AntiqueWhite" Width="50" Text="{Binding Rail2Stress, Converter={StaticResource stress2TextConverter}}" Padding="5"></TextBlock>
+            <TextBlock Foreground="White" Background="AntiqueWhite" Width="50" Text="{Binding Rail2Temperature, Converter={StaticResource temperature2TextConverter}}" Padding="5"></TextBlock>
+        </StackPanel>
         <Ellipse Fill="Orange" Height="26" Width="26"/>
         <Label x:Name="lblNumber" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Padding="0" FontSize="10" 
                Content="{Binding TerminalNumber, ElementName=masterUserControl, Mode=TwoWay}"/>

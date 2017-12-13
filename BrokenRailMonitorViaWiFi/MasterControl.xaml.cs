@@ -36,6 +36,10 @@ namespace BrokenRailMonitorViaWiFi
         private MainWindow _mainWin;
         public static readonly DependencyProperty Is4GProperty = DependencyProperty.Register("Is4G", typeof(bool), typeof(MasterControl), new PropertyMetadata(false, OnIs4GChanged));
         private DispatcherTimer _offlineTimer;
+        private int _rail1Stress;
+        private int _rail1Temperature;
+        private int _rail2Stress;
+        private int _rail2Temperature;
 
         public bool Is4G
         {
@@ -142,6 +146,73 @@ namespace BrokenRailMonitorViaWiFi
             set
             {
                 _find4GErrorMsg = value;
+            }
+        }
+        public int Rail1Stress
+        {
+            get
+            {
+                return _rail1Stress;
+            }
+
+            set
+            {
+                if (_rail1Stress != value)
+                {
+                    _rail1Stress = value;
+                    OnPropertyChanged("Rail1Stress");
+                }
+            }
+        }
+
+        public int Rail1Temperature
+        {
+            get
+            {
+                return _rail1Temperature;
+            }
+
+            set
+            {
+                if (_rail1Temperature != value)
+                {
+                    _rail1Temperature = value;
+                    OnPropertyChanged("Rail1Temperature");
+                }
+            }
+        }
+
+        public int Rail2Stress
+        {
+            get
+            {
+                return _rail2Stress;
+            }
+
+            set
+            {
+                if (_rail2Stress != value)
+                {
+                    _rail2Stress = value;
+                    OnPropertyChanged("Rail2Stress");
+                }
+            }
+        }
+
+        public int Rail2Temperature
+        {
+            get
+            {
+                return _rail2Temperature;
+            }
+
+            set
+            {
+                if (_rail2Temperature != value)
+                {
+                    _rail2Temperature = value;
+                    OnPropertyChanged("Rail2Temperature");
+                }
             }
         }
 

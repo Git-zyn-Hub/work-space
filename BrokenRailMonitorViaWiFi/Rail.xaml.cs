@@ -23,9 +23,7 @@ namespace BrokenRailMonitorViaWiFi
     {
         private readonly int _railNumber;
         private RailStates _railState = RailStates.IsError;
-        private RailNo _whichRail;
-        private int _railStress;
-        private int _railTemperature;
+        //private RailNo _whichRail;
         public int RailNumber
         {
             get
@@ -47,56 +45,23 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
-        public RailNo WhichRail
-        {
-            get
-            {
-                return _whichRail;
-            }
+        //public RailNo WhichRail
+        //{
+        //    get
+        //    {
+        //        return _whichRail;
+        //    }
 
-            set
-            {
-                if (_whichRail != value)
-                {
-                    _whichRail = value;
-                    OnPropertyChanged("WhichRail");
-                }
-            }
-        }
+        //    set
+        //    {
+        //        if (_whichRail != value)
+        //        {
+        //            _whichRail = value;
+        //            OnPropertyChanged("WhichRail");
+        //        }
+        //    }
+        //}
 
-        public int RailStress
-        {
-            get
-            {
-                return _railStress;
-            }
-
-            set
-            {
-                if (_railStress != value)
-                {
-                    _railStress = value;
-                    OnPropertyChanged("RailStress");
-                }
-            }
-        }
-
-        public int RailTemperature
-        {
-            get
-            {
-                return _railTemperature;
-            }
-
-            set
-            {
-                if (_railTemperature != value)
-                {
-                    _railTemperature = value;
-                    OnPropertyChanged("RailTemperature");
-                }
-            }
-        }
 
         public Rail()
         {

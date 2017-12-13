@@ -33,6 +33,7 @@ namespace BrokenRailMonitorViaWiFi
     {
         private static readonly int MasterControlWidth = 26;
         private static readonly int RailWidth = 104;
+        private static readonly int LeftOffset = 30;//主控添加应力之后，最左边的显示不全，所以Rail以及MasterControl整体右移。
         //private Window _container;
         private ScrollViewerThumbnail _svtThumbnail;
         private string _directoryName;
@@ -177,19 +178,19 @@ namespace BrokenRailMonitorViaWiFi
 
                     Rail rail1 = new Rail(terminalNo);
                     Rail rail2 = new Rail(terminalNo);
-                    rail1.WhichRail = RailNo.Rail1;
-                    rail2.WhichRail = RailNo.Rail2;
+                    //rail1.WhichRail = RailNo.Rail1;
+                    //rail2.WhichRail = RailNo.Rail2;
                     this._rail1List.Add(rail1);
                     this._rail2List.Add(rail2);
                     this.cvsDevices.Children.Add(this.MasterControlList[this.MasterControlList.Count - 1]);
-                    Canvas.SetLeft(this.MasterControlList[this.MasterControlList.Count - 1], (2 + RailWidth) * i);
+                    Canvas.SetLeft(this.MasterControlList[this.MasterControlList.Count - 1], (2 + RailWidth) * i + LeftOffset);
                     if (i < nodeCount - 1)
                     {
                         this.cvsRail1.Children.Add(rail1);
-                        Canvas.SetLeft(rail1, (2 + RailWidth) * i + MasterControlWidth / 2 + 1);
+                        Canvas.SetLeft(rail1, (2 + RailWidth) * i + MasterControlWidth / 2 + 1 + LeftOffset);
 
                         this.cvsRail2.Children.Add(rail2);
-                        Canvas.SetLeft(rail2, (2 + RailWidth) * i + MasterControlWidth / 2 + 1);
+                        Canvas.SetLeft(rail2, (2 + RailWidth) * i + MasterControlWidth / 2 + 1 + LeftOffset);
                     }
                     XmlNode neighbourSmallNode = device.SelectSingleNode("NeighbourSmall");
                     string innerTextNeighbourSmall = neighbourSmallNode.InnerText.Trim();

@@ -7,16 +7,7 @@
              x:Name="railUserControl"
              mc:Ignorable="d" Height="26" Width="104"
              MouseLeftButtonDown="railUserControl_MouseLeftButtonDown">
-    <UserControl.Resources>
-        <local:WhichRail2MarginConverters x:Key="whichRail2MarginConverters"/>
-        <local:Stress2TextConverter x:Key="stress2TextConverter"/>
-        <local:Temperature2TextConverter x:Key="temperature2TextConverter"/>
-    </UserControl.Resources>
     <Grid>
-        <StackPanel Orientation="Horizontal" Width="100" HorizontalAlignment="Center" Margin="{Binding WhichRail,Converter={StaticResource whichRail2MarginConverters}}">
-            <TextBlock Foreground="White" Width="50" Text="{Binding RailStress, Converter={StaticResource stress2TextConverter}}" Padding="5"></TextBlock>
-            <TextBlock Foreground="White" Width="50" Text="{Binding RailTemperature, Converter={StaticResource temperature2TextConverter}}" Padding="5"></TextBlock>
-        </StackPanel>
         <Rectangle x:Name="recRail" Fill="red" Height="10" Width="104"></Rectangle>
     </Grid>
 </UserControl>
