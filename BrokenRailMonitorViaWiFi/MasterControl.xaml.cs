@@ -40,6 +40,7 @@ namespace BrokenRailMonitorViaWiFi
         private int _rail1Temperature;
         private int _rail2Stress;
         private int _rail2Temperature;
+        private int _masterCtrlTemperature;
 
         public bool Is4G
         {
@@ -212,6 +213,23 @@ namespace BrokenRailMonitorViaWiFi
                 {
                     _rail2Temperature = value;
                     OnPropertyChanged("Rail2Temperature");
+                }
+            }
+        }
+
+        public int MasterCtrlTemperature
+        {
+            get
+            {
+                return _masterCtrlTemperature;
+            }
+
+            set
+            {
+                if (_masterCtrlTemperature != value)
+                {
+                    _masterCtrlTemperature = value;
+                    OnPropertyChanged("MasterCtrlTemperature");
                 }
             }
         }

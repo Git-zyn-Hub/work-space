@@ -23,12 +23,15 @@
             </ContextMenu>
         </Grid.ContextMenu>
         <StackPanel Orientation="Horizontal" Width="100" HorizontalAlignment="Center" Margin="-50,-55,-50,55">
-            <TextBlock Foreground="White" Background="AntiqueWhite" Width="50" Text="{Binding Rail1Stress, Converter={StaticResource stress2TextConverter}}" Padding="5"></TextBlock>
-            <TextBlock Foreground="White" Background="AntiqueWhite" Width="50" Text="{Binding Rail1Temperature, Converter={StaticResource temperature2TextConverter}}" Padding="5"></TextBlock>
+            <TextBlock Foreground="White" Width="50" Text="{Binding Rail1Stress, Converter={StaticResource stress2TextConverter}}" Padding="5"></TextBlock>
+            <TextBlock Foreground="White" Width="50" Text="{Binding Rail1Temperature, Converter={StaticResource temperature2TextConverter}}" Padding="5"></TextBlock>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Width="100" HorizontalAlignment="Center" Margin="-50,55,-50,-55">
-            <TextBlock Foreground="White" Background="AntiqueWhite" Width="50" Text="{Binding Rail2Stress, Converter={StaticResource stress2TextConverter}}" Padding="5"></TextBlock>
-            <TextBlock Foreground="White" Background="AntiqueWhite" Width="50" Text="{Binding Rail2Temperature, Converter={StaticResource temperature2TextConverter}}" Padding="5"></TextBlock>
+            <TextBlock Foreground="White" Width="50" Text="{Binding Rail2Stress, Converter={StaticResource stress2TextConverter}}" Padding="5"></TextBlock>
+            <TextBlock Foreground="White" Width="50" Text="{Binding Rail2Temperature, Converter={StaticResource temperature2TextConverter}}" Padding="5"></TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Width="50" HorizontalAlignment="Center" Margin="45,0,-45,0">
+            <TextBlock Foreground="White" Width="50" Text="{Binding MasterCtrlTemperature, Converter={StaticResource temperature2TextConverter}}" Padding="5"></TextBlock>
         </StackPanel>
         <Ellipse Fill="Orange" Height="26" Width="26"/>
         <Label x:Name="lblNumber" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0" Padding="0" FontSize="10" 
