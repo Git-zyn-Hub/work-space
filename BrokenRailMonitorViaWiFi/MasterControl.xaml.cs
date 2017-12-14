@@ -242,6 +242,7 @@ namespace BrokenRailMonitorViaWiFi
         {
             InitializeComponent();
             _mainWin = mainWin;
+            this.DataContext = this;
             _offlineTimer = new DispatcherTimer();
             _offlineTimer.Interval = new TimeSpan(0, 2, 5);
             _offlineTimer.Tick += offlineTimer_Tick;

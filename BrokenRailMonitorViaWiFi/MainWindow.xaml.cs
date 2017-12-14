@@ -1161,9 +1161,9 @@ namespace BrokenRailMonitorViaWiFi
                                                         }
                                                         MasterControlList[index].Rail1Stress = (bytesOnOffContent[3] << 8) + bytesOnOffContent[4];
                                                         MasterControlList[index].Rail2Stress = (bytesOnOffContent[5] << 8) + bytesOnOffContent[6];
-                                                        setMasterCtrlTemperature(MasterControlList[index].Rail1Temperature, bytesOnOffContent[7]);
-                                                        setMasterCtrlTemperature(MasterControlList[index].Rail2Temperature, bytesOnOffContent[8]);
-                                                        setMasterCtrlTemperature(MasterControlList[index].MasterCtrlTemperature, bytesOnOffContent[9]);
+                                                        MasterControlList[index].Rail1Temperature = setMasterCtrlTemperature(bytesOnOffContent[7]);
+                                                        MasterControlList[index].Rail2Temperature = setMasterCtrlTemperature(bytesOnOffContent[8]);
+                                                        MasterControlList[index].MasterCtrlTemperature = setMasterCtrlTemperature(bytesOnOffContent[9]);
                                                     }
                                                     else
                                                     {
@@ -1314,17 +1314,17 @@ namespace BrokenRailMonitorViaWiFi
                                                             }
                                                             MasterControlList[index].Rail1Stress = (bytesOnOffContent[i + 3] << 8) + bytesOnOffContent[i + 4];
                                                             MasterControlList[index].Rail2Stress = (bytesOnOffContent[i + 5] << 8) + bytesOnOffContent[i + 6];
-                                                            setMasterCtrlTemperature(MasterControlList[index].Rail1Temperature, bytesOnOffContent[i + 7]);
-                                                            setMasterCtrlTemperature(MasterControlList[index].Rail2Temperature, bytesOnOffContent[i + 8]);
-                                                            setMasterCtrlTemperature(MasterControlList[index].MasterCtrlTemperature, bytesOnOffContent[i + 9]);
+                                                            MasterControlList[index].Rail1Temperature = setMasterCtrlTemperature(bytesOnOffContent[i + 7]);
+                                                            MasterControlList[index].Rail2Temperature = setMasterCtrlTemperature(bytesOnOffContent[i + 8]);
+                                                            MasterControlList[index].MasterCtrlTemperature = setMasterCtrlTemperature(bytesOnOffContent[i + 9]);
                                                             if (i == (contentLength - 20))
                                                             {
                                                                 index = FindMasterControlIndex(bytesOnOffContent[i + 10]);
                                                                 MasterControlList[index].Rail1Stress = (bytesOnOffContent[i + 13] << 8) + bytesOnOffContent[i + 14];
                                                                 MasterControlList[index].Rail2Stress = (bytesOnOffContent[i + 15] << 8) + bytesOnOffContent[i + 16];
-                                                                setMasterCtrlTemperature(MasterControlList[index].Rail1Temperature, bytesOnOffContent[i + 17]);
-                                                                setMasterCtrlTemperature(MasterControlList[index].Rail2Temperature, bytesOnOffContent[i + 18]);
-                                                                setMasterCtrlTemperature(MasterControlList[index].MasterCtrlTemperature, bytesOnOffContent[i + 19]);
+                                                                MasterControlList[index].Rail1Temperature = setMasterCtrlTemperature(bytesOnOffContent[i + 17]);
+                                                                MasterControlList[index].Rail2Temperature = setMasterCtrlTemperature(bytesOnOffContent[i + 18]);
+                                                                MasterControlList[index].MasterCtrlTemperature = setMasterCtrlTemperature(bytesOnOffContent[i + 19]);
                                                             }
                                                         }
                                                     }
@@ -1441,8 +1441,9 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
-        private void setMasterCtrlTemperature(int destTempe, byte tempe)
+        private int setMasterCtrlTemperature(byte tempe)
         {
+            int destTempe;
             int sign = (tempe & 0x80) >> 7;
             if (sign == 1)
             {
@@ -1452,6 +1453,7 @@ namespace BrokenRailMonitorViaWiFi
             {
                 destTempe = tempe;
             }
+            return destTempe;
         }
 
         private void setRail1State(int index, int onOff)
