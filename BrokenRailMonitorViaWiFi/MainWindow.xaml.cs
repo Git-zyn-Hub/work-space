@@ -57,7 +57,8 @@ namespace BrokenRailMonitorViaWiFi
         private int _hit0xf4Count = 0;
         private List<string> _fileNameList = new List<string>();
         private bool _isConnect = false;
-        private const String _serverIP = "103.44.145.248";
+        private String _serverIP = "103.44.145.248";
+        private const String _serverWeb = "f1880f0253.51mypc.cn";
         private const int _fileReceivePort = 23955;
         private bool _isSubscribingAllRailInfo = false;
 
@@ -1593,7 +1594,14 @@ namespace BrokenRailMonitorViaWiFi
             try
             {
                 //IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("192.168.16.254"), 8080);
-                IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("103.44.145.248"), 23539);
+                //IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("103.44.145.248"), 23539);
+                //IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("192.168.1.106"), 23539);
+                //IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("103.44.145.233"), 23539);
+
+                IPHostEntry host = Dns.GetHostEntry(_serverWeb);
+                IPAddress ip = host.AddressList[0];
+                _serverIP = ip.ToString();
+                IPEndPoint deviceIP = new IPEndPoint(ip, 23539);
                 _socketMain = new Socket(deviceIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 _socketMain.Connect(deviceIP);
 
