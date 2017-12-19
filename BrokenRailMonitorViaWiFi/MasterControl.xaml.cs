@@ -273,7 +273,7 @@ namespace BrokenRailMonitorViaWiFi
                     _mainWin.WaitingRingEnable();
                     _mainWin.WaitReceiveTimer.Start();
                 }
-                byte[] sendData = SendDataPackage.PackageSendData(0xff, (byte)_terminalNumber, (byte)CommandType.GetPointRailInfo, new byte[2] { 0, 0 });
+                byte[] sendData = SendDataPackage.PackageSendData((byte)_mainWin.clientIDShow.ClientID, (byte)_terminalNumber, (byte)CommandType.GetPointRailInfo, new byte[2] { 0, 0 });
                 Socket socketGet = GetNearest4GTerminalSocket(true);
                 if (socketGet != null)
                 {

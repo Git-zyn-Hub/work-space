@@ -1405,6 +1405,11 @@ namespace BrokenRailMonitorViaWiFi
                                             }));
                                         }
                                         break;
+                                    case (byte)CommandType.BroadcastConfigFileSize:
+                                        {
+                                            handleBroadcastFileSize(actualReceive);
+                                        }
+                                        break;
                                     default:
                                         break;
                                 }
@@ -1559,6 +1564,40 @@ namespace BrokenRailMonitorViaWiFi
                     rail2.Error();
                 }
             }
+        }
+
+        private void handleBroadcastFileSize(byte[] data)
+        {
+            try
+            {
+                int size = (data[6] << 16) + (data[7] << 8) + data[8];
+                long configFileSize = GetFileSize(AppDomain.CurrentDomain.BaseDirectory + "\\config.xml");
+                if (configFileSize == size)
+                {
+                    AppendMessage("配置文件大小" + configFileSize.ToString() + "字节，与服务器相同，不需下载。", DataLevel.Warning);
+                }
+                else
+                {
+                    AppendMessage("配置文件发生改变，大小" + size.ToString() + "字节，请到菜单->设备->下载菜单项下载", DataLevel.Warning);
+                }
+            }
+            catch (Exception ee)
+            {
+                AppendMessage("处理接收配置文件大小异常：" + ee.Message, DataLevel.Error);
+            }
+        }
+
+        /// <summary>
+        /// 获取文件大小
+        /// </summary>
+        /// <param name="sFullName"></param>
+        /// <returns></returns>
+        public static long GetFileSize(string sFullName)
+        {
+            long lSize = 0;
+            if (File.Exists(sFullName))
+                lSize = new FileInfo(sFullName).Length;
+            return lSize;
         }
         //public void SettingWinClose()
         //{
