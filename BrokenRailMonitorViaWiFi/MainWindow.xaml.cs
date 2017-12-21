@@ -37,6 +37,7 @@ namespace BrokenRailMonitorViaWiFi
         //private Window _container;
         private ScrollViewerThumbnail _svtThumbnail;
         private string _directoryName;
+        private string _directoryHistoryName;
         private Socket _socketMain;
         private Socket _acceptSocket;
         private Thread _socketListeningThread;
@@ -115,6 +116,7 @@ namespace BrokenRailMonitorViaWiFi
         public MainWindow()
         {
             InitializeComponent();
+            checkHistoryDirectory();
             //_getAllRailInfoTimer.Tick += getAllRailInfoTimer_Tick;
             //_getAllRailInfoTimer.Interval = new TimeSpan(0, 0, 75);
 
@@ -777,7 +779,7 @@ namespace BrokenRailMonitorViaWiFi
                                                     {
                                                         refreshFileConfig(actualReceive[7]);
                                                     }
-                                                    string fileName = System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName + @"\DataTerminal" + actualReceive[7].ToString("D3") + ".xml";
+                                                    string fileName = System.Environment.CurrentDirectory + @"\History\" + _directoryHistoryName + @"\DataTerminal" + actualReceive[7].ToString("D3") + ".xml";
                                                     if (File.Exists(fileName))
                                                     {
                                                         XmlDocument xmlDoc = new XmlDocument();
@@ -800,7 +802,7 @@ namespace BrokenRailMonitorViaWiFi
                                                                 int month = actualReceive[9 + j * 84];
                                                                 int day = actualReceive[10 + j * 84];
                                                                 string directoryName = year.ToString() + "\\" + year.ToString() + "-" + month.ToString("D2") + "\\" + year.ToString() + "-" + month.ToString("D2") + "-" + day.ToString("D2");
-                                                                if (directoryName != _directoryName)
+                                                                if (directoryName != _directoryHistoryName)
                                                                 {
                                                                     if (j != 0)
                                                                     {
@@ -810,7 +812,7 @@ namespace BrokenRailMonitorViaWiFi
                                                                             _fileNameList.Add(fileName);
                                                                         }
                                                                     }
-                                                                    _directoryName = directoryName;
+                                                                    _directoryHistoryName = directoryName;
                                                                     jStartValue = j;
                                                                     isReturn = true;
                                                                     _hit0xf4Count = 0;
@@ -2196,7 +2198,7 @@ namespace BrokenRailMonitorViaWiFi
                 DateTime now = System.DateTime.Now;
                 string directoryName = now.ToString("yyyy") + "\\" + now.ToString("yyyy-MM");
                 OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.InitialDirectory = System.Environment.CurrentDirectory + @"\DataRecord\" + directoryName;
+                openFileDialog.InitialDirectory = System.Environment.CurrentDirectory + @"\History\" + directoryName;
                 openFileDialog.Filter = "xml files(*.xml)|*.xml";
                 openFileDialog.RestoreDirectory = true;
                 openFileDialog.FilterIndex = 1;
@@ -2338,14 +2340,14 @@ namespace BrokenRailMonitorViaWiFi
         }
         private void refreshFileConfig(int terminalNo)
         {
-            string fileName = System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName + @"\DataTerminal" + terminalNo.ToString("D3") + ".xml";
+            string fileName = System.Environment.CurrentDirectory + @"\History\" + _directoryHistoryName + @"\DataTerminal" + terminalNo.ToString("D3") + ".xml";
             if (File.Exists(fileName))
             {
                 File.Delete(fileName);
             }
-            if (!Directory.Exists(System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName))
+            if (!Directory.Exists(System.Environment.CurrentDirectory + @"\History\" + _directoryHistoryName))
             {
-                Directory.CreateDirectory(System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName);
+                Directory.CreateDirectory(System.Environment.CurrentDirectory + @"\History\" + _directoryHistoryName);
             }
             if (!File.Exists(fileName))
             {
@@ -2359,6 +2361,20 @@ namespace BrokenRailMonitorViaWiFi
                 writer.WriteEndDocument();
                 writer.Flush();
                 writer.Close();
+            }
+        }
+
+        private void checkHistoryDirectory()
+        {
+            if (!Directory.Exists(System.Environment.CurrentDirectory + @"\History"))
+            {
+                Directory.CreateDirectory(System.Environment.CurrentDirectory + @"\History");
+            }
+            DateTime now = System.DateTime.Now;
+            _directoryHistoryName = now.ToString("yyyy") + "\\" + now.ToString("yyyy-MM") + "\\" + now.ToString("yyyy-MM-dd");
+            if (!Directory.Exists(System.Environment.CurrentDirectory + @"\History\" + _directoryHistoryName))
+            {
+                Directory.CreateDirectory(System.Environment.CurrentDirectory + @"\History\" + _directoryHistoryName);
             }
         }
 
