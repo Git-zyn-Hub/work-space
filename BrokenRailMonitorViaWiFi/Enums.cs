@@ -30,4 +30,10 @@ namespace BrokenRailMonitorViaWiFi
         Rail1,
         Rail2
     }
+
+    public enum RailInfoResultMode
+    {
+        获取历史模式,
+        获取全部铁轨信息模式
+    }
 }

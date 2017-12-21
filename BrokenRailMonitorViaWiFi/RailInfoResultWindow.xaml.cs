@@ -45,6 +45,7 @@ namespace BrokenRailMonitorViaWiFi
         private double _originChartHeight = 0;
         private int _checkCount = 0;
         private string _fileName;
+        private RailInfoResultMode _windowMode;
 
         public MasterControl MasterCtrl
         {
@@ -72,6 +73,19 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
+        public RailInfoResultMode WindowMode
+        {
+            get
+            {
+                return _windowMode;
+            }
+
+            set
+            {
+                _windowMode = value;
+            }
+        }
+
         private RailInfoResultWindow(int terminalNo)
         {
             InitializeComponent();
@@ -79,7 +93,20 @@ namespace BrokenRailMonitorViaWiFi
             _terminalNo = terminalNo;
             DateTime now = System.DateTime.Now;
             _directoryName = now.ToString("yyyy") + "\\" + now.ToString("yyyy-MM") + "\\" + now.ToString("yyyy-MM-dd");
-            FileName = System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName + @"\DataTerminal" + _terminalNo.ToString("D3") + ".xml";
+            string directory;
+            switch (WindowMode)
+            {
+                case RailInfoResultMode.获取历史模式:
+                    directory = "History";
+                    break;
+                case RailInfoResultMode.获取全部铁轨信息模式:
+                    directory = "DataRecord";
+                    break;
+                default:
+                    directory = "DataRecord";
+                    break;
+            }
+            FileName = System.Environment.CurrentDirectory + @"\" + directory + @"\" + _directoryName + @"\DataTerminal" + _terminalNo.ToString("D3") + ".xml";
             this.masterControl.HideContextMenu();
         }
 
