@@ -1067,8 +1067,7 @@ namespace BrokenRailMonitorViaWiFi
                                             }
                                             this.Dispatcher.Invoke(new Action(() =>
                                             {
-                                                RailInfoResultWindow railInfoResultWin = RailInfoResultWindow.GetInstance(actualReceive[7]);
-                                                railInfoResultWin.WindowMode = RailInfoResultMode.获取全部铁轨信息模式;
+                                                RailInfoResultWindow railInfoResultWin = RailInfoResultWindow.GetInstance(actualReceive[7], RailInfoResultMode.获取全部铁轨信息模式);
                                                 int index = FindMasterControlIndex(actualReceive[7]);
                                                 if (index == -1)
                                                 {
@@ -2216,8 +2215,7 @@ namespace BrokenRailMonitorViaWiFi
                         {
                             if (int.TryParse(strTerminalNo, out terminalNo))
                             {
-                                RailInfoResultWindow railInfoResultWin = RailInfoResultWindow.GetInstance(terminalNo);
-                                railInfoResultWin.WindowMode = RailInfoResultMode.获取历史模式;
+                                RailInfoResultWindow railInfoResultWin = RailInfoResultWindow.GetInstance(terminalNo, RailInfoResultMode.获取历史模式);
                                 int indexOfMaster = FindMasterControlIndex(terminalNo);
                                 if (indexOfMaster == -1)
                                 {

@@ -45,7 +45,7 @@ namespace BrokenRailMonitorViaWiFi
         private double _originChartHeight = 0;
         private int _checkCount = 0;
         private string _fileName;
-        private RailInfoResultMode _windowMode;
+        private static RailInfoResultMode _windowMode;
 
         public MasterControl MasterCtrl
         {
@@ -73,7 +73,7 @@ namespace BrokenRailMonitorViaWiFi
             }
         }
 
-        public RailInfoResultMode WindowMode
+        public static RailInfoResultMode WindowMode
         {
             get
             {
@@ -110,8 +110,9 @@ namespace BrokenRailMonitorViaWiFi
             this.masterControl.HideContextMenu();
         }
 
-        public static RailInfoResultWindow GetInstance(int terminalNo)
+        public static RailInfoResultWindow GetInstance(int terminalNo, RailInfoResultMode windowMode)
         {
+            WindowMode = windowMode;
             if (_uniqueInstance == null)
             {
                 _uniqueInstance = new RailInfoResultWindow(terminalNo);
