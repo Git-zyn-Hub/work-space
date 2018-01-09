@@ -62,6 +62,7 @@ namespace BrokenRailMonitorViaWiFi
         private const String _serverWeb = "f1880f0253.51mypc.cn";
         private const int _fileReceivePort = 23955;
         private bool _isSubscribingAllRailInfo = false;
+        private Socket _socket;
 
         public List<int> SocketRegister
         {
@@ -309,59 +310,20 @@ namespace BrokenRailMonitorViaWiFi
         {
             try
             {
-                Socket socket = oSocket as Socket;
-                if (socket != null)
+                _socket = oSocket as Socket;
+                if (_socket != null)
                 {
                     int accumulateNumber = 0;
                     while (true)
                     {
                         byte[] receivedBytes = new byte[4096];
-                        int numBytes = socket.Receive(receivedBytes, SocketFlags.None);
+                        int numBytes = _socket.Receive(receivedBytes, SocketFlags.None);
                         //判断Socket连接是否断开
                         if (numBytes == 0)
                         {
                             if (_receiveEmptyPackageCount == 1)
                             {
-                                _receiveEmptyPackageCount = 0;
-                                AppendMessage("与服务器" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！", DataLevel.Error);
-                                _isConnect = false;
-                                if (_timeToWaitTimer.IsEnabled)
-                                {
-                                    _timeToWaitTimer.Stop();
-                                }
-                                this.Dispatcher.Invoke(new Action(() =>
-                                {
-                                    this.clientIDShow.ClientID = 0;
-                                }));
-                                foreach (var item in MasterControlList)
-                                {
-                                    if (item.IpAndPort == socket.RemoteEndPoint.ToString())
-                                    {
-                                        _socketRegister.Remove(item.TerminalNumber);
-                                        int index = FindMasterControlIndex(item.TerminalNumber);
-                                        if (index != -1)
-                                        {
-                                            this.Dispatcher.Invoke(new Action(() =>
-                                            {
-                                                MasterControlList[index].Offline();
-                                            }));
-                                        }
-                                        item.Dispose();
-                                    }
-                                }
-                                try
-                                {
-                                    socketDisconnect();
-                                }
-                                catch (Exception ee)
-                                {
-                                    AppendMessage("关闭线程及Socket异常：" + ee.Message, DataLevel.Error);
-                                }
-                                finally
-                                {
-                                    closeSocket();
-                                    //miConnect_Click(this, null);
-                                }
+                                connectCloseHandle(_socket);
                                 break;
                             }
                             _receiveEmptyPackageCount++;
@@ -402,7 +364,7 @@ namespace BrokenRailMonitorViaWiFi
                             //有一种特殊情况，就是收到1024字节的时候正好是一整包，这样进入判断的话就会将两个本来就应该分开的包连起来，这种情况没有处理。
                             accumulateNumber = 0;
                             receivedBytes = new byte[2048];
-                            numBytes = socket.Receive(receivedBytes, SocketFlags.None);
+                            numBytes = _socket.Receive(receivedBytes, SocketFlags.None);
                             accumulateNumber += numBytes;
                             byte[] secondReceive = new byte[numBytes];
                             for (int i = 0; i < numBytes; i++)
@@ -432,7 +394,7 @@ namespace BrokenRailMonitorViaWiFi
                             {
                                 this.Dispatcher.BeginInvoke(new Action(() =>
                                 {
-                                    this.dataShowUserCtrl.AddShowData("收到" + socket.RemoteEndPoint.ToString() + "->  " + strReceive, DataLevel.Default);
+                                    this.dataShowUserCtrl.AddShowData("收到" + _socket.RemoteEndPoint.ToString() + "->  " + strReceive, DataLevel.Default);
                                 }));
                                 continue;
                             }
@@ -441,7 +403,7 @@ namespace BrokenRailMonitorViaWiFi
                                 //处理心跳包
                                 this.Dispatcher.BeginInvoke(new Action(() =>
                                 {
-                                    this.dataShowUserCtrl.AddShowData("收到心跳包" + socket.RemoteEndPoint.ToString() + "->  " + strReceive, DataLevel.Default);
+                                    this.dataShowUserCtrl.AddShowData("收到心跳包" + _socket.RemoteEndPoint.ToString() + "->  " + strReceive, DataLevel.Default);
                                 }));
                                 if (strReceive.Length > 5)
                                 {
@@ -465,9 +427,9 @@ namespace BrokenRailMonitorViaWiFi
                                                         AppendMessage("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！", DataLevel.Error);
                                                         break;
                                                     }
-                                                    if (item.SocketImport == null || item.IpAndPort != socket.RemoteEndPoint.ToString())
+                                                    if (item.SocketImport == null || item.IpAndPort != _socket.RemoteEndPoint.ToString())
                                                     {
-                                                        item.SocketImport = socket;
+                                                        item.SocketImport = _socket;
                                                         //socket已经导入，注册socket。
                                                         SocketRegister.Add(intTerminalNo);
                                                         this.Dispatcher.Invoke(new Action(() =>
@@ -497,9 +459,9 @@ namespace BrokenRailMonitorViaWiFi
                                                             AppendMessage("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！", DataLevel.Error);
                                                             break;
                                                         }
-                                                        if (item.SocketImport == null || item.IpAndPort != socket.RemoteEndPoint.ToString())
+                                                        if (item.SocketImport == null || item.IpAndPort != _socket.RemoteEndPoint.ToString())
                                                         {
-                                                            item.SocketImport = socket;
+                                                            item.SocketImport = _socket;
                                                             //socket已经导入，注册socket。
                                                             SocketRegister.Add(intTerminalNo);
                                                             this.Dispatcher.Invoke(new Action(() =>
@@ -1441,6 +1403,23 @@ namespace BrokenRailMonitorViaWiFi
             catch (ThreadAbortException)
             {
 
+            }
+            catch (SocketException ex)
+            {
+                AppendMessage("Socket接收线程异常:编号" + ex.ErrorCode + "," + ex.Message, DataLevel.Error);
+                switch (ex.ErrorCode)
+                {
+                    case 10053:
+                    case 10054:
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            connectCloseHandle(_socket);
+                        }));
+                        break;
+                    default:
+                        AppendMessage("发生未处理异常！", DataLevel.Error);
+                        break;
+                }
             }
             catch (Exception ee)
             {
@@ -2614,6 +2593,50 @@ namespace BrokenRailMonitorViaWiFi
             catch (Exception ee)
             {
                 AppendMessage("接收文件异常:" + ee.Message, DataLevel.Error);
+            }
+        }
+
+        private void connectCloseHandle(Socket socket)
+        {
+            _receiveEmptyPackageCount = 0;
+            AppendMessage("与服务器" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！", DataLevel.Error);
+            _isConnect = false;
+            if (_timeToWaitTimer.IsEnabled)
+            {
+                _timeToWaitTimer.Stop();
+            }
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                this.clientIDShow.ClientID = 0;
+            }));
+            foreach (var item in MasterControlList)
+            {
+                if (item.IpAndPort == socket.RemoteEndPoint.ToString())
+                {
+                    _socketRegister.Remove(item.TerminalNumber);
+                    int index = FindMasterControlIndex(item.TerminalNumber);
+                    if (index != -1)
+                    {
+                        this.Dispatcher.Invoke(new Action(() =>
+                        {
+                            MasterControlList[index].Offline();
+                        }));
+                    }
+                    item.Dispose();
+                }
+            }
+            try
+            {
+                socketDisconnect();
+            }
+            catch (Exception ee)
+            {
+                AppendMessage("关闭线程及Socket异常：" + ee.Message, DataLevel.Error);
+            }
+            finally
+            {
+                closeSocket();
+                //miConnect_Click(this, null);
             }
         }
 
