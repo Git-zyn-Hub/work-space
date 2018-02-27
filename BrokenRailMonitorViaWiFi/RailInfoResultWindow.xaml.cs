@@ -40,7 +40,7 @@ namespace BrokenRailMonitorViaWiFi
         private MasterControl _masterCtrl;
         private List<CheckBox> _checkBoxes = new List<CheckBox>();
         private FullScreenChartWindow _fullScreenWin;
-        private List<Chart> _charts = new List<Chart>();
+        private List<FrameworkElement> _charts = new List<FrameworkElement>();
         private double _originChartWidth = 0;
         private double _originChartHeight = 0;
         private int _checkCount = 0;
@@ -530,93 +530,13 @@ namespace BrokenRailMonitorViaWiFi
             }
             chartRail2Stress.Series.Add(dataSeries);
 
-            chartRail1LeftSignalAmplitude.Series.Clear();
-            dataSeries = new DataSeries();
-            dataSeries.RenderAs = RenderAs.Line;
-            dataSeries.LineThickness = 2;
-            dataSeries.XValueType = ChartValueTypes.DateTime;
-            DataPoint dPRail1LeftSigAmp;
-            int rail1LeftMax = 0;
-            for (int j = 0; j < _rail1LeftSigAmpList.Count; j++)
-            {
-                for (int k = 0; k < 4; k++)
-                {
-                    dPRail1LeftSigAmp = new DataPoint();
-                    dPRail1LeftSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
-                    dPRail1LeftSigAmp.YValue = _rail1LeftSigAmpList[j][k];
-                    rail1LeftMax = Math.Max(_rail1LeftSigAmpList[j][k], rail1LeftMax);
-                    setPointMarker(dPRail1LeftSigAmp, k);
-                    dataSeries.DataPoints.Add(dPRail1LeftSigAmp);
-                }
-            }
-            changeYAxisMax(chartRail1LeftSignalAmplitude, rail1LeftMax);
-            chartRail1LeftSignalAmplitude.Series.Add(dataSeries);
+            chartRail1LeftSignalAmplitude.AmplitudeOf4Frequency = _rail1LeftSigAmpList;
 
-            chartRail1RightSignalAmplitude.Series.Clear();
-            dataSeries = new DataSeries();
-            dataSeries.RenderAs = RenderAs.Line;
-            dataSeries.LineThickness = 2;
-            dataSeries.XValueType = ChartValueTypes.DateTime;
-            DataPoint dPRail1RightSigAmp;
-            int rail1RightMax = 0;
-            for (int j = 0; j < _rail1RightSigAmpList.Count; j++)
-            {
-                for (int k = 0; k < 4; k++)
-                {
-                    dPRail1RightSigAmp = new DataPoint();
-                    dPRail1RightSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
-                    dPRail1RightSigAmp.YValue = _rail1RightSigAmpList[j][k];
-                    rail1RightMax = Math.Max(_rail1RightSigAmpList[j][k], rail1RightMax);
-                    setPointMarker(dPRail1RightSigAmp, k);
-                    dataSeries.DataPoints.Add(dPRail1RightSigAmp);
-                }
-            }
-            changeYAxisMax(chartRail1RightSignalAmplitude, rail1RightMax);
-            chartRail1RightSignalAmplitude.Series.Add(dataSeries);
+            chartRail1RightSignalAmplitude.AmplitudeOf4Frequency = _rail1RightSigAmpList;
 
-            chartRail2LeftSignalAmplitude.Series.Clear();
-            dataSeries = new DataSeries();
-            dataSeries.RenderAs = RenderAs.Line;
-            dataSeries.LineThickness = 2;
-            dataSeries.XValueType = ChartValueTypes.DateTime;
-            DataPoint dPRail2LeftSigAmp;
-            int rail2LeftMax = 0;
-            for (int j = 0; j < _rail2LeftSigAmpList.Count; j++)
-            {
-                for (int k = 0; k < 4; k++)
-                {
-                    dPRail2LeftSigAmp = new DataPoint();
-                    dPRail2LeftSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
-                    dPRail2LeftSigAmp.YValue = _rail2LeftSigAmpList[j][k];
-                    rail2LeftMax = Math.Max(_rail2LeftSigAmpList[j][k], rail2LeftMax);
-                    setPointMarker(dPRail2LeftSigAmp, k);
-                    dataSeries.DataPoints.Add(dPRail2LeftSigAmp);
-                }
-            }
-            changeYAxisMax(chartRail2LeftSignalAmplitude, rail2LeftMax);
-            chartRail2LeftSignalAmplitude.Series.Add(dataSeries);
+            chartRail2LeftSignalAmplitude.AmplitudeOf4Frequency = _rail2LeftSigAmpList;
 
-            chartRail2RightSignalAmplitude.Series.Clear();
-            dataSeries = new DataSeries();
-            dataSeries.RenderAs = RenderAs.Line;
-            dataSeries.LineThickness = 2;
-            dataSeries.XValueType = ChartValueTypes.DateTime;
-            DataPoint dPRail2RightSigAmp;
-            int rail2RightMax = 0;
-            for (int j = 0; j < _rail2RightSigAmpList.Count; j++)
-            {
-                for (int k = 0; k < 4; k++)
-                {
-                    dPRail2RightSigAmp = new DataPoint();
-                    dPRail2RightSigAmp.XValue = _dateTimeList[j].AddSeconds(k);
-                    dPRail2RightSigAmp.YValue = _rail2RightSigAmpList[j][k];
-                    rail2RightMax = Math.Max(_rail2RightSigAmpList[j][k], rail2RightMax);
-                    setPointMarker(dPRail2RightSigAmp, k);
-                    dataSeries.DataPoints.Add(dPRail2RightSigAmp);
-                }
-            }
-            changeYAxisMax(chartRail2RightSignalAmplitude, rail2RightMax);
-            chartRail2RightSignalAmplitude.Series.Add(dataSeries);
+            chartRail2RightSignalAmplitude.AmplitudeOf4Frequency = _rail2RightSigAmpList;
         }
 
         private void setPointMarker(DataPoint dp, int index)

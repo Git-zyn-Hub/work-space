@@ -2177,7 +2177,7 @@ namespace BrokenRailMonitorViaWiFi
                 DateTime now = System.DateTime.Now;
                 string directoryName = now.ToString("yyyy") + "\\" + now.ToString("yyyy-MM");
                 OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.InitialDirectory = System.Environment.CurrentDirectory + @"\History\" + directoryName;
+                //openFileDialog.InitialDirectory = System.Environment.CurrentDirectory + @"\History\" + directoryName;
                 openFileDialog.Filter = "xml files(*.xml)|*.xml";
                 openFileDialog.RestoreDirectory = true;
                 openFileDialog.FilterIndex = 1;

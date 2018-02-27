@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
         xmlns:chart="clr-namespace:Visifire.Charts;assembly=WPFVisifire.Charts"
+        xmlns:sp="clr-namespace:SurfacePlot;assembly=SurfacePlot"
         mc:Ignorable="d"
         Title="铁轨信息结果显示" Height="600" Width="800" 
         Loaded="Window_Loaded" WindowState="Maximized" Closed="Window_Closed">
@@ -120,7 +121,15 @@
                     <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
             </chart:Chart>
-            <chart:Chart ScrollingEnabled="False" View3D="False"
+            <sp:SurfacePlot3D x:Name="chartRail1LeftSignalAmplitude"
+                              Grid.Row="1" Grid.Column="2" Title="轨1左信号幅值"></sp:SurfacePlot3D>
+            <sp:SurfacePlot3D x:Name="chartRail1RightSignalAmplitude"
+                              Grid.Row="2" Grid.Column="0" Title="轨1右信号幅值"></sp:SurfacePlot3D>
+            <sp:SurfacePlot3D x:Name="chartRail2LeftSignalAmplitude"
+                              Grid.Row="2" Grid.Column="1" Title="轨2左信号幅值"></sp:SurfacePlot3D>
+            <sp:SurfacePlot3D x:Name="chartRail2RightSignalAmplitude"
+                              Grid.Row="2" Grid.Column="2" Title="轨2右信号幅值"></sp:SurfacePlot3D>
+            <!--<chart:Chart ScrollingEnabled="False" View3D="False"
                          IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="All" ZoomOutText="Restore"
                          x:Name="chartRail1LeftSignalAmplitude" Grid.Row="1" Grid.Column="2" Visibility="Visible"
                          SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
@@ -179,7 +188,7 @@
                 <chart:Chart.AxesX>
                     <chart:Axis Interval="20" IntervalType="Minutes" ValueFormatString="HH:mm:ss"/>
                 </chart:Chart.AxesX>
-            </chart:Chart>
+            </chart:Chart>-->
         </Grid>
     </Grid>
 </Window>
