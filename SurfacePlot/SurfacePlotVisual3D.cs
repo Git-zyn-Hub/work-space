@@ -146,16 +146,16 @@ namespace SurfacePlot
                     texcoords[i, j] = new Point(u, u);
                 }
 
-            //if (rows > 1)
-            //{
-            //    var surfaceMeshBuilder = new MeshBuilder();
-            //    surfaceMeshBuilder.AddRectangularMesh(Points, texcoords);
+            if (rows > 1)
+            {
+                var surfaceMeshBuilder = new MeshBuilder();
+                surfaceMeshBuilder.AddRectangularMesh(Points, texcoords);
 
-            //    var surfaceModel = new GeometryModel3D(surfaceMeshBuilder.ToMesh(),
-            //                                           MaterialHelper.CreateMaterial(SurfaceBrush, null, null, 1, 0));
-            //    surfaceModel.BackMaterial = surfaceModel.Material;
-            //    plotModel.Children.Add(surfaceModel);
-            //}
+                var surfaceModel = new GeometryModel3D(surfaceMeshBuilder.ToMesh(),
+                                                       MaterialHelper.CreateMaterial(SurfaceBrush, null, null, 1, 0));
+                surfaceModel.BackMaterial = surfaceModel.Material;
+                plotModel.Children.Add(surfaceModel);
+            }
 
             var axesMeshBuilder = new MeshBuilder();
             for (double x = minX; x <= maxX; x += IntervalX)

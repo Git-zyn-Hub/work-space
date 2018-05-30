@@ -647,7 +647,7 @@ namespace BrokenRailMonitorViaWiFi
             {
                 case 1:
                     {
-                        Chart aChart = _fullScreenWin.gridFullScreen.Children[0] as Chart;
+                        FrameworkElement aChart = _fullScreenWin.gridFullScreen.Children[0] as FrameworkElement;
                         if (aChart != null)
                         {
                             aChart.Width = System.Windows.SystemParameters.PrimaryScreenWidth;
@@ -662,8 +662,8 @@ namespace BrokenRailMonitorViaWiFi
                         _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(oneColumn);
                         _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(twoColumn);
 
-                        Chart oneChart = _fullScreenWin.gridFullScreen.Children[0] as Chart;
-                        Chart twoChart = _fullScreenWin.gridFullScreen.Children[1] as Chart;
+                        FrameworkElement oneChart = _fullScreenWin.gridFullScreen.Children[0] as FrameworkElement;
+                        FrameworkElement twoChart = _fullScreenWin.gridFullScreen.Children[1] as FrameworkElement;
                         if (oneChart != null && twoChart != null)
                         {
                             oneChart.SetValue(Grid.RowProperty, 0);
@@ -686,9 +686,9 @@ namespace BrokenRailMonitorViaWiFi
                         _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(twoColumn);
                         _fullScreenWin.gridFullScreen.ColumnDefinitions.Add(threeColumn);
 
-                        Chart oneChart = _fullScreenWin.gridFullScreen.Children[0] as Chart;
-                        Chart twoChart = _fullScreenWin.gridFullScreen.Children[1] as Chart;
-                        Chart threeChart = _fullScreenWin.gridFullScreen.Children[2] as Chart;
+                        FrameworkElement oneChart = _fullScreenWin.gridFullScreen.Children[0] as FrameworkElement;
+                        FrameworkElement twoChart = _fullScreenWin.gridFullScreen.Children[1] as FrameworkElement;
+                        FrameworkElement threeChart = _fullScreenWin.gridFullScreen.Children[2] as FrameworkElement;
                         if (oneChart != null && twoChart != null && threeChart != null)
                         {
                             oneChart.SetValue(Grid.RowProperty, 0);
@@ -717,10 +717,10 @@ namespace BrokenRailMonitorViaWiFi
                         _fullScreenWin.gridFullScreen.RowDefinitions.Add(oneRow);
                         _fullScreenWin.gridFullScreen.RowDefinitions.Add(twoRow);
 
-                        Chart oneChart = _fullScreenWin.gridFullScreen.Children[0] as Chart;
-                        Chart twoChart = _fullScreenWin.gridFullScreen.Children[1] as Chart;
-                        Chart threeChart = _fullScreenWin.gridFullScreen.Children[2] as Chart;
-                        Chart fourChart = _fullScreenWin.gridFullScreen.Children[3] as Chart;
+                        FrameworkElement oneChart = _fullScreenWin.gridFullScreen.Children[0] as FrameworkElement;
+                        FrameworkElement twoChart = _fullScreenWin.gridFullScreen.Children[1] as FrameworkElement;
+                        FrameworkElement threeChart = _fullScreenWin.gridFullScreen.Children[2] as FrameworkElement;
+                        FrameworkElement fourChart = _fullScreenWin.gridFullScreen.Children[3] as FrameworkElement;
 
                         if (oneChart != null && twoChart != null && threeChart != null && fourChart != null)
                         {
