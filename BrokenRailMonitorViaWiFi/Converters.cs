@@ -35,8 +35,9 @@ namespace BrokenRailMonitorViaWiFi
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            int stress = (int)value;
-            return stress == 0 ? String.Empty : stress.ToString();
+            int temp = (int)value;
+            double stress = (double)temp / 100;
+            return stress == 0 ? String.Empty : (stress.ToString() + "MPa");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

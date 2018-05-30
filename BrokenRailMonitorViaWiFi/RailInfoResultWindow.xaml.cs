@@ -258,12 +258,26 @@ namespace BrokenRailMonitorViaWiFi
                 XmlNode stress1Node = node.SelectSingleNode("Rail1/Stress");
                 string innerTextStress1 = stress1Node.InnerText.Trim();
                 string[] stress1 = innerTextStress1.Split('-');
-                _rail1Stress[i] = ((Convert.ToInt32(stress1[0])) << 8) + Convert.ToInt32(stress1[1]);
+                if (((Convert.ToInt32(stress1[0])) & 0x80) == 0x80)
+                {
+                    _rail1Stress[i] = -(((Convert.ToInt32(stress1[0])) & 0x7f) << 8) - Convert.ToInt32(stress1[1]);
+                }
+                else
+                {
+                    _rail1Stress[i] = ((Convert.ToInt32(stress1[0])) << 8) + Convert.ToInt32(stress1[1]);
+                }
 
                 XmlNode stress2Node = node.SelectSingleNode("Rail2/Stress");
                 string innerTextStress2 = stress2Node.InnerText.Trim();
                 string[] stress2 = innerTextStress2.Split('-');
-                _rail2Stress[i] = ((Convert.ToInt32(stress2[0])) << 8) + Convert.ToInt32(stress2[1]);
+                if (((Convert.ToInt32(stress2[0])) & 0x80) == 0x80)
+                {
+                    _rail2Stress[i] = -(((Convert.ToInt32(stress2[0])) & 0x7f) << 8) - Convert.ToInt32(stress2[1]);
+                }
+                else
+                {
+                    _rail2Stress[i] = ((Convert.ToInt32(stress2[0])) << 8) + Convert.ToInt32(stress2[1]);
+                }
 
                 XmlNode rail1LeftSigAmpNode = node.SelectSingleNode("Rail1/SignalAmplitudeLeft");
                 string innerTextRail1LeftSigAmp = rail1LeftSigAmpNode.InnerText.Trim();
