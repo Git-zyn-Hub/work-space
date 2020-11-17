@@ -1,12 +1,12 @@
-﻿<Application x:Class="BrokenRailMonitorViaWiFi.App"
+﻿<Application x:Class="BrokenRail3MonitorViaWiFi.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi"
+             xmlns:local="clr-namespace:BrokenRail3MonitorViaWiFi"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="clr-namespace:BrokenRailMonitorViaWiFi">
+                    xmlns:controls="clr-namespace:BrokenRail3MonitorViaWiFi">
             <Style x:Key="CircleProgressRingStyle" TargetType="controls:ModernProgressRing">
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="Foreground" Value="#ff1ba1e2" />
@@ -279,7 +279,7 @@
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Height="Auto"/>
                                                     </Grid.RowDefinitions>
-                                                    <Image Source="/BrokenRailMonitorViaWiFi;component/Resources/small_info_icon.png" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="3" Width="33" Stretch="Uniform"/>
+                                                    <Image Source="/BrokenRail3MonitorViaWiFi;component/Resources/small_info_icon.png" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="3" Width="33" Stretch="Uniform"/>
                                                     <TextBlock FontFamily="Tahoma" Grid.Row="0" Grid.Column="1" FontSize="13" Text="提示：" Foreground="#5095D6" />
                                                     <TextBlock Grid.Row="1" Grid.Column="1" Foreground="Red" FontSize="11pt" HorizontalAlignment="Right"
                                                        Text="{Binding ElementName=MyAdorner, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}">

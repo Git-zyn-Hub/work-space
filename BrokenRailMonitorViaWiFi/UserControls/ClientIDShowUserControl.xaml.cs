@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace BrokenRailMonitorViaWiFi.UserControls
+namespace BrokenRail3MonitorViaWiFi.UserControls
 {
     /// <summary>
     /// Interaction logic for ClientIDShowUserControl.xaml

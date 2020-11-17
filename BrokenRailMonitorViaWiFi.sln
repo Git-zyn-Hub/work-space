@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30709.132
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrokenRailMonitorViaWiFi", "BrokenRailMonitorViaWiFi\BrokenRailMonitorViaWiFi.csproj", "{4FF3A858-415F-4E0B-A7B8-43EAC73E75FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrokenRail3MonitorViaWiFi", "BrokenRailMonitorViaWiFi\BrokenRail3MonitorViaWiFi.csproj", "{4FF3A858-415F-4E0B-A7B8-43EAC73E75FB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurfacePlot", "SurfacePlot\SurfacePlot.csproj", "{689E5A33-6531-421B-8E76-87897F7D808D}"
 EndProject
@@ -24,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E049EE52-46E9-4C64-9FA5-D81E6F4ABC77}
 	EndGlobalSection
 EndGlobal

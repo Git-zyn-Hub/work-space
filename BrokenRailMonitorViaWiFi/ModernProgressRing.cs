@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace BrokenRailMonitorViaWiFi
+namespace BrokenRail3MonitorViaWiFi
 {
     /// <summary>
     /// Represents a control that indicates that an operation is ongoing. 

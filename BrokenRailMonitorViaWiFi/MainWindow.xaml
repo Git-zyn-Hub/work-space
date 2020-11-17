@@ -1,10 +1,10 @@
-﻿<Window x:Class="BrokenRailMonitorViaWiFi.MainWindow"
+﻿<Window x:Class="BrokenRail3MonitorViaWiFi.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi" Closing="Window_Closing"
-        xmlns:userCtrl="clr-namespace:BrokenRailMonitorViaWiFi.UserControls"
+        xmlns:local="clr-namespace:BrokenRail3MonitorViaWiFi" Closing="Window_Closing"
+        xmlns:userCtrl="clr-namespace:BrokenRail3MonitorViaWiFi.UserControls"
         mc:Ignorable="d" Loaded="Window_Loaded"
         Title="断轨监测" Height="600" Width="1024" MinHeight="450" MinWidth="450">
     <Window.Background>

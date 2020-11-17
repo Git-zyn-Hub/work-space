@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Xml;
 
-namespace BrokenRailMonitorViaWiFi
+namespace BrokenRail3MonitorViaWiFi
 {
     /// <summary>
     /// Interaction logic for GetSectionWindow.xaml

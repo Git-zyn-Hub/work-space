@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Xml;
 
-namespace BrokenRailMonitorViaWiFi.Windows
+namespace BrokenRail3MonitorViaWiFi.Windows
 {
     /// <summary>
     /// Interaction logic for GetHistoryWindow.xaml

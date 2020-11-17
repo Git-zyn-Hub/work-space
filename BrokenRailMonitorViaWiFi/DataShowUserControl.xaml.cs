@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace BrokenRailMonitorViaWiFi
+namespace BrokenRail3MonitorViaWiFi
 {
     /// <summary>
     /// Interaction logic for DataShowUserControl.xaml

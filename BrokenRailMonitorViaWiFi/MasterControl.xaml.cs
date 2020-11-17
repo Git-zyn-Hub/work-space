@@ -1,4 +1,4 @@
-﻿using BrokenRailMonitorViaWiFi.Windows;
+﻿using BrokenRail3MonitorViaWiFi.Windows;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,7 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace BrokenRailMonitorViaWiFi
+namespace BrokenRail3MonitorViaWiFi
 {
     /// <summary>
     /// Interaction logic for MasterControl.xaml

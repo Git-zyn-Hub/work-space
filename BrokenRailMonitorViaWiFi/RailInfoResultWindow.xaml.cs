@@ -15,7 +15,7 @@ using System.Xml;
 using Visifire.Charts;
 using Visifire.Commons;
 
-namespace BrokenRailMonitorViaWiFi
+namespace BrokenRail3MonitorViaWiFi
 {
     /// <summary>
     /// Interaction logic for RailInfoResultWindow.xaml

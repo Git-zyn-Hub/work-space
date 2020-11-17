@@ -11,7 +11,7 @@ using System.Xml;
 using excel = ClosedXML.Excel;
 using io = System.IO;
 
-namespace BrokenRailMonitorViaWiFi
+namespace BrokenRail3MonitorViaWiFi
 {
     public class ExportExcel
     {
