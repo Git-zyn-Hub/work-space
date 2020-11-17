@@ -26,25 +26,28 @@
             <!--<Button x:Name="btnSet" HorizontalAlignment="Left" Width="70" Click="btnSet_Click" Height="30">设置</Button>-->
             <Menu x:Name="menu" Height="25" HorizontalAlignment="Left">
                 <MenuItem x:Name="miConnect" Header="连接" FontSize="15" Click="miConnect_Click"></MenuItem>
-                <MenuItem Header="设备" FontSize="15">
+                <!--<MenuItem Header="设备" FontSize="15">
                     <MenuItem x:Name="miRefreshDevices" Header="刷新" FontSize="15" Click="miRefreshDevices_Click"></MenuItem>
                     <MenuItem x:Name="miUpload" Header="上传" FontSize="15" Click="miUpload_Click"></MenuItem>
                     <MenuItem x:Name="miDownload" Header="下载" FontSize="15" Click="miDownload_Click"></MenuItem>
-                </MenuItem>
+                </MenuItem>-->
                 <MenuItem x:Name="miCommand" Header="指令" FontSize="15">
-                    <!--<MenuItem x:Name="miRailInitial" Header="初始化" Click="miRailInitial_Click"></MenuItem>-->
-                    <!--<MenuItem x:Name="miTimeBaseCorrect" Header="发射时基校准" Click="miTimeBaseCorrect_Click"></MenuItem>-->
+                    <!--<MenuItem x:Name="miRailInitial" Header="初始化" Click="miRailInitial_Click"></MenuItem>
+                    <MenuItem x:Name="miTimeBaseCorrect" Header="发射时基校准" Click="miTimeBaseCorrect_Click"></MenuItem>
                     <MenuItem x:Name="miSubscribeAllRailInfo" Header="订阅所有终端铁轨信息" Click="miSubscribeAllRailInfo_Click"></MenuItem>
                     <MenuItem x:Name="miGetOneSectionInfo" Header="获取某段铁轨信息" Click="miGetOneSectionInfo_Click"></MenuItem>
-                    <!--<MenuItem x:Name="miGetAllDevicesSignalAmplitude" Header="获取所有终端信号幅值" Click="miGetAllDevicesSignalAmplitude_Click"></MenuItem>-->
+                    <MenuItem x:Name="miGetAllDevicesSignalAmplitude" Header="获取所有终端信号幅值" Click="miGetAllDevicesSignalAmplitude_Click"></MenuItem>
                     <MenuItem x:Name="miRealTimeConfig" Header="实时时钟配置" Click="miRealTimeConfig_Click"></MenuItem>
-                    <MenuItem x:Name="miEraseFlash" Header="擦除Flash" Click="miEraseFlash_Click"></MenuItem>
+                    <MenuItem x:Name="miEraseFlash" Header="擦除Flash" Click="miEraseFlash_Click"></MenuItem>-->
+                    <MenuItem x:Name="miGetConfigInfo" Header="获取配置信息" Click="miGetConfigInfo_Click"/>
+                    <MenuItem x:Name="miSetTime" Header="对时" Click="miSetTime_Click"/>
                 </MenuItem>
                 <!--<MenuItem Header="历史" FontSize="15">-->
                 <!--<MenuItem x:Name="miGetHistory" Header="获取历史" Click="miGetHistory_Click"></MenuItem>-->
                 <MenuItem x:Name="miViewHistory" Header="回看历史" Click="miViewHistory_Click" FontSize="15"></MenuItem>
                 <MenuItem x:Name="miExportExcel" Header="导出Excel" Click="miExportExcel_Click" FontSize="15"></MenuItem>
                 <!--</MenuItem>-->
+                <MenuItem x:Name="miRealtimeInfo" Header="实时信息" FontSize="15" Click="miRealtimeInfo_Click"/>
             </Menu>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
                 <Ellipse x:Name="elpIndicator" Fill="LightGreen" Height="15" Width="15"></Ellipse>

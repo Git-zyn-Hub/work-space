@@ -1,4 +1,5 @@
 ﻿using BrokenRail3MonitorViaWiFi.Windows;
+using BrokenRailMonitorViaWiFi.Windows;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -317,7 +318,7 @@ namespace BrokenRail3MonitorViaWiFi
                     int accumulateNumber = 0;
                     while (true)
                     {
-                        byte[] receivedBytes = new byte[4096];
+                        byte[] receivedBytes = new byte[5120];
                         int numBytes = _socket.Receive(receivedBytes, SocketFlags.None);
                         //判断Socket连接是否断开
                         if (numBytes == 0)
@@ -355,6 +356,7 @@ namespace BrokenRail3MonitorViaWiFi
                         {
                             actualReceive[i] = receivedBytes[i];
                         }
+                        //处理断包
                         //V519发满1024字节之后会截断一下，在下一个1024字节继续发送
                         //long beforePlusRemainder = accumulateNumber % 1024;
                         accumulateNumber += numBytes;
@@ -385,997 +387,122 @@ namespace BrokenRail3MonitorViaWiFi
 
                         byte[] packageUnhandled = new byte[0];
 
-                        handlePackage: ASCIIEncoding encoding = new ASCIIEncoding();
+                    handlePackage: ASCIIEncoding encoding = new ASCIIEncoding();
                         string strReceive = encoding.GetString(actualReceive);
                         if (strReceive.Length > 5)
                         {
                             string strReceiveFirst3Letter = strReceive.Substring(0, 3);
                             string strReceiveFirst6Letter = strReceive.Substring(0, 6);
-                            if (strReceiveFirst6Letter == "Client")
+                            //检查校验和
+                            try
                             {
-                                this.Dispatcher.BeginInvoke(new Action(() =>
+                                if (actualReceive[0] == 0x66 && actualReceive[1] == 0xcc)
                                 {
-                                    this.dataShowUserCtrl.AddShowData("收到" + _socket.RemoteEndPoint.ToString() + "->  " + strReceive, DataLevel.Default);
-                                }));
-                                continue;
-                            }
-                            else if (strReceiveFirst3Letter == "###")
-                            {
-                                //处理心跳包
-                                this.Dispatcher.BeginInvoke(new Action(() =>
-                                {
-                                    this.dataShowUserCtrl.AddShowData("收到心跳包" + _socket.RemoteEndPoint.ToString() + "->  " + strReceive, DataLevel.Default);
-                                }));
-                                if (strReceive.Length > 5)
-                                {
-                                    //根据心跳包里面包含的终端号添加4G点中的socket。
-                                    string strTerminalNo = strReceive.Substring(3, 3);
-                                    int intTerminalNo = Convert.ToInt32(strTerminalNo);
-
+                                    StringBuilder sb = new StringBuilder(500);
+                                    for (int i = 0; i < actualReceive.Length; i++)
+                                    {
+                                        sb.Append(actualReceive[i].ToString("x2"));
+                                    }
                                     this.Dispatcher.Invoke(new Action(() =>
                                     {
-                                        int index = FindMasterControlIndex(intTerminalNo);
-                                        if (index != -1)
-                                            MasterControlList[index].Online();
-                                        if (SocketRegister.Count == 0)
-                                        {
-                                            foreach (var item in MasterControlList)
-                                            {
-                                                if (item.TerminalNumber == intTerminalNo)
-                                                {
-                                                    if (!item.Is4G)
-                                                    {
-                                                        AppendMessage("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！", DataLevel.Error);
-                                                        break;
-                                                    }
-                                                    if (item.SocketImport == null || item.IpAndPort != _socket.RemoteEndPoint.ToString())
-                                                    {
-                                                        item.SocketImport = _socket;
-                                                        //socket已经导入，注册socket。
-                                                        SocketRegister.Add(intTerminalNo);
-                                                        this.Dispatcher.Invoke(new Action(() =>
-                                                        {
-                                                            this.dataShowUserCtrl.AddShowData(intTerminalNo.ToString() + "号终端4G点Socket注册", DataLevel.Normal);
-                                                        }));
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        for (int i = 0; i < SocketRegister.Count; i++)
-                                        {
-                                            if (SocketRegister[i] == intTerminalNo)
-                                            {
-                                                //找到已经注册的终端就跳出循环，不再找了，也不进行Socket赋值。
-                                                break;
-                                            }
-                                            else if (i == SocketRegister.Count - 1)
-                                            {
-                                                foreach (var item in MasterControlList)
-                                                {
-                                                    if (item.TerminalNumber == intTerminalNo)
-                                                    {
-                                                        if (!item.Is4G)
-                                                        {
-                                                            AppendMessage("心跳包中包含的终端号" + intTerminalNo.ToString() + "所示终端不是4G点，\r\n请检查心跳数据内容配置或者config文档！", DataLevel.Error);
-                                                            break;
-                                                        }
-                                                        if (item.SocketImport == null || item.IpAndPort != _socket.RemoteEndPoint.ToString())
-                                                        {
-                                                            item.SocketImport = _socket;
-                                                            //socket已经导入，注册socket。
-                                                            SocketRegister.Add(intTerminalNo);
-                                                            this.Dispatcher.Invoke(new Action(() =>
-                                                            {
-                                                                this.dataShowUserCtrl.AddShowData(intTerminalNo.ToString() + "号终端4G点Socket注册", DataLevel.Normal);
-                                                            }));
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        this.dataShowUserCtrl.AddShowData("收到数据  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
                                     }));
-                                }
-                                continue;
-                            }
-                            else
-                            {
-                                //检查校验和
-                                try
-                                {
-                                    if (actualReceive[0] == 0x66 && actualReceive[1] == 0xcc)
-                                    {
-                                        StringBuilder sb = new StringBuilder(500);
-                                        for (int i = 0; i < actualReceive.Length; i++)
-                                        {
-                                            sb.Append(actualReceive[i].ToString("x2"));
-                                        }
-                                        this.Dispatcher.Invoke(new Action(() =>
-                                        {
-                                            this.dataShowUserCtrl.AddShowData("收到数据  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
-                                        }));
 
-                                        int length = (actualReceive[2] << 8) + actualReceive[3];
-                                        if (length < actualReceive.Length)
-                                        {
-                                            //原来是！=的时候进入判断，可能会造成unhandledLength为负值，导致数组越界。
-                                            //处理粘包的情况。
-                                            int unhandledLength = actualReceive.Length - length;
-                                            byte[] packagePrevious = new byte[length];
-                                            packageUnhandled = new byte[unhandledLength];
-                                            for (int j = 0; j < length; j++)
-                                            {
-                                                packagePrevious[j] = actualReceive[j];
-                                            }
-                                            for (int i = 0; i < unhandledLength; i++)
-                                            {
-                                                packageUnhandled[i] = actualReceive[length + i];
-                                            }
-                                            actualReceive = new byte[length];
-                                            packagePrevious.CopyTo(actualReceive, 0);
-                                            goto handlePackage;
-                                            //AppendMessage("长度字段与实际收到长度不相等");
-                                            //continue;
-                                        }
-                                        int checksum = 0;
-                                        for (int i = 0; i < actualReceive.Length - 2; i++)
-                                        {
-                                            checksum += actualReceive[i];
-                                        }
-                                        int sumHigh;
-                                        int sumLow;
-                                        sumHigh = (checksum & 0xff00) >> 8;
-                                        sumLow = checksum & 0xff;
-                                        if (sumHigh != actualReceive[actualReceive.Length - 2] || sumLow != actualReceive[actualReceive.Length - 1])
-                                        {
-                                            this.Dispatcher.Invoke(new Action(() =>
-                                            {
-                                                this.dataShowUserCtrl.AddShowData("校验和出错", DataLevel.Error);
-                                            }));
-                                            continue;
-                                        }
-                                    }
-                                    else if (actualReceive[0] == 0x55 && actualReceive[1] == 0xaa)
+                                    int length = (actualReceive[2] << 8) + actualReceive[3];
+                                    if (length < actualReceive.Length)
                                     {
-                                        StringBuilder sb = new StringBuilder(500);
-                                        for (int i = 0; i < actualReceive.Length; i++)
+                                        //原来是！=的时候进入判断，可能会造成unhandledLength为负值，导致数组越界。
+                                        //处理粘包的情况。
+                                        int unhandledLength = actualReceive.Length - length;
+                                        byte[] packagePrevious = new byte[length];
+                                        packageUnhandled = new byte[unhandledLength];
+                                        for (int j = 0; j < length; j++)
                                         {
-                                            sb.Append(actualReceive[i].ToString("x2"));
+                                            packagePrevious[j] = actualReceive[j];
                                         }
+                                        for (int i = 0; i < unhandledLength; i++)
+                                        {
+                                            packageUnhandled[i] = actualReceive[length + i];
+                                        }
+                                        actualReceive = new byte[length];
+                                        packagePrevious.CopyTo(actualReceive, 0);
+                                        goto handlePackage;
+                                        //AppendMessage("长度字段与实际收到长度不相等");
+                                        //continue;
+                                    }
+                                    int checksum = 0;
+                                    for (int i = 0; i < actualReceive.Length - 2; i++)
+                                    {
+                                        checksum += actualReceive[i];
+                                    }
+                                    int sumHigh;
+                                    int sumLow;
+                                    sumHigh = (checksum & 0xff00) >> 8;
+                                    sumLow = checksum & 0xff;
+                                    if (sumHigh != actualReceive[actualReceive.Length - 2] || sumLow != actualReceive[actualReceive.Length - 1])
+                                    {
                                         this.Dispatcher.Invoke(new Action(() =>
                                         {
-                                            this.dataShowUserCtrl.AddShowData("收到指令  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
-                                        }));
-                                    }
-                                    else
-                                    {
-                                        this.Dispatcher.BeginInvoke(new Action(() =>
-                                        {
-                                            //string strReceiveBroken = encoding.GetString(actualReceive);
-                                            StringBuilder sb = new StringBuilder(500);
-                                            for (int i = 0; i < actualReceive.Length; i++)
-                                            {
-                                                sb.Append(actualReceive[i].ToString("x2"));
-                                            }
-                                            this.dataShowUserCtrl.AddShowData("收到拆分的错误包  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Warning);
+                                            this.dataShowUserCtrl.AddShowData("校验和出错", DataLevel.Error);
                                         }));
                                         continue;
                                     }
                                 }
-                                catch (Exception ee)
+                                else if (actualReceive[0] == 0x55 && actualReceive[1] == 0xaa)
                                 {
-                                    AppendMessage("检查校验和异常：" + ee.Message, DataLevel.Error);
+                                    StringBuilder sb = new StringBuilder(500);
+                                    for (int i = 0; i < actualReceive.Length; i++)
+                                    {
+                                        sb.Append(actualReceive[i].ToString("x2"));
+                                    }
+                                    this.Dispatcher.Invoke(new Action(() =>
+                                    {
+                                        this.dataShowUserCtrl.AddShowData("收到指令  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
+                                    }));
                                 }
-
+                                else
+                                {
+                                    this.Dispatcher.BeginInvoke(new Action(() =>
+                                    {
+                                            //string strReceiveBroken = encoding.GetString(actualReceive);
+                                            StringBuilder sb = new StringBuilder(500);
+                                        for (int i = 0; i < actualReceive.Length; i++)
+                                        {
+                                            sb.Append(actualReceive[i].ToString("x2"));
+                                        }
+                                        this.dataShowUserCtrl.AddShowData("收到拆分的错误包  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Warning);
+                                    }));
+                                    continue;
+                                }
+                            }
+                            catch (Exception ee)
+                            {
+                                AppendMessage("检查校验和异常：" + ee.Message, DataLevel.Error);
                             }
                             if (actualReceive[0] == 0x66 && actualReceive[1] == 0xcc)
                             {
-                                switch (actualReceive[6])
+                                switch (actualReceive[2])
                                 {
-                                    case 0xfe:
-                                        this.Dispatcher.Invoke(new Action(() =>
+                                    //获取配置
+                                    case 0x02:
                                         {
-                                            switch (actualReceive[7])
-                                            {
-                                                case 0xf0:
-                                                    this.dataShowUserCtrl.AddShowData("初始信息配置指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
-                                                    break;
-                                                case 0xf1:
-                                                    this.dataShowUserCtrl.AddShowData("读取单点配置信息指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
-                                                    break;
-                                                case 0xf2:
-                                                    this.dataShowUserCtrl.AddShowData("设置门限指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
-                                                    break;
-                                                case 0x52:
-                                                    this.dataShowUserCtrl.AddShowData("实时时钟配置指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
-                                                    break;
-                                                //case 0xf3:
-                                                //    this.dataShowUserCtrl.AddShowData("超声信号发射通报指令，4G终端已接收！", DataLevel.Normal);
-                                                //    break;
-                                                case 0xf4:
-                                                    this.dataShowUserCtrl.AddShowData("获取Flash里存储的铁轨历史信息指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
-                                                    break;
-                                                case 0xf5:
-                                                    this.dataShowUserCtrl.AddShowData("获取单点铁轨信息指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
-                                                    break;
-                                                case 0x56:
-                                                    this.dataShowUserCtrl.AddShowData("擦除flash指令，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
-                                                    break;
-                                                case 0x55:
-                                                    this.dataShowUserCtrl.AddShowData("获取某段铁轨信息，" + actualReceive[4] + "号4G终端已接收！", DataLevel.Normal);
-                                                    break;
-                                                default:
-                                                    this.dataShowUserCtrl.AddShowData("未知指令被接收！", DataLevel.Normal);
-                                                    break;
-                                            }
-                                        }));
-                                        break;
-                                    case 0xf1:
-                                        {
-                                            this.Dispatcher.Invoke(new Action(() =>
-                                            {
-                                                this.WaitReceiveTimer.Stop();
-                                                this.WaitingRingDisable();
-                                            }));
-                                            int terminalNo = actualReceive[7];
-                                            int i = 0;
-                                            int count = MasterControlList.Count;
-                                            bool isError = false;
-                                            this.Dispatcher.Invoke(new Action(() =>
-                                            {
-                                                foreach (var masterControl in MasterControlList)
-                                                {
-                                                    if (masterControl.TerminalNumber == terminalNo)
-                                                    {
-                                                        if (i == 0 || i == 1)
-                                                        {
-                                                            if (0 != actualReceive[8])
-                                                            {
-                                                                AppendMessage(terminalNo.ToString() + "号终端次级相邻小终端不为0！\r\n终端没有次级相邻小终端应填0", DataLevel.Error);
-                                                                isError = true;
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            if (MasterControlList[i - 1].NeighbourSmall != actualReceive[8])
-                                                            {
-                                                                AppendMessage(terminalNo.ToString() + "号终端次级相邻小终端不匹配！\r\nconfig.xml配置文件中为"
-                                                                    + MasterControlList[i - 1].NeighbourSmall.ToString() + "收到的为" + actualReceive[8].ToString(), DataLevel.Error);
-                                                                isError = true;
-                                                            }
-                                                        }
-                                                        if (masterControl.NeighbourSmall != actualReceive[9])
-                                                        {
-                                                            AppendMessage(terminalNo.ToString() + "号终端相邻小终端不匹配！\r\nconfig.xml配置文件中为"
-                                                                    + masterControl.NeighbourSmall.ToString() + "收到的为" + actualReceive[9].ToString(), DataLevel.Error);
-                                                            isError = true;
-                                                        }
-                                                        if (masterControl.NeighbourBig != actualReceive[10])
-                                                        {
-                                                            AppendMessage(terminalNo.ToString() + "号终端相邻大终端不匹配！\r\nconfig.xml配置文件中为"
-                                                                    + masterControl.NeighbourBig.ToString() + "收到的为" + actualReceive[10].ToString(), DataLevel.Error);
-                                                            isError = true;
-                                                        }
-                                                        if (i == count - 2 || i == count - 1)
-                                                        {
-                                                            if (0xff != actualReceive[11])
-                                                            {
-                                                                AppendMessage(terminalNo.ToString() + "号终端次级相邻大终端不为255！\r\n终端没有次级相邻大终端应填255", DataLevel.Error);
-                                                                isError = true;
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            if (MasterControlList[i + 1].NeighbourBig != actualReceive[11])
-                                                            {
-                                                                AppendMessage(terminalNo.ToString() + "号终端次级相邻大终端不匹配！\r\nconfig.xml配置文件中为"
-                                                                    + MasterControlList[i + 1].NeighbourBig.ToString() + "收到的为" + actualReceive[11].ToString(), DataLevel.Error);
-                                                                isError = true;
-                                                            }
-                                                        }
-                                                        if (!isError)
-                                                        {
-                                                            bool flashIsValid = false;
-                                                            if (actualReceive[12] == 1)
-                                                            {
-                                                                flashIsValid = true;
-                                                            }
-                                                            else if (actualReceive[12] == 0)
-                                                            {
-                                                                flashIsValid = false;
-                                                            }
-                                                            else
-                                                            {
-                                                                AppendMessage("‘Flash是否有效’字段收到未定义数据。按照无效处理！", DataLevel.Error);
-                                                            }
-                                                            PointConfigInfoWindow onePCIWin = new PointConfigInfoWindow(terminalNo, actualReceive[8], actualReceive[9], actualReceive[10], actualReceive[11], flashIsValid);
-                                                            onePCIWin.Owner = this;
-                                                            onePCIWin.ShowDialog();
-                                                        }
-                                                        break;
-                                                    }
-                                                    if (count - 1 == i)
-                                                    {
-                                                        AppendMessage(terminalNo.ToString() + "号终端不存在", DataLevel.Error);
-                                                    }
-                                                    i++;
-                                                }
-                                            }));
+                                            handleGetConfig(actualReceive);
                                         }
                                         break;
-                                    case 0xf4:
+                                    //实时通断数据
+                                    case 0xA0:
                                         {
-                                            //每次检查路径都会把_directoryName置成现在的时间。会导致，每次写前一天的都会进入if (directoryName != _directoryName)判断。
-                                            //然后把_hit0xf4Count置0，就会删除上次写好的文件。
-                                            //。检查路径已经在refreshFileConfig（）里做了因此不需要在这里检查路径了。
-                                            //checkDirectory();
-                                            int length = (actualReceive[2] << 8) + actualReceive[3];
-                                            if (length == 10 && actualReceive[7] == 0xff)
-                                            {
-                                                //接收数据结束。
-                                                _hit0xf4Count = 0;
-                                                string fileNames = String.Empty;
-                                                foreach (var item in _fileNameList)
-                                                {
-                                                    fileNames += "\r\n" + item;
-                                                }
-                                                if (_fileNameList.Count == 0)
-                                                {
-                                                    AppendMessage("共写了" + _fileNameList.Count + "个文件", DataLevel.Default);
-                                                }
-                                                else
-                                                {
-                                                    AppendMessage("共写了" + _fileNameList.Count + "个文件" + (_fileNameList.Count == 1 ? "为：" : "分别为：") + fileNames, DataLevel.Default);
-                                                }
-                                                _fileNameList.Clear();
-                                            }
-                                            else if ((length - 10) % 84 == 0)
-                                            {
-                                                int dataCount = (length - 10) / 84;
-                                                if (dataCount != 0)
-                                                {
-                                                    bool isReturn = false;
-                                                    int jStartValue = 0;
-                                                    judgeRefreshFileOrNot:
-                                                    if (_hit0xf4Count == 0)
-                                                    {
-                                                        refreshFileConfig(actualReceive[7]);
-                                                    }
-                                                    string fileName = System.Environment.CurrentDirectory + @"\History\" + _directoryHistoryName + @"\DataTerminal" + actualReceive[7].ToString("D3") + ".xml";
-                                                    if (File.Exists(fileName))
-                                                    {
-                                                        XmlDocument xmlDoc = new XmlDocument();
-                                                        xmlDoc.Load(fileName);
-                                                        XmlNode xn1 = xmlDoc.SelectSingleNode("Datas");
-                                                        if (xn1 != null)
-                                                        {
-                                                            int j;
-                                                            if (!isReturn)
-                                                            {
-                                                                j = 0;
-                                                            }
-                                                            else
-                                                            {
-                                                                j = jStartValue;
-                                                            }
-                                                            for (; j < dataCount; j++)
-                                                            {
-                                                                int year = actualReceive[8 + j * 84] + 2000;
-                                                                int month = actualReceive[9 + j * 84];
-                                                                int day = actualReceive[10 + j * 84];
-                                                                string directoryName = year.ToString() + "\\" + year.ToString() + "-" + month.ToString("D2") + "\\" + year.ToString() + "-" + month.ToString("D2") + "-" + day.ToString("D2");
-                                                                if (directoryName != _directoryHistoryName)
-                                                                {
-                                                                    if (j != 0)
-                                                                    {
-                                                                        xmlDoc.Save(fileName);
-                                                                        if (!_fileNameList.Exists(x => x.Equals(fileName)))
-                                                                        {
-                                                                            _fileNameList.Add(fileName);
-                                                                        }
-                                                                    }
-                                                                    _directoryHistoryName = directoryName;
-                                                                    jStartValue = j;
-                                                                    isReturn = true;
-                                                                    _hit0xf4Count = 0;
-                                                                    goto judgeRefreshFileOrNot;
-                                                                }
-
-                                                                //写入xml文件格式。
-                                                                XmlElement xeData = xmlDoc.CreateElement("Data");//创建一个<Data>节点
-                                                                xn1.AppendChild(xeData);
-                                                                XmlElement xeTime = xmlDoc.CreateElement("Time");
-                                                                xeData.AppendChild(xeTime);
-                                                                XmlElement xeRail1 = xmlDoc.CreateElement("Rail1");
-                                                                xeData.AppendChild(xeRail1);
-                                                                XmlElement xeOnOff1 = xmlDoc.CreateElement("OnOff");
-                                                                xeRail1.AppendChild(xeOnOff1);
-                                                                XmlElement xeStress1 = xmlDoc.CreateElement("Stress");
-                                                                xeRail1.AppendChild(xeStress1);
-                                                                XmlElement xeTemprature1 = xmlDoc.CreateElement("Temprature");
-                                                                xeRail1.AppendChild(xeTemprature1);
-                                                                XmlElement xeThisAmplitude1 = xmlDoc.CreateElement("ThisAmplitude");
-                                                                xeRail1.AppendChild(xeThisAmplitude1);
-                                                                XmlElement xeSignalAmplitude1Left = xmlDoc.CreateElement("SignalAmplitudeLeft");
-                                                                xeRail1.AppendChild(xeSignalAmplitude1Left);
-                                                                XmlElement xeSignalAmplitude1Right = xmlDoc.CreateElement("SignalAmplitudeRight");
-                                                                xeRail1.AppendChild(xeSignalAmplitude1Right);
-                                                                XmlElement xeRail2 = xmlDoc.CreateElement("Rail2");
-                                                                xeData.AppendChild(xeRail2);
-                                                                XmlElement xeOnOff2 = xmlDoc.CreateElement("OnOff");
-                                                                xeRail2.AppendChild(xeOnOff2);
-                                                                XmlElement xeStress2 = xmlDoc.CreateElement("Stress");
-                                                                xeRail2.AppendChild(xeStress2);
-                                                                XmlElement xeTemprature2 = xmlDoc.CreateElement("Temprature");
-                                                                xeRail2.AppendChild(xeTemprature2);
-                                                                XmlElement xeThisAmplitude2 = xmlDoc.CreateElement("ThisAmplitude");
-                                                                xeRail2.AppendChild(xeThisAmplitude2);
-                                                                XmlElement xeSignalAmplitude2Left = xmlDoc.CreateElement("SignalAmplitudeLeft");
-                                                                xeRail2.AppendChild(xeSignalAmplitude2Left);
-                                                                XmlElement xeSignalAmplitude2Right = xmlDoc.CreateElement("SignalAmplitudeRight");
-                                                                xeRail2.AppendChild(xeSignalAmplitude2Right);
-
-                                                                //写入数据。
-                                                                xeTime.InnerText = actualReceive[8 + j * 84].ToString() + "-" + actualReceive[9 + j * 84].ToString() + "-" +
-                                                                                   actualReceive[10 + j * 84].ToString() + "-" + actualReceive[11 + j * 84].ToString() + "-" +
-                                                                                   actualReceive[12 + j * 84].ToString() + "-" + actualReceive[13 + j * 84].ToString();
-                                                                xeOnOff1.InnerText = actualReceive[14 + j * 84].ToString();
-                                                                xeStress1.InnerText = actualReceive[16 + j * 84].ToString() + "-" + actualReceive[17 + j * 84].ToString();
-                                                                xeTemprature1.InnerText = actualReceive[20 + j * 84].ToString() + "-" + actualReceive[21 + j * 84].ToString();
-                                                                xeThisAmplitude1.InnerText = actualReceive[24 + j * 84].ToString() + "-" + actualReceive[25 + j * 84].ToString();
-                                                                string strSignalAmplitude = "";
-                                                                for (int i = 28 + j * 84; i < 44 + j * 84; i++)
-                                                                {
-                                                                    strSignalAmplitude += actualReceive[i].ToString();
-                                                                    if (i == 43 + j * 84)
-                                                                    {
-                                                                        continue;
-                                                                    }
-                                                                    strSignalAmplitude += "-";
-                                                                }
-                                                                xeSignalAmplitude1Left.InnerText = strSignalAmplitude;
-                                                                strSignalAmplitude = "";
-                                                                for (int i = 44 + j * 84; i < 60 + j * 84; i++)
-                                                                {
-                                                                    strSignalAmplitude += actualReceive[i].ToString();
-                                                                    if (i == 59 + j * 84)
-                                                                    {
-                                                                        continue;
-                                                                    }
-                                                                    strSignalAmplitude += "-";
-                                                                }
-                                                                xeSignalAmplitude1Right.InnerText = strSignalAmplitude;
-                                                                xeOnOff2.InnerText = actualReceive[15 + j * 84].ToString();
-                                                                xeStress2.InnerText = actualReceive[18 + j * 84].ToString() + "-" + actualReceive[19 + j * 84].ToString();
-                                                                xeTemprature2.InnerText = actualReceive[22 + j * 84].ToString() + "-" + actualReceive[23 + j * 84].ToString();
-                                                                //第二个温度前一字节还表示收到了非相邻终端发来的超声信号吗？
-                                                                //if (actualReceive[56] == 1)
-                                                                //{
-                                                                //    this.Dispatcher.Invoke(new Action(() =>
-                                                                //    {
-                                                                //        this.dataShowUserCtrl.AddShowData(actualReceive[7].ToString() + "号终端收到非相邻终端发来的超声信号！", DataLevel.Warning);
-                                                                //    }));
-                                                                //}
-                                                                //else if (actualReceive[56] == 0)
-                                                                //{
-
-                                                                //}
-                                                                //else
-                                                                //{
-                                                                //    AppendMessage("'收到非相邻终端发来的超声信号'位收到未定义数据！");
-                                                                //}
-                                                                xeThisAmplitude2.InnerText = actualReceive[26 + j * 84].ToString() + "-" + actualReceive[27 + j * 84].ToString();
-                                                                strSignalAmplitude = "";
-                                                                for (int i = 60 + j * 84; i < 76 + j * 84; i++)
-                                                                {
-                                                                    strSignalAmplitude += actualReceive[i].ToString();
-                                                                    if (i == 75 + j * 84)
-                                                                    {
-                                                                        continue;
-                                                                    }
-                                                                    strSignalAmplitude += "-";
-                                                                }
-                                                                xeSignalAmplitude2Left.InnerText = strSignalAmplitude;
-                                                                strSignalAmplitude = "";
-                                                                for (int i = 76 + j * 84; i < 92 + j * 84; i++)
-                                                                {
-                                                                    strSignalAmplitude += actualReceive[i].ToString();
-                                                                    if (i == 91 + j * 84)
-                                                                    {
-                                                                        continue;
-                                                                    }
-                                                                    strSignalAmplitude += "-";
-                                                                }
-                                                                xeSignalAmplitude2Right.InnerText = strSignalAmplitude;
-                                                            }
-                                                        }
-                                                        xmlDoc.Save(fileName);
-                                                        if (!_fileNameList.Exists(x => x.Equals(fileName)))
-                                                        {
-                                                            _fileNameList.Add(fileName);
-                                                        }
-                                                    }
-                                                    _hit0xf4Count++;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                AppendMessage("接收到的数据内容长度不是一包长度84的整数倍！", DataLevel.Error);
-                                            }
+                                            handleRealtimeAmpData(actualReceive);
                                         }
                                         break;
-                                    case 0xf5:
+                                    //实时频谱信息
+                                    case 0xA1:
                                         {
-                                            this.Dispatcher.Invoke(new Action(() =>
-                                            {
-                                                this.WaitReceiveTimer.Stop();
-                                                this.WaitingRingDisable();
-                                            }));
-                                            checkDirectory();
-                                            initialFileConfig(actualReceive[7]);
-                                            string fileName = System.Environment.CurrentDirectory + @"\DataRecord\" + _directoryName + @"\DataTerminal" + actualReceive[7].ToString("D3") + ".xml";
-                                            if (File.Exists(fileName))
-                                            {
-                                                XmlDocument xmlDoc = new XmlDocument();
-                                                xmlDoc.Load(fileName);
-                                                XmlNode xn1 = xmlDoc.SelectSingleNode("Datas");
-                                                if (xn1 != null)
-                                                {
-                                                    XmlElement xeData = xmlDoc.CreateElement("Data");//创建一个<Data>节点
-                                                    xn1.AppendChild(xeData);
-                                                    XmlElement xeTime = xmlDoc.CreateElement("Time");
-                                                    xeData.AppendChild(xeTime);
-                                                    XmlElement xeRail1 = xmlDoc.CreateElement("Rail1");
-                                                    xeData.AppendChild(xeRail1);
-                                                    XmlElement xeOnOff1 = xmlDoc.CreateElement("OnOff");
-                                                    xeRail1.AppendChild(xeOnOff1);
-                                                    XmlElement xeStress1 = xmlDoc.CreateElement("Stress");
-                                                    xeRail1.AppendChild(xeStress1);
-                                                    XmlElement xeTemprature1 = xmlDoc.CreateElement("Temprature");
-                                                    xeRail1.AppendChild(xeTemprature1);
-                                                    XmlElement xeThisAmplitude1 = xmlDoc.CreateElement("ThisAmplitude");
-                                                    xeRail1.AppendChild(xeThisAmplitude1);
-                                                    XmlElement xeSignalAmplitude1Left = xmlDoc.CreateElement("SignalAmplitudeLeft");
-                                                    xeRail1.AppendChild(xeSignalAmplitude1Left);
-                                                    XmlElement xeSignalAmplitude1Right = xmlDoc.CreateElement("SignalAmplitudeRight");
-                                                    xeRail1.AppendChild(xeSignalAmplitude1Right);
-                                                    XmlElement xeRail2 = xmlDoc.CreateElement("Rail2");
-                                                    xeData.AppendChild(xeRail2);
-                                                    XmlElement xeOnOff2 = xmlDoc.CreateElement("OnOff");
-                                                    xeRail2.AppendChild(xeOnOff2);
-                                                    XmlElement xeStress2 = xmlDoc.CreateElement("Stress");
-                                                    xeRail2.AppendChild(xeStress2);
-                                                    XmlElement xeTemprature2 = xmlDoc.CreateElement("Temprature");
-                                                    xeRail2.AppendChild(xeTemprature2);
-                                                    XmlElement xeThisAmplitude2 = xmlDoc.CreateElement("ThisAmplitude");
-                                                    xeRail2.AppendChild(xeThisAmplitude2);
-                                                    XmlElement xeSignalAmplitude2Left = xmlDoc.CreateElement("SignalAmplitudeLeft");
-                                                    xeRail2.AppendChild(xeSignalAmplitude2Left);
-                                                    XmlElement xeSignalAmplitude2Right = xmlDoc.CreateElement("SignalAmplitudeRight");
-                                                    xeRail2.AppendChild(xeSignalAmplitude2Right);
-                                                    xeTime.InnerText = actualReceive[8].ToString() + "-" + actualReceive[9].ToString() + "-" +
-                                                                       actualReceive[10].ToString() + "-" + actualReceive[11].ToString() + "-" +
-                                                                       actualReceive[12].ToString() + "-" + actualReceive[13].ToString();
-                                                    xeOnOff1.InnerText = actualReceive[14].ToString();
-                                                    xeStress1.InnerText = actualReceive[15].ToString() + "-" + actualReceive[16].ToString();
-                                                    xeTemprature1.InnerText = actualReceive[17].ToString() + "-" + actualReceive[18].ToString();
-                                                    xeThisAmplitude1.InnerText = actualReceive[19].ToString() + "-" + actualReceive[20].ToString();
-                                                    string strSignalAmplitude = "";
-                                                    for (int i = 21; i < 37; i++)
-                                                    {
-                                                        strSignalAmplitude += actualReceive[i].ToString();
-                                                        if (i == 36)
-                                                        {
-                                                            continue;
-                                                        }
-                                                        strSignalAmplitude += "-";
-                                                    }
-                                                    xeSignalAmplitude1Left.InnerText = strSignalAmplitude;
-                                                    strSignalAmplitude = "";
-                                                    for (int i = 37; i < 53; i++)
-                                                    {
-                                                        strSignalAmplitude += actualReceive[i].ToString();
-                                                        if (i == 52)
-                                                        {
-                                                            continue;
-                                                        }
-                                                        strSignalAmplitude += "-";
-                                                    }
-                                                    xeSignalAmplitude1Right.InnerText = strSignalAmplitude;
-                                                    xeOnOff2.InnerText = actualReceive[53].ToString();
-                                                    xeStress2.InnerText = actualReceive[54].ToString() + "-" + actualReceive[55].ToString();
-                                                    xeTemprature2.InnerText = actualReceive[56].ToString() + "-" + actualReceive[57].ToString();
-                                                    if (actualReceive[56] == 1)
-                                                    {
-                                                        this.Dispatcher.Invoke(new Action(() =>
-                                                        {
-                                                            this.dataShowUserCtrl.AddShowData(actualReceive[7].ToString() + "号终端收到非相邻终端发来的超声信号！", DataLevel.Warning);
-                                                        }));
-                                                    }
-                                                    else if (actualReceive[56] == 0)
-                                                    {
-
-                                                    }
-                                                    else
-                                                    {
-                                                        AppendMessage("'收到非相邻终端发来的超声信号'位收到未定义数据！", DataLevel.Error);
-                                                    }
-                                                    xeThisAmplitude2.InnerText = actualReceive[58].ToString() + "-" + actualReceive[59].ToString();
-                                                    strSignalAmplitude = "";
-                                                    for (int i = 60; i < 76; i++)
-                                                    {
-                                                        strSignalAmplitude += actualReceive[i].ToString();
-                                                        if (i == 75)
-                                                        {
-                                                            continue;
-                                                        }
-                                                        strSignalAmplitude += "-";
-                                                    }
-                                                    xeSignalAmplitude2Left.InnerText = strSignalAmplitude;
-                                                    strSignalAmplitude = "";
-                                                    for (int i = 76; i < 92; i++)
-                                                    {
-                                                        strSignalAmplitude += actualReceive[i].ToString();
-                                                        if (i == 91)
-                                                        {
-                                                            continue;
-                                                        }
-                                                        strSignalAmplitude += "-";
-                                                    }
-                                                    xeSignalAmplitude2Right.InnerText = strSignalAmplitude;
-                                                    //xe1.SetAttribute("Value", this.txtAimFrameNo.Text);设置该节点Value属性
-                                                    xmlDoc.Save(fileName);
-                                                }
-                                            }
-                                            this.Dispatcher.Invoke(new Action(() =>
-                                            {
-                                                RailInfoResultWindow railInfoResultWin = RailInfoResultWindow.GetInstance(actualReceive[7], RailInfoResultMode.获取全部铁轨信息模式);
-                                                int index = FindMasterControlIndex(actualReceive[7]);
-                                                if (index == -1)
-                                                {
-                                                    AppendMessage("收到的终端号在终端集合中不存在！", DataLevel.Error);
-                                                    return;
-                                                }
-                                                else
-                                                {
-                                                    railInfoResultWin.MasterCtrl = this.MasterControlList[index];
-                                                }
-                                                railInfoResultWin.RefreshResult();
-                                                railInfoResultWin.Show();
-                                            }));
-                                        }
-                                        break;
-                                    case 0x55:
-                                    case 0x56:
-                                        {
-                                            try
-                                            {
-                                                if (this._svtThumbnail == null)
-                                                {
-                                                    AppendMessage("设备及铁轨未初始化！", DataLevel.Error);
-                                                    return;
-                                                }
-
-                                                this.WaitingRingDisable();
-                                                this.WaitReceiveTimer.Stop();
-
-                                                int length = (actualReceive[2] << 8) + actualReceive[3];
-                                                byte[] bytesOnOffContent = new byte[length - 9];
-                                                byte[] bytesTemp = new byte[length - 9];
-                                                for (int i = 7; i < length - 2; i++)
-                                                {
-                                                    bytesOnOffContent[i - 7] = actualReceive[i];
-                                                }
-                                                for (int i = 0; i < bytesOnOffContent.Length; i += 10)
-                                                {
-                                                    for (int j = 0; j < 10; j++)
-                                                    {
-                                                        bytesTemp[i + j] = bytesOnOffContent[bytesOnOffContent.Length - i - (10 - j)];
-                                                    }
-                                                }
-                                                bytesTemp.CopyTo(bytesOnOffContent, 0);
-                                                int contentLength = bytesOnOffContent.Length;
-                                                if (contentLength % 10 == 0)
-                                                {
-                                                    if (contentLength == 10)
-                                                    {
-                                                        //如果只有一个终端的数据就不存在两个终端数据冲突的情况。
-                                                        int index = FindMasterControlIndex(bytesOnOffContent[0]);
-                                                        if (_terminalsReceiveFlag != null)
-                                                        {
-                                                            _terminalsReceiveFlag[bytesOnOffContent[0]] = true;
-                                                        }
-                                                        //检查1号铁轨
-                                                        if (index != 0)
-                                                        {
-                                                            //第一个终端没有左边的铁轨
-                                                            int onOffRail1Left = bytesOnOffContent[1] & 0x0f;
-                                                            this.Dispatcher.Invoke(new Action(() =>
-                                                            {
-                                                                setRail1State(index - 1, onOffRail1Left);
-                                                            }));
-                                                        }
-                                                        if (index != MasterControlList.Count - 1)
-                                                        {
-                                                            //最后一个终端没有右边的铁轨
-                                                            int onOffRail1Right = (bytesOnOffContent[1] & 0xf0) >> 4;
-                                                            this.Dispatcher.Invoke(new Action(() =>
-                                                            {
-                                                                setRail1State(index, onOffRail1Right);
-                                                            }));
-                                                        }
-
-                                                        //检查2号铁轨
-                                                        if (index != 0)
-                                                        {
-                                                            //第一个终端没有左边的铁轨
-                                                            int onOffRail2Left = bytesOnOffContent[2] & 0x0f;
-                                                            this.Dispatcher.Invoke(new Action(() =>
-                                                            {
-                                                                setRail2State(index - 1, onOffRail2Left);
-                                                            }));
-                                                        }
-                                                        if (index != MasterControlList.Count - 1)
-                                                        {
-                                                            //最后一个终端没有右边的铁轨
-                                                            int onOffRail2Right = (bytesOnOffContent[2] & 0xf0) >> 4;
-                                                            this.Dispatcher.Invoke(new Action(() =>
-                                                            {
-                                                                setRail2State(index, onOffRail2Right);
-                                                            }));
-                                                        }
-                                                        MasterControlList[index].Rail1Stress = (bytesOnOffContent[3] << 8) + bytesOnOffContent[4];
-                                                        MasterControlList[index].Rail2Stress = (bytesOnOffContent[5] << 8) + bytesOnOffContent[6];
-                                                        MasterControlList[index].Rail1Temperature = setMasterCtrlTemperature(bytesOnOffContent[7]);
-                                                        MasterControlList[index].Rail2Temperature = setMasterCtrlTemperature(bytesOnOffContent[8]);
-                                                        MasterControlList[index].MasterCtrlTemperature = setMasterCtrlTemperature(bytesOnOffContent[9]);
-                                                    }
-                                                    else
-                                                    {
-                                                        //如果有多个终端的数据，需要处理冲突。
-                                                        for (int i = 0; i < contentLength - 10; i += 10)
-                                                        {
-                                                            int index = FindMasterControlIndex(bytesOnOffContent[i]);
-                                                            if (_terminalsReceiveFlag != null)
-                                                            {
-                                                                _terminalsReceiveFlag[bytesOnOffContent[i]] = true;
-                                                            }
-                                                            //检查1号铁轨
-                                                            if (i == 0 && index != 0)
-                                                            {
-                                                                //第一个终端没有左边的铁轨
-                                                                int onOffRail1Left = bytesOnOffContent[1] & 0x0f;
-                                                                this.Dispatcher.Invoke(new Action(() =>
-                                                                {
-                                                                    setRail1State(index - 1, onOffRail1Left);
-                                                                }));
-                                                            }
-                                                            else
-                                                            {
-                                                                if (((bytesOnOffContent[i + 1] & 0xf0) >> 4) == (bytesOnOffContent[i + 11] & 0x0f))
-                                                                {
-                                                                    //不冲突
-                                                                    int onOff = (bytesOnOffContent[i + 1] & 0xf0) >> 4;
-                                                                    this.Dispatcher.Invoke(new Action(() =>
-                                                                    {
-                                                                        setRail1State(index, onOff);
-                                                                    }));
-                                                                }
-                                                                else if (((bytesOnOffContent[i + 1] & 0xf0) >> 4) == 9 || (bytesOnOffContent[i + 11] & 0x0f) == 9)
-                                                                {
-                                                                    this.Dispatcher.Invoke(new Action(() =>
-                                                                    {
-                                                                        setRail1State(index, 9);
-                                                                    }));
-                                                                }
-                                                                else
-                                                                {
-                                                                    //冲突
-                                                                    this.Dispatcher.Invoke(new Action(() =>
-                                                                    {
-                                                                        this._svtThumbnail.Different(new int[1] { index }, 1);
-                                                                        Rail rail = this.cvsRail1.Children[index] as Rail;
-                                                                        rail.Different();
-
-                                                                        int tNo = MasterControlList[index].TerminalNumber;
-                                                                        int tNextNo = MasterControlList[index + 1].TerminalNumber;
-                                                                        string errorTerminal = string.Empty;
-                                                                        if ((bytesOnOffContent[i + 1] & 0xf0) == 0x70)
-                                                                        {
-                                                                            errorTerminal = tNo.ToString() + "号终端接收异常";
-                                                                        }
-                                                                        else if ((bytesOnOffContent[i + 11] & 0x0f) == 0x07)
-                                                                        {
-                                                                            errorTerminal = tNextNo.ToString() + "号终端接收异常";
-                                                                        }
-                                                                        this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨通断信息矛盾！" + errorTerminal +
-                                                                            "，请检查", DataLevel.Warning);
-                                                                    }));
-                                                                }
-                                                            }
-                                                            if (i == (contentLength - 20))
-                                                            {
-                                                                int indexLastTerminal = FindMasterControlIndex(bytesOnOffContent[i + 10]);
-                                                                if (_terminalsReceiveFlag != null)
-                                                                {
-                                                                    _terminalsReceiveFlag[bytesOnOffContent[i + 10]] = true;
-                                                                }
-                                                                if (indexLastTerminal != MasterControlList.Count - 1)
-                                                                {
-                                                                    //最后一个终端没有右边的铁轨
-                                                                    int onOffRail1Right = (bytesOnOffContent[i + 11] & 0xf0) >> 4;
-                                                                    this.Dispatcher.Invoke(new Action(() =>
-                                                                    {
-                                                                        setRail1State(indexLastTerminal, onOffRail1Right);
-                                                                    }));
-                                                                }
-                                                            }
-
-                                                            //检查2号铁轨
-                                                            if (i == 0 && index != 0)
-                                                            {
-                                                                //第一个终端没有左边的铁轨
-                                                                int onOffRail2Left = bytesOnOffContent[2] & 0x0f;
-                                                                this.Dispatcher.Invoke(new Action(() =>
-                                                                {
-                                                                    setRail2State(index - 1, onOffRail2Left);
-                                                                }));
-                                                            }
-                                                            else
-                                                            {
-                                                                if (((bytesOnOffContent[i + 2] & 0xf0) >> 4) == (bytesOnOffContent[i + 12] & 0x0f))
-                                                                {
-                                                                    //不冲突
-                                                                    int onOff = (bytesOnOffContent[i + 2] & 0xf0) >> 4;
-                                                                    this.Dispatcher.Invoke(new Action(() =>
-                                                                    {
-                                                                        setRail2State(index, onOff);
-                                                                    }));
-                                                                }
-                                                                else if (((bytesOnOffContent[i + 2] & 0xf0) >> 4) == 9 || (bytesOnOffContent[i + 12] & 0x0f) == 9)
-                                                                {
-                                                                    this.Dispatcher.Invoke(new Action(() =>
-                                                                    {
-                                                                        setRail2State(index, 9);
-                                                                    }));
-                                                                }
-                                                                else
-                                                                {
-                                                                    //冲突
-                                                                    this.Dispatcher.Invoke(new Action(() =>
-                                                                    {
-                                                                        this._svtThumbnail.Different(new int[1] { index }, 2);
-                                                                        Rail rail = this.cvsRail2.Children[index] as Rail;
-                                                                        rail.Different();
-
-                                                                        int tNo = MasterControlList[index].TerminalNumber;
-                                                                        int tNextNo = MasterControlList[index + 1].TerminalNumber;
-                                                                        string errorTerminal = string.Empty;
-                                                                        if ((bytesOnOffContent[i + 2] & 0xf0) == 0x70)
-                                                                        {
-                                                                            errorTerminal = tNo.ToString() + "号终端接收异常";
-                                                                        }
-                                                                        else if ((bytesOnOffContent[i + 12] & 0x0f) == 0x07)
-                                                                        {
-                                                                            errorTerminal = tNextNo.ToString() + "号终端接收异常";
-                                                                        }
-                                                                        this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨通断信息矛盾！" + errorTerminal +
-                                                                            "，请检查", DataLevel.Warning);
-                                                                    }));
-                                                                }
-                                                            }
-                                                            if (i == (contentLength - 20))
-                                                            {
-                                                                int indexLastTerminal = FindMasterControlIndex(bytesOnOffContent[i + 10]);
-                                                                if (indexLastTerminal != MasterControlList.Count - 1)
-                                                                {
-                                                                    //最后一个终端没有右边的铁轨
-                                                                    int onOffRail2Right = (bytesOnOffContent[i + 12] & 0xf0) >> 4;
-                                                                    this.Dispatcher.Invoke(new Action(() =>
-                                                                    {
-                                                                        setRail2State(indexLastTerminal, onOffRail2Right);
-                                                                    }));
-                                                                }
-                                                            }
-                                                            MasterControlList[index].Rail1Stress = (bytesOnOffContent[i + 3] << 8) + bytesOnOffContent[i + 4];
-                                                            MasterControlList[index].Rail2Stress = (bytesOnOffContent[i + 5] << 8) + bytesOnOffContent[i + 6];
-                                                            MasterControlList[index].Rail1Temperature = setMasterCtrlTemperature(bytesOnOffContent[i + 7]);
-                                                            MasterControlList[index].Rail2Temperature = setMasterCtrlTemperature(bytesOnOffContent[i + 8]);
-                                                            MasterControlList[index].MasterCtrlTemperature = setMasterCtrlTemperature(bytesOnOffContent[i + 9]);
-                                                            if (i == (contentLength - 20))
-                                                            {
-                                                                index = FindMasterControlIndex(bytesOnOffContent[i + 10]);
-                                                                MasterControlList[index].Rail1Stress = (bytesOnOffContent[i + 13] << 8) + bytesOnOffContent[i + 14];
-                                                                MasterControlList[index].Rail2Stress = (bytesOnOffContent[i + 15] << 8) + bytesOnOffContent[i + 16];
-                                                                MasterControlList[index].Rail1Temperature = setMasterCtrlTemperature(bytesOnOffContent[i + 17]);
-                                                                MasterControlList[index].Rail2Temperature = setMasterCtrlTemperature(bytesOnOffContent[i + 18]);
-                                                                MasterControlList[index].MasterCtrlTemperature = setMasterCtrlTemperature(bytesOnOffContent[i + 19]);
-                                                            }
-                                                        }
-                                                    }
-
-                                                    int rail1NormalCount = 0;
-                                                    int rail2NormalCount = 0;
-                                                    this.Dispatcher.Invoke(new Action(() =>
-                                                    {
-                                                        for (int i = 0; i < this.cvsRail1.Children.Count; i++)
-                                                        {
-                                                            var rail1 = this.cvsRail1.Children[i] as Rail;
-                                                            if (rail1.RailState == RailStates.IsNormal)
-                                                            {
-                                                                rail1NormalCount++;
-                                                            }
-                                                            if (rail1NormalCount == this.cvsRail1.Children.Count)
-                                                            {
-                                                                this.dataShowUserCtrl.AddShowData("1号铁轨正常", DataLevel.Normal);
-                                                            }
-                                                            var rail2 = this.cvsRail2.Children[i] as Rail;
-                                                            if (rail2.RailState == RailStates.IsNormal)
-                                                            {
-                                                                rail2NormalCount++;
-                                                            }
-                                                            if (rail2NormalCount == this.cvsRail2.Children.Count)
-                                                            {
-                                                                this.dataShowUserCtrl.AddShowData("2号铁轨正常", DataLevel.Normal);
-                                                            }
-                                                        }
-                                                    }));
-                                                }
-                                                else
-                                                {
-                                                    AppendMessage("发送数据内容的长度错误，应该是10的倍数", DataLevel.Error);
-                                                }
-                                            }
-                                            catch (Exception ee)
-                                            {
-                                                AppendMessage("处理常规信息异常：" + ee.Message, DataLevel.Error);
-                                            }
-
-                                        }
-                                        break;
-                                    case 0x88:
-                                        {
-                                            this.WaitingRingDisable();
-                                            this.WaitReceiveTimer.Stop();
-                                            this._multicastWaitReceiveTimer.Stop();
-
-                                            this.Dispatcher.BeginInvoke(new Action(() =>
-                                            {
-                                                this.dataShowUserCtrl.AddShowData(actualReceive[7].ToString() + "号终端失联，未收到其返回的数据！", DataLevel.Error);
-                                            }));
-                                        }
-                                        break;
-                                    //case 0xf7:
-                                    //    {
-                                    //        int errorTerminalNo = actualReceive[7];
-                                    //        AppendMessage(errorTerminalNo.ToString() + " 号终端回应超时！");
-                                    //    }
-                                    //    break;
-                                    default:
-                                        AppendMessage("收到未知数据！", DataLevel.Error);
-                                        break;
-                                }
-                            }
-                            else if (actualReceive[0] == 0x55 && actualReceive[1] == 0xaa)
-                            {
-                                switch (actualReceive[5])
-                                {
-                                    case (byte)CommandType.AssignClientID:
-                                        {
-                                            this.Dispatcher.BeginInvoke(new Action(() =>
-                                            {
-                                                this.clientIDShow.ClientID = actualReceive[4];
-                                                this.dataShowUserCtrl.AddShowData("为电脑分配ClientID：" + actualReceive[4].ToString(), DataLevel.Default);
-                                            }));
-                                        }
-                                        break;
-                                    case (byte)CommandType.BroadcastConfigFileSize:
-                                        {
-                                            handleBroadcastFileSize(actualReceive);
+                                            handleRealtimeSpectrum(actualReceive);
                                         }
                                         break;
                                     default:
+                                        AppendMessage("收到未知数据！", DataLevel.Error);
                                         break;
                                 }
                             }
@@ -1427,6 +554,21 @@ namespace BrokenRail3MonitorViaWiFi
                 //socketDisconnect();
                 AppendMessage("Socket监听线程异常：" + ee.Message, DataLevel.Error);
             }
+        }
+
+        private void handleRealtimeSpectrum(byte[] data)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void handleRealtimeAmpData(byte[] data)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void handleGetConfig(byte[] data)
+        {
+            throw new NotImplementedException();
         }
 
         private int setMasterCtrlTemperature(byte tempe)
@@ -1614,35 +756,19 @@ namespace BrokenRail3MonitorViaWiFi
         {
             try
             {
-                //IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("192.168.16.254"), 8080);
-                //IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("103.44.145.248"), 23539);
-                //IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("192.168.1.106"), 23539);
-                //IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse("103.44.145.233"), 23539);
+                IPEndPoint hostIP = new IPEndPoint(IPAddress.Any, 16479);
+                _socketMain = new Socket(hostIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                _socketMain.Bind(hostIP);
+                _socketMain.Listen(500);
+                _acceptSocket = _socketMain.Accept();
 
-                IPHostEntry host = Dns.GetHostEntry(_serverWeb);
-                IPAddress ip = host.AddressList[0];
-                _serverIP = ip.ToString();
-                //IPEndPoint deviceIP = new IPEndPoint(ip, 23539);            
-                IPEndPoint deviceIP = new IPEndPoint(ip, 30809);
-
-                _socketMain = new Socket(deviceIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                _socketMain.Connect(deviceIP);
+                _socketListeningThread = new Thread(new ParameterizedThreadStart(socketListening));
+                _socketListeningThread.Start(_acceptSocket);
 
                 _isConnect = true;
                 this.miConnect.Header = "已连接";
                 this.miConnect.Background = new SolidColorBrush(Colors.LightGreen);
                 this.miConnect.IsEnabled = false;
-                SendData("电脑" + _socketMain.LocalEndPoint.ToString());
-
-                _socketListeningThread = new Thread(new ParameterizedThreadStart(socketListening));
-                _socketListeningThread.Start(_socketMain);
-                //IPEndPoint hostIP = new IPEndPoint(IPAddress.Any, 16479);
-                //_socketMain = new Socket(hostIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                //_socketMain.Bind(hostIP);
-                //_socketMain.Listen(500);
-                //_socketAcceptThread = new Thread(socketAccept);
-                //_socketAcceptThread.IsBackground = true;
-                //_socketAcceptThread.Start();
             }
             catch (Exception ee)
             {
@@ -1909,7 +1035,7 @@ namespace BrokenRail3MonitorViaWiFi
                 {
                     sendData = SendDataPackage.PackageSendData((byte)this.clientIDShow.ClientID,
                             (byte)0xff, (byte)CommandType.SubscribeAllRailInfo, new byte[1] { 0xff });
-                    this.miSubscribeAllRailInfo.Header = "订阅所有终端铁轨信息";
+                    //this.miSubscribeAllRailInfo.Header = "订阅所有终端铁轨信息";
                     errorAllRails();
                     _isSubscribingAllRailInfo = false;
                 }
@@ -1917,7 +1043,7 @@ namespace BrokenRail3MonitorViaWiFi
                 {
                     sendData = SendDataPackage.PackageSendData((byte)this.clientIDShow.ClientID,
                             (byte)0xff, (byte)CommandType.SubscribeAllRailInfo, new byte[1] { 0 });
-                    this.miSubscribeAllRailInfo.Header = "取消订阅所有终端铁轨信息";
+                    //this.miSubscribeAllRailInfo.Header = "取消订阅所有终端铁轨信息";
                     _isSubscribingAllRailInfo = true;
                 }
                 if (_socketMain != null)
@@ -2646,6 +1772,32 @@ namespace BrokenRail3MonitorViaWiFi
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             devicesInitial();
+        }
+
+        private void miRealtimeInfo_Click(object sender, RoutedEventArgs e)
+        {
+            RealtimeInfoWindow riWin = new RealtimeInfoWindow();
+            riWin.Show();
+        }
+
+        private void miGetConfigInfo_Click(object sender, RoutedEventArgs e)
+        {
+            byte[] sendData = SendDataPackage.PackageSendData(Command3Type.GetConfig, ConfigType.GET_CONFIG, 1, new byte[1] { 0 });
+            if (_socketMain != null)
+            {
+                _socketMain.Send(sendData, SocketFlags.None);
+                AppendDataMsg(sendData);
+                AppendMessage("获取系统配置信息", DataLevel.Default);
+            }
+            else
+            {
+                AppendMessage("请先连接", DataLevel.Error);
+            }
+        }
+
+        private void miSetTime_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

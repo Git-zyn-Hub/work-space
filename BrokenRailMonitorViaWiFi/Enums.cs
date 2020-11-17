@@ -25,6 +25,25 @@ namespace BrokenRail3MonitorViaWiFi
         ErrorReport = 0x88
     }
 
+    public enum Command3Type
+    {
+        GetConfig = 0x02,
+        RealtimeAmpData = 0xA0,
+        RealtimeSpectrum = 0xA1
+    }
+
+    public enum ConfigType
+    {
+        GET_FFT = 1,
+        SET_CONFIG,
+        SET_Time,
+        SET_TNum,
+        SET_Memclr,
+        GET_Mem,
+        SET_AmpConfig,
+        GET_CONFIG
+    }
+
     public enum RailNo
     {
         Rail1,

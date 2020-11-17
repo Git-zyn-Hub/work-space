@@ -115,6 +115,9 @@
     <Compile Include="UserControls\ClientIDShowUserControl.xaml.cs">
       <DependentUpon>ClientIDShowUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\ConfigInfoUserControl.xaml.cs">
+      <DependentUpon>ConfigInfoUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ValidationRules.cs" />
     <Compile Include="Windows\EraseFlashWindow.xaml.cs">
       <DependentUpon>EraseFlashWindow.xaml</DependentUpon>
@@ -127,6 +130,9 @@
     </Compile>
     <Compile Include="Windows\PointConfigInfoWindow.xaml.cs">
       <DependentUpon>PointConfigInfoWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\RealtimeInfoWindow.xaml.cs">
+      <DependentUpon>RealtimeInfoWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\ThresholdSettingWindow.xaml.cs">
       <DependentUpon>ThresholdSettingWindow.xaml</DependentUpon>
@@ -183,6 +189,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\ConfigInfoUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\EraseFlashWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -196,6 +206,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\PointConfigInfoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\RealtimeInfoWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
