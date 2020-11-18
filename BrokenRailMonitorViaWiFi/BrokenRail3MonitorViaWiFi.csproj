@@ -80,6 +80,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Classes\CalcIntFrom4Bytes.cs" />
     <Compile Include="Converters.cs" />
     <Compile Include="DataShowUserControl.xaml.cs">
       <DependentUpon>DataShowUserControl.xaml</DependentUpon>
@@ -131,11 +132,14 @@
     <Compile Include="Windows\PointConfigInfoWindow.xaml.cs">
       <DependentUpon>PointConfigInfoWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\RealtimeInfoWindow.xaml.cs">
-      <DependentUpon>RealtimeInfoWindow.xaml</DependentUpon>
+    <Compile Include="Windows\ConfigInfoWindow.xaml.cs">
+      <DependentUpon>ConfigInfoWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\ThresholdSettingWindow.xaml.cs">
       <DependentUpon>ThresholdSettingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\TongDuanWindow.xaml.cs">
+      <DependentUpon>TongDuanWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="DataShowUserControl.xaml">
       <SubType>Designer</SubType>
@@ -209,11 +213,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Windows\RealtimeInfoWindow.xaml">
+    <Page Include="Windows\ConfigInfoWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\ThresholdSettingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\TongDuanWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

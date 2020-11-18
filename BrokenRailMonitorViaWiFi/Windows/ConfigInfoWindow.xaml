@@ -1,13 +1,13 @@
-﻿<Window x:Class="BrokenRailMonitorViaWiFi.Windows.RealtimeInfoWindow"
+﻿<Window x:Class="BrokenRail3MonitorViaWiFi.Windows.ConfigInfoWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:BrokenRailMonitorViaWiFi.Windows"
+        xmlns:local="clr-namespace:BrokenRail3MonitorViaWiFi.Windows"
         xmlns:u="clr-namespace:BrokenRail3MonitorViaWiFi.UserControls"
         mc:Ignorable="d"
         Title="实时信息" Height="450" Width="800">
     <Grid>
-        <u:ConfigInfoUserControl></u:ConfigInfoUserControl>
+        <u:ConfigInfoUserControl x:Name="ucConfigInfo"></u:ConfigInfoUserControl>
     </Grid>
 </Window>

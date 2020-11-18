@@ -1,5 +1,4 @@
 ﻿using BrokenRail3MonitorViaWiFi.Windows;
-using BrokenRailMonitorViaWiFi.Windows;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -65,6 +64,7 @@ namespace BrokenRail3MonitorViaWiFi
         private const int _fileReceivePort = 23955;
         private bool _isSubscribingAllRailInfo = false;
         private Socket _socket;
+        private static MainWindow _instance;
 
         public List<int> SocketRegister
         {
@@ -123,12 +123,18 @@ namespace BrokenRail3MonitorViaWiFi
             //_getAllRailInfoTimer.Tick += getAllRailInfoTimer_Tick;
             //_getAllRailInfoTimer.Interval = new TimeSpan(0, 0, 75);
 
-            WaitReceiveTimer.Tick += WaitReceiveTimer_Tick;
-            WaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
+            //WaitReceiveTimer.Tick += WaitReceiveTimer_Tick;
+            //WaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
 
-            _multicastWaitReceiveTimer.Tick += multicastWaitReceiveTimer_Tick;
-            _multicastWaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
+            //_multicastWaitReceiveTimer.Tick += multicastWaitReceiveTimer_Tick;
+            //_multicastWaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
             //_waitingRingThread = new Thread(waitingRingEnable);
+            _instance = this;
+        }
+
+        public static MainWindow GetInstance()
+        {
+            return _instance;
         }
 
         private void devicesInitial()
@@ -568,7 +574,9 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void handleGetConfig(byte[] data)
         {
-            throw new NotImplementedException();
+            ConfigInfoWindow winConfigInfo = new ConfigInfoWindow();
+            winConfigInfo.SetData(data);
+            winConfigInfo.Show();
         }
 
         private int setMasterCtrlTemperature(byte tempe)
@@ -1776,8 +1784,12 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void miRealtimeInfo_Click(object sender, RoutedEventArgs e)
         {
-            RealtimeInfoWindow riWin = new RealtimeInfoWindow();
-            riWin.Show();
+            TongDuanWindow winTongDuan = new TongDuanWindow();
+            winTongDuan.RefreshCharts(new byte[112] { 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78,
+                                                     0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x00, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78,
+                                                      0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x00, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78,
+                                                         0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x00, 0x34, 0x56, 0x78}, 0);
+            winTongDuan.Show();
         }
 
         private void miGetConfigInfo_Click(object sender, RoutedEventArgs e)
