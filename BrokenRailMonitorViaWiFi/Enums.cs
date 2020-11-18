@@ -28,6 +28,7 @@ namespace BrokenRail3MonitorViaWiFi
     public enum Command3Type
     {
         GetConfig = 0x02,
+        SendCmd = 0x03,
         RealtimeAmpData = 0xA0,
         RealtimeSpectrum = 0xA1
     }

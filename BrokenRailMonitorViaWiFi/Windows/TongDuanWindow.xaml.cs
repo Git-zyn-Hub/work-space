@@ -1,4 +1,5 @@
 ﻿using BrokenRail3MonitorViaWiFi.Classes;
+using BrokenRail3MonitorViaWiFi.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,39 @@ namespace BrokenRail3MonitorViaWiFi.Windows
             //lineChart.HideIndicator();
         }
 
+        public void SetData(byte[] data)
+        {
+            int length = CalcIntFromBytes.CalcIntFrom2Bytes(data, 3);
+            if (length == 153)
+            {
+                lblTime.Content = TimeStamp.GetDateTime(CalcIntFromBytes.CalcIntFrom4Bytes(data, 5)).ToString();
+                lblTemperature.Content = CalcIntFromBytes.CalcIntFrom2Bytes(data, 12);
+                masterControl.TerminalNumber = data[11];
+                SetRailsStatus(data[18]);
+                RefreshCharts(data, 21);
+            }
+        }
+
+        private void SetOneRailStatus(Rail rail, byte tongDuan, int mask)
+        {
+            if ((tongDuan & mask) == mask)
+            {
+                rail.Normal();
+            }
+            else
+            {
+                rail.Error();
+            }
+        }
+
+        private void SetRailsStatus(byte tongDuan)
+        {
+            SetOneRailStatus(railLL, tongDuan, 0x08);
+            SetOneRailStatus(railLR, tongDuan, 0x04);
+            SetOneRailStatus(railRL, tongDuan, 0x02);
+            SetOneRailStatus(railRR, tongDuan, 0x01);
+        }
+
         public void RefreshCharts(byte[] data, int index)
         {
             RefreshOneChart(chartAmpRailLUp, data, index);
@@ -63,7 +97,8 @@ namespace BrokenRail3MonitorViaWiFi.Windows
                 dpSignalAmplitude = new DataPoint();
                 dpSignalAmplitude.XValue = CalcIntFromBytes.CalcIntFrom2Bytes(data, index + k * 2) / 1000.0;
                 dpSignalAmplitude.YValue = CalcIntFromBytes.CalcIntFrom4Bytes(data, index + 8 + k * 4);
-                dpSignalAmplitude.ZValue = CalcIntFromBytes.CalcIntFrom4Bytes(data, index + 8 + k * 4) / CalcIntFromBytes.CalcIntFrom4Bytes(data, index + 24);
+                int noise = CalcIntFromBytes.CalcIntFrom4Bytes(data, index + 24);
+                dpSignalAmplitude.ZValue = noise == 0 ? 0 : CalcIntFromBytes.CalcIntFrom4Bytes(data, index + 8 + k * 4) / noise;
                 signalSeries.DataPoints.Add(dpSignalAmplitude);
             }
             DataSeries noiseSeries = new DataSeries();

@@ -1,4 +1,5 @@
-﻿using BrokenRail3MonitorViaWiFi.Windows;
+﻿using BrokenRail3MonitorViaWiFi.Classes;
+using BrokenRail3MonitorViaWiFi.Windows;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -65,6 +66,9 @@ namespace BrokenRail3MonitorViaWiFi
         private bool _isSubscribingAllRailInfo = false;
         private Socket _socket;
         private static MainWindow _instance;
+        private ConfigInfoWindow _winConfigInfo;
+        private TongDuanWindow _winTongDuan;
+        private FFTWindow _winFFT;
 
         public List<int> SocketRegister
         {
@@ -130,6 +134,19 @@ namespace BrokenRail3MonitorViaWiFi
             //_multicastWaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
             //_waitingRingThread = new Thread(waitingRingEnable);
             _instance = this;
+        }
+        private void WinFFT_Closed(object sender, EventArgs e)
+        {
+            _winFFT = null;
+        }
+        private void WinTongDuan_Closed(object sender, EventArgs e)
+        {
+            _winTongDuan = null;
+        }
+
+        private void WinConfigInfo_Closed(object sender, EventArgs e)
+        {
+            _winConfigInfo = null;
         }
 
         public static MainWindow GetInstance()
@@ -363,16 +380,16 @@ namespace BrokenRail3MonitorViaWiFi
                             actualReceive[i] = receivedBytes[i];
                         }
                         //处理断包
-                        //V519发满1024字节之后会截断一下，在下一个1024字节继续发送
-                        //long beforePlusRemainder = accumulateNumber % 1024;
+                        //V519发满400字节之后会截断一下，在下一个400字节继续发送
+                        //long beforePlusRemainder = accumulateNumber % 400;
+                        duanBao:
                         accumulateNumber += numBytes;
-                        int afterPlusRemainder = accumulateNumber % 1024;
+                        int afterPlusRemainder = accumulateNumber % 400;
                         if (afterPlusRemainder == 0)
                         {
-                            //等于0的时候说明接收的字段跨过1024字节，再收一组数据。
-                            //有一种特殊情况，就是收到1024字节的时候正好是一整包，这样进入判断的话就会将两个本来就应该分开的包连起来，这种情况没有处理。
-                            accumulateNumber = 0;
-                            receivedBytes = new byte[2048];
+                            //等于0的时候说明接收的字段跨过400字节，再收一组数据。
+                            //有一种特殊情况，就是收到400字节的时候正好是一整包，这样进入判断的话就会将两个本来就应该分开的包连起来，这种情况没有处理。
+                            receivedBytes = new byte[5120];
                             numBytes = _socket.Receive(receivedBytes, SocketFlags.None);
                             accumulateNumber += numBytes;
                             byte[] secondReceive = new byte[numBytes];
@@ -387,8 +404,13 @@ namespace BrokenRail3MonitorViaWiFi
                             sumReceive.CopyTo(actualReceive, 0);
                             //this.Dispatcher.BeginInvoke(new Action(() =>
                             //{
-                            //    this.dataShowUserCtrl.AddShowData("跨越1024字节处理！", DataLevel.Warning);
+                            //    this.dataShowUserCtrl.AddShowData("跨越400字节处理！", DataLevel.Warning);
                             //}));
+                            goto duanBao;
+                        }
+                        else
+                        {
+                            accumulateNumber = 0;
                         }
 
                         byte[] packageUnhandled = new byte[0];
@@ -397,8 +419,6 @@ namespace BrokenRail3MonitorViaWiFi
                         string strReceive = encoding.GetString(actualReceive);
                         if (strReceive.Length > 5)
                         {
-                            string strReceiveFirst3Letter = strReceive.Substring(0, 3);
-                            string strReceiveFirst6Letter = strReceive.Substring(0, 6);
                             //检查校验和
                             try
                             {
@@ -414,7 +434,7 @@ namespace BrokenRail3MonitorViaWiFi
                                         this.dataShowUserCtrl.AddShowData("收到数据  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
                                     }));
 
-                                    int length = (actualReceive[2] << 8) + actualReceive[3];
+                                    int length = (actualReceive[3] << 8) + actualReceive[4] + 2;
                                     if (length < actualReceive.Length)
                                     {
                                         //原来是！=的时候进入判断，可能会造成unhandledLength为负值，导致数组越界。
@@ -437,7 +457,7 @@ namespace BrokenRail3MonitorViaWiFi
                                         //continue;
                                     }
                                     int checksum = 0;
-                                    for (int i = 0; i < actualReceive.Length - 2; i++)
+                                    for (int i = 2; i < actualReceive.Length - 2; i++)
                                     {
                                         checksum += actualReceive[i];
                                     }
@@ -470,8 +490,8 @@ namespace BrokenRail3MonitorViaWiFi
                                 {
                                     this.Dispatcher.BeginInvoke(new Action(() =>
                                     {
-                                            //string strReceiveBroken = encoding.GetString(actualReceive);
-                                            StringBuilder sb = new StringBuilder(500);
+                                        //string strReceiveBroken = encoding.GetString(actualReceive);
+                                        StringBuilder sb = new StringBuilder(500);
                                         for (int i = 0; i < actualReceive.Length; i++)
                                         {
                                             sb.Append(actualReceive[i].ToString("x2"));
@@ -492,19 +512,28 @@ namespace BrokenRail3MonitorViaWiFi
                                     //获取配置
                                     case 0x02:
                                         {
-                                            handleGetConfig(actualReceive);
+                                            this.Dispatcher.Invoke(new Action(() =>
+                                            {
+                                                handleGetConfig(actualReceive);
+                                            }));
                                         }
                                         break;
                                     //实时通断数据
                                     case 0xA0:
                                         {
-                                            handleRealtimeAmpData(actualReceive);
+                                            this.Dispatcher.Invoke(new Action(() =>
+                                            {
+                                                handleRealtimeAmpData(actualReceive);
+                                            }));
                                         }
                                         break;
                                     //实时频谱信息
                                     case 0xA1:
                                         {
-                                            handleRealtimeSpectrum(actualReceive);
+                                            this.Dispatcher.Invoke(new Action(() =>
+                                            {
+                                                handleRealtimeSpectrum(actualReceive);
+                                            }));
                                         }
                                         break;
                                     default:
@@ -564,19 +593,45 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void handleRealtimeSpectrum(byte[] data)
         {
-            throw new NotImplementedException();
+            if (_winFFT == null)
+            {
+                _winFFT = new FFTWindow(data);
+                _winFFT.Closed += WinFFT_Closed; ;
+                _winFFT.Show();
+            }
+            else
+            {
+                _winFFT.SetData(data);
+            }
         }
+
 
         private void handleRealtimeAmpData(byte[] data)
         {
-            throw new NotImplementedException();
+            if (_winTongDuan == null)
+            {
+                _winTongDuan = new TongDuanWindow();
+                _winTongDuan.Closed += WinTongDuan_Closed;
+                _winTongDuan.Show();
+            }
+            else
+            {
+                _winTongDuan.SetData(data);
+            }
         }
 
         private void handleGetConfig(byte[] data)
         {
-            ConfigInfoWindow winConfigInfo = new ConfigInfoWindow();
-            winConfigInfo.SetData(data);
-            winConfigInfo.Show();
+            if (_winConfigInfo == null)
+            {
+                _winConfigInfo = new ConfigInfoWindow();
+                _winConfigInfo.Closed += WinConfigInfo_Closed;
+                _winConfigInfo.Show();
+            }
+            else
+            {
+                _winConfigInfo.SetData(data);
+            }
         }
 
         private int setMasterCtrlTemperature(byte tempe)
@@ -764,7 +819,7 @@ namespace BrokenRail3MonitorViaWiFi
         {
             try
             {
-                IPEndPoint hostIP = new IPEndPoint(IPAddress.Any, 16479);
+                IPEndPoint hostIP = new IPEndPoint(IPAddress.Parse("192.168.0.201"), 8234);
                 _socketMain = new Socket(hostIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 _socketMain.Bind(hostIP);
                 _socketMain.Listen(500);
@@ -914,6 +969,8 @@ namespace BrokenRail3MonitorViaWiFi
             //_socketAcceptThread.Abort();
             //CloseAcceptSocket();
             _socketMain = null;
+            _acceptSocket.Close();
+            _acceptSocket = null;
             this.Dispatcher.Invoke(new Action(() =>
             {
                 this.miConnect.Header = "连接";
@@ -1676,7 +1733,7 @@ namespace BrokenRail3MonitorViaWiFi
                 {
                     while (true)
                     {
-                        byte[] receivedBytes = new byte[1024];
+                        byte[] receivedBytes = new byte[400];
                         int numBytes = socket.Receive(receivedBytes, SocketFlags.None);
 
                         //判断Socket连接是否断开
@@ -1738,30 +1795,7 @@ namespace BrokenRail3MonitorViaWiFi
             _receiveEmptyPackageCount = 0;
             AppendMessage("与服务器" + socket.RemoteEndPoint.ToString() + "的连接可能已断开！", DataLevel.Error);
             _isConnect = false;
-            if (_timeToWaitTimer.IsEnabled)
-            {
-                _timeToWaitTimer.Stop();
-            }
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                this.clientIDShow.ClientID = 0;
-            }));
-            foreach (var item in MasterControlList)
-            {
-                if (item.IpAndPort == socket.RemoteEndPoint.ToString())
-                {
-                    _socketRegister.Remove(item.TerminalNumber);
-                    int index = FindMasterControlIndex(item.TerminalNumber);
-                    if (index != -1)
-                    {
-                        this.Dispatcher.Invoke(new Action(() =>
-                        {
-                            MasterControlList[index].Offline();
-                        }));
-                    }
-                    item.Dispose();
-                }
-            }
+
             try
             {
                 socketDisconnect();
@@ -1784,20 +1818,23 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void miRealtimeInfo_Click(object sender, RoutedEventArgs e)
         {
-            TongDuanWindow winTongDuan = new TongDuanWindow();
-            winTongDuan.RefreshCharts(new byte[112] { 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78,
-                                                     0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x00, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78,
-                                                      0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x00, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78,
-                                                         0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x00, 0x34, 0x56, 0x78}, 0);
-            winTongDuan.Show();
+            //TongDuanWindow winTongDuan = new TongDuanWindow();
+            //winTongDuan.RefreshCharts(new byte[112] { 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78,
+            //                                         0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x00, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78,
+            //                                          0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x00, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78,
+            //                                             0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x20, 0x00, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78, 0x00, 0x34, 0x56, 0x78}, 0);
+            //winTongDuan.Show();
+            _winFFT = new FFTWindow(new byte[4122]);
+            _winFFT.Closed += WinFFT_Closed; ;
+            _winFFT.Show();
         }
 
         private void miGetConfigInfo_Click(object sender, RoutedEventArgs e)
         {
             byte[] sendData = SendDataPackage.PackageSendData(Command3Type.GetConfig, ConfigType.GET_CONFIG, 1, new byte[1] { 0 });
-            if (_socketMain != null)
+            if (_acceptSocket != null)
             {
-                _socketMain.Send(sendData, SocketFlags.None);
+                _acceptSocket.Send(sendData, SocketFlags.None);
                 AppendDataMsg(sendData);
                 AppendMessage("获取系统配置信息", DataLevel.Default);
             }
@@ -1809,7 +1846,24 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void miSetTime_Click(object sender, RoutedEventArgs e)
         {
+            long stamp = TimeStamp.GetTimeStamp(DateTime.Now);
+            byte[] timeArray = new byte[4];
+            timeArray[0] = (byte)((stamp & 0xff000000) >> 24);
+            timeArray[1] = (byte)((stamp & 0xff0000) >> 16);
+            timeArray[2] = (byte)((stamp & 0xff00) >> 8);
+            timeArray[3] = (byte)(stamp & 0xff);
 
+            byte[] sendData = SendDataPackage.PackageSendData(Command3Type.SendCmd, ConfigType.SET_Time, 4, timeArray);
+            if (_acceptSocket != null)
+            {
+                _acceptSocket.Send(sendData, SocketFlags.None);
+                AppendDataMsg(sendData);
+                AppendMessage("对时", DataLevel.Default);
+            }
+            else
+            {
+                AppendMessage("请先连接", DataLevel.Error);
+            }
         }
     }
 }

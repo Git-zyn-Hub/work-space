@@ -81,6 +81,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Classes\CalcIntFrom4Bytes.cs" />
+    <Compile Include="Classes\TimeStamp.cs" />
     <Compile Include="Converters.cs" />
     <Compile Include="DataShowUserControl.xaml.cs">
       <DependentUpon>DataShowUserControl.xaml</DependentUpon>
@@ -119,9 +120,15 @@
     <Compile Include="UserControls\ConfigInfoUserControl.xaml.cs">
       <DependentUpon>ConfigInfoUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\FFTChartUserControl.xaml.cs">
+      <DependentUpon>FFTChartUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ValidationRules.cs" />
     <Compile Include="Windows\EraseFlashWindow.xaml.cs">
       <DependentUpon>EraseFlashWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\FFTWindow.xaml.cs">
+      <DependentUpon>FFTWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\GetHistoryWindow.xaml.cs">
       <DependentUpon>GetHistoryWindow.xaml</DependentUpon>
@@ -197,7 +204,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\FFTChartUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\EraseFlashWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\FFTWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

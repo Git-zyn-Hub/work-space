@@ -1,0 +1,25 @@
+﻿<Window x:Class="BrokenRail3MonitorViaWiFi.Windows.FFTWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BrokenRail3MonitorViaWiFi.Windows"
+        xmlns:u="clr-namespace:BrokenRail3MonitorViaWiFi.UserControls"
+        mc:Ignorable="d"
+        Title="频谱" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition Height="394*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal">
+            <CheckBox VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked">显示直流分量</CheckBox>
+            <Label VerticalAlignment="Center" Padding="10 0">时间</Label>
+            <Label x:Name="lblTime"></Label>
+        </StackPanel>
+        <ScrollViewer  Grid.Row="1">
+            <StackPanel x:Name="stpContainer">
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

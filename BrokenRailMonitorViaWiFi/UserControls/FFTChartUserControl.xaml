@@ -1,0 +1,28 @@
+﻿<UserControl x:Class="BrokenRail3MonitorViaWiFi.UserControls.FFTChartUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BrokenRail3MonitorViaWiFi.UserControls"
+             xmlns:chart="clr-namespace:Visifire.Charts;assembly=WPFVisifire.Charts"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" Height="400">
+    <Grid>
+        <CheckBox x:Name="ckbShowDC" HorizontalAlignment="Left" VerticalAlignment="Top" Panel.ZIndex="20" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked">显示直流分量</CheckBox>
+        <chart:Chart ScrollingEnabled="False" View3D="False"
+                         IndicatorEnabled="True" ZoomingEnabled="True" ShowAllText="全部" ZoomOutText="恢复"
+                         x:Name="chartFFT" Visibility="Visible" Grid.Row="0" Grid.Column="1"
+                         SnapsToDevicePixels="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Watermark="False"
+                         Rendered="lineChart_Rendered">
+            <chart:Chart.Titles>
+                <chart:Title Text="{Binding InfoNumber}"/>
+            </chart:Chart.Titles>
+            <chart:Chart.AxesY>
+                <chart:Axis></chart:Axis>
+            </chart:Chart.AxesY>
+            <chart:Chart.AxesX>
+                <chart:Axis/>
+            </chart:Chart.AxesX>
+        </chart:Chart>
+    </Grid>
+</UserControl>
