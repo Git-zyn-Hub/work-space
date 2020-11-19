@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BrokenRail3MonitorViaWiFi.Windows"
         xmlns:u="clr-namespace:BrokenRail3MonitorViaWiFi.UserControls"
         mc:Ignorable="d"
-        Title="实时信息" Height="450" Width="800">
+        Title="配置信息" Height="450" Width="800">
     <Grid>
         <u:ConfigInfoUserControl x:Name="ucConfigInfo"></u:ConfigInfoUserControl>
     </Grid>

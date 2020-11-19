@@ -46,8 +46,8 @@
                 <!--<MenuItem x:Name="miGetHistory" Header="获取历史" Click="miGetHistory_Click"></MenuItem>
                 <MenuItem x:Name="miViewHistory" Header="回看历史" Click="miViewHistory_Click" FontSize="15"></MenuItem>
                 <MenuItem x:Name="miExportExcel" Header="导出Excel" Click="miExportExcel_Click" FontSize="15"></MenuItem>-->
-                <!--</MenuItem>
-                <MenuItem x:Name="miRealtimeInfo" Header="实时信息" FontSize="15" Click="miRealtimeInfo_Click"/>-->
+                <!--</MenuItem>-->
+                <MenuItem x:Name="miRealtimeInfo" Header="实时信息" FontSize="15" Click="miRealtimeInfo_Click"/>
             </Menu>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
                 <Ellipse x:Name="elpIndicator" Fill="LightGreen" Height="15" Width="15"></Ellipse>

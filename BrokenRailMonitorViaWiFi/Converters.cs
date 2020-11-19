@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BrokenRail3MonitorViaWiFi.Classes;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -52,6 +53,34 @@ namespace BrokenRail3MonitorViaWiFi
         {
             int temperature = (int)value;
             return temperature == 0 ? String.Empty : (temperature.ToString() + "℃");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class CurrentTimeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int timeStamp = (int)value;
+            return TimeStamp.GetDateTime(timeStamp).ToString("yyyy/MM/dd h:mm:ss");
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class Second2TimeConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int second = (int)value;
+            return TimeStamp.parseTimeSeconds(second, 0);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

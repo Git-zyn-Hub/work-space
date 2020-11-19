@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:BrokenRail3MonitorViaWiFi"
         xmlns:chart="clr-namespace:Visifire.Charts;assembly=WPFVisifire.Charts"
         mc:Ignorable="d"
-        Title="TongDuanWindow" Height="600" Width="800">
+        Title="通断" Height="600" Width="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="130"/>
