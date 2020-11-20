@@ -82,6 +82,8 @@ namespace BrokenRail3MonitorViaWiFi
             }
         }
 
+        public ConfigInfoUserControl UCConfigInfo { get; set; }
+
         public List<MasterControl> MasterControlList
         {
             get

@@ -1,4 +1,5 @@
 ﻿using BrokenRail3MonitorViaWiFi.Classes;
+using BrokenRail3MonitorViaWiFi.UserControls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,16 +36,16 @@ namespace BrokenRail3MonitorViaWiFi.Windows
             InitializeComponent();
             this.DataContext = this;
             MyTitle = "下发配置";
-            ConfigInfoWindow winConfigInfo = MainWindow.GetInstance().GetConfigInfoWin();
-            if (winConfigInfo != null && winConfigInfo.ucConfigInfo != null)
+            ConfigInfoUserControl ucConfigInfo = MainWindow.GetInstance().UCConfigInfo;
+            if (ucConfigInfo != null)
             {
-                终端编号 = winConfigInfo.ucConfigInfo.终端编号 + 1;
-                发送超声波频率 = winConfigInfo.ucConfigInfo.发送超声波频率;
-                发送超声波长度 = winConfigInfo.ucConfigInfo.发送超声波长度;
-                接收判断门限 = winConfigInfo.ucConfigInfo.接收判断门限;
-                信息上报频率 = winConfigInfo.ucConfigInfo.信息上报频率;
-                详细信息的编号 = winConfigInfo.ucConfigInfo.详细信息的编号;
-                对时间隔 = winConfigInfo.ucConfigInfo.对时间隔;
+                终端编号 = ucConfigInfo.终端编号 + 1;
+                发送超声波频率 = ucConfigInfo.发送超声波频率;
+                发送超声波长度 = ucConfigInfo.发送超声波长度;
+                接收判断门限 = ucConfigInfo.接收判断门限;
+                信息上报频率 = ucConfigInfo.信息上报频率;
+                详细信息的编号 = ucConfigInfo.详细信息的编号;
+                对时间隔 = ucConfigInfo.对时间隔;
             }
         }
 
@@ -63,6 +64,7 @@ namespace BrokenRail3MonitorViaWiFi.Windows
 
             byte[] sendData = SendDataPackage.PackageSendData(Command3Type.SendCmd, ConfigType.SET_CONFIG, 46, content);
             MainWindow.GetInstance().SendCommand(sendData);
+            Close();
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)

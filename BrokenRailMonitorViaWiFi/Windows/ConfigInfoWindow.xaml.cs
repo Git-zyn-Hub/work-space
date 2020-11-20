@@ -57,6 +57,7 @@ namespace BrokenRail3MonitorViaWiFi.Windows
                 ucConfigInfo.电压1_5V = CalcIntFromBytes.CalcIntFrom2Bytes(data, 77) / 100.0;
                 ucConfigInfo.电流12V = CalcIntFromBytes.CalcIntFrom2Bytes(data, 79);
                 ucConfigInfo.NotifyChanged();
+                MainWindow.GetInstance().UCConfigInfo = ucConfigInfo;
             }
             else
             {

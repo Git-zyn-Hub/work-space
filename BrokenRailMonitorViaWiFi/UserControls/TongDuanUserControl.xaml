@@ -31,9 +31,8 @@
             <Label>时间:</Label>
             <Label x:Name="lblTime"></Label>
             <Label>温度:</Label>
-            <Label x:Name="lblTemperature">
-
-            </Label>
+            <Label x:Name="lblTemperature"></Label>
+            <Label>℃</Label>
         </StackPanel>
 
         <Grid  Grid.Row="1">

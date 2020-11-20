@@ -61,7 +61,7 @@ namespace BrokenRail3MonitorViaWiFi.UserControls
             {
                 lblTime.Content = TimeStamp.GetDateTime(CalcIntFromBytes.CalcIntFrom4Bytes(data, 5)).ToString();
                 lblTemperature.Content = CalcIntFromBytes.CalcIntFrom2Bytes(data, 12);
-                masterControl.TerminalNumber = data[11];
+                masterControl.TerminalNumber = data[11] + 1;
                 SetRailsStatus(data[18]);
                 RefreshCharts(data, 21);
             }
