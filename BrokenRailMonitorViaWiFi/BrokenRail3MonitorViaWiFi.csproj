@@ -124,6 +124,9 @@
       <DependentUpon>FFTChartUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ValidationRules.cs" />
+    <Compile Include="Windows\CmdDetailConfigWindow.xaml.cs">
+      <DependentUpon>CmdDetailConfigWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\EraseFlashWindow.xaml.cs">
       <DependentUpon>EraseFlashWindow.xaml</DependentUpon>
     </Compile>
@@ -141,6 +144,12 @@
     </Compile>
     <Compile Include="Windows\ConfigInfoWindow.xaml.cs">
       <DependentUpon>ConfigInfoWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\CmdTNumWindow.xaml.cs">
+      <DependentUpon>CmdTNumWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SetConfigWindow.xaml.cs">
+      <DependentUpon>SetConfigWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\ThresholdSettingWindow.xaml.cs">
       <DependentUpon>ThresholdSettingWindow.xaml</DependentUpon>
@@ -208,6 +217,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\CmdDetailConfigWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\EraseFlashWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -229,6 +242,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\ConfigInfoWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\CmdTNumWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SetConfigWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -38,6 +38,23 @@ namespace BrokenRail3MonitorViaWiFi.Classes
             return (data[index] << 8) + data[index + 1];
         }
 
+        public static byte[] Calc2BytesFromInt(int data)
+        {
+            byte[] result = new byte[2];
+            result[0] = (byte)((data & 0xff00) >> 8);
+            result[1] = (byte)(data & 0xff);
+            return result;
+        }
 
+
+        public static byte[] Calc4BytesFromInt(int data)
+        {
+            byte[] result = new byte[4];
+            result[0] = (byte)((data & 0xff000000) >> 24);
+            result[1] = (byte)((data & 0xff0000) >> 16);
+            result[2] = (byte)((data & 0xff00) >> 8);
+            result[3] = (byte)(data & 0xff);
+            return result;
+        }
     }
 }

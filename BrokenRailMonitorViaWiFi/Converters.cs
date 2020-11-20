@@ -88,4 +88,40 @@ namespace BrokenRail3MonitorViaWiFi
             throw new NotImplementedException();
         }
     }
+
+    public class BoolReverseConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return !(bool)value;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class MultiBool2OneBoolConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool result = true;
+            for (int i = 0; i < values.Length; i++)
+            {
+                bool one = (bool)values[i];
+                result = result && !one;
+                if (!result)
+                {
+                    break;
+                }
+            }
+            return result;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

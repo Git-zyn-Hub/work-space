@@ -1,0 +1,120 @@
+﻿<Window x:Class="BrokenRail3MonitorViaWiFi.Windows.SetConfigWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:root="clr-namespace:BrokenRail3MonitorViaWiFi"
+        Loaded="winSetConfig_Loaded"
+        mc:Ignorable="d"
+        x:Name="winSetConfig"
+        Title="发送指令" Height="400" Width="400">
+    <Window.Resources>
+        <Style TargetType="StackPanel">
+            <Setter Property="Margin" Value="5"/>
+        </Style>
+        <root:MultiBool2OneBoolConverter x:Key="multiBool2OneBoolConverter"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="235*"/>
+            <RowDefinition Height="65"/>
+        </Grid.RowDefinitions>
+        <Label Content="{Binding MyTitle}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" FontWeight="Bold"></Label>
+        <StackPanel Grid.Row="1">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="81,5,0,5">
+                <Label Content="内部编号"/>
+                <TextBox Grid.Row="1" HorizontalAlignment="Center" x:Name="txtTerNum"
+                 VerticalAlignment="Center" MinWidth="100" Style="{DynamicResource ErrorInputStyle}">
+                    <Binding Path="终端编号" ElementName="winSetConfig" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <root:ValidationRuleFrom1To5 ErrorMessage="请输入1到5之间的整数！" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="11,5,0,5">
+                <Label Content="发送超声波频率(KHz)"/>
+                <TextBox Grid.Row="1" HorizontalAlignment="Center" x:Name="txtSendFreq"
+                 VerticalAlignment="Center" MinWidth="100" Style="{DynamicResource ErrorInputStyle}">
+                    <Binding Path="发送超声波频率" ElementName="winSetConfig" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <root:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="15,5,0,5">
+                <Label Content="发送超声波长度(ms)"/>
+                <TextBox Grid.Row="1" HorizontalAlignment="Center" x:Name="txtSendLength"
+                 VerticalAlignment="Center" MinWidth="100" Style="{DynamicResource ErrorInputStyle}">
+                    <Binding Path="发送超声波长度" ElementName="winSetConfig" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <root:ValidationRuleFrom0To65535 ErrorMessage="请输入0到65535之间的整数！" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="55,5,0,5">
+                <Label Content="接收判断门限"/>
+                <TextBox Grid.Row="1" HorizontalAlignment="Center" x:Name="txtRecvJudge"
+                 VerticalAlignment="Center" MinWidth="100" Style="{DynamicResource ErrorInputStyle}">
+                    <Binding Path="接收判断门限" ElementName="winSetConfig" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <root:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="37,5,0,5">
+                <Label Content="信息上报频率(m)"/>
+                <TextBox Grid.Row="1" HorizontalAlignment="Center" x:Name="txtMessageUpFreq"
+                 VerticalAlignment="Center" MinWidth="100" Style="{DynamicResource ErrorInputStyle}">
+                    <Binding Path="信息上报频率" ElementName="winSetConfig" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <root:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="33,5,0,5">
+                <Label Content="幅度详细信息配置"/>
+                <TextBox Grid.Row="1" HorizontalAlignment="Center" x:Name="txtDetailInfo"
+                 VerticalAlignment="Center" MinWidth="100" Style="{DynamicResource ErrorInputStyle}">
+                    <Binding Path="详细信息的编号" ElementName="winSetConfig" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <root:ValidationRuleFrom1To8 ErrorMessage="请输入1到8之间的整数！" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="62,5,0,5">
+                <Label Content="对时间隔(h)"/>
+                <TextBox Grid.Row="1" HorizontalAlignment="Center" x:Name="txtSetTimeInterval"
+                 VerticalAlignment="Center" MinWidth="100" Style="{DynamicResource ErrorInputStyle}">
+                    <Binding Path="对时间隔" ElementName="winSetConfig" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                        <Binding.ValidationRules>
+                            <root:ValidationRuleFrom0To255 ErrorMessage="请输入0到255之间的整数！" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button x:Name="btnOk" Width="60" Height="25" Click="btnOk_Click" Margin="0,0,80,0" Content="确定">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{StaticResource multiBool2OneBoolConverter}">
+                        <Binding Path="(Validation.HasError)" ElementName="txtTerNum"/>
+                        <Binding Path="(Validation.HasError)" ElementName="txtSendFreq"/>
+                        <Binding Path="(Validation.HasError)" ElementName="txtSendLength"/>
+                        <Binding Path="(Validation.HasError)" ElementName="txtRecvJudge"/>
+                        <Binding Path="(Validation.HasError)" ElementName="txtMessageUpFreq"/>
+                        <Binding Path="(Validation.HasError)" ElementName="txtDetailInfo"/>
+                        <Binding Path="(Validation.HasError)" ElementName="txtSetTimeInterval"/>
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
+            <Button x:Name="btnCancel" Width="60" Height="25" Click="btnCancel_Click">取消</Button>
+        </StackPanel>
+    </Grid>
+</Window>

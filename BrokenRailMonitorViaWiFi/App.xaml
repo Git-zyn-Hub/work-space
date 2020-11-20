@@ -279,7 +279,7 @@
                                                         <RowDefinition Height="Auto"/>
                                                         <RowDefinition Height="Auto"/>
                                                     </Grid.RowDefinitions>
-                                                    <Image Source="/BrokenRail3MonitorViaWiFi;component/Resources/small_info_icon.png" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="3" Width="33" Stretch="Uniform"/>
+                                                    <Image Source="/Resources/small_info_icon.png"  Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="3" Width="33" Stretch="Uniform"/>
                                                     <TextBlock FontFamily="Tahoma" Grid.Row="0" Grid.Column="1" FontSize="13" Text="提示：" Foreground="#5095D6" />
                                                     <TextBlock Grid.Row="1" Grid.Column="1" Foreground="Red" FontSize="11pt" HorizontalAlignment="Right"
                                                        Text="{Binding ElementName=MyAdorner, Path=AdornedElement.(Validation.Errors)[0].ErrorContent}">

@@ -45,7 +45,14 @@ namespace BrokenRail3MonitorViaWiFi.UserControls
 
         public void Refresh()
         {
-            UpdateChart(0);
+            if (ckbShowDC.IsChecked.HasValue && !ckbShowDC.IsChecked.Value)
+            {
+                UpdateChart(4);
+            }
+            else
+            {
+                UpdateChart(0);
+            }
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)

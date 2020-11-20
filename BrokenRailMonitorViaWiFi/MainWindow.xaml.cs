@@ -56,7 +56,7 @@ namespace BrokenRail3MonitorViaWiFi
         private List<int> _4GPointIndex = new List<int>();
         private Dictionary<int, bool> _terminalsReceiveFlag;
         private List<int> _sendTime = new List<int>();
-        private int _hit0xf4Count = 0;
+        //private int _hit0xf4Count = 0;
         private List<string> _fileNameList = new List<string>();
         private bool _isConnect = false;
         private String _serverIP = "103.44.145.248";
@@ -1815,7 +1815,7 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            devicesInitial();
+            //devicesInitial();
         }
 
         private void miRealtimeInfo_Click(object sender, RoutedEventArgs e)
@@ -1830,13 +1830,13 @@ namespace BrokenRail3MonitorViaWiFi
             //_winFFT.Closed += WinFFT_Closed; ;
             //_winFFT.Show();
             _winConfigInfo = new ConfigInfoWindow();
-            _winConfigInfo.SetData(new byte[95] { 0x66, 0xCC, 0x02, 0x00, 0x5D, 0x5F, 0xB6, 0x32, 
+            _winConfigInfo.SetData(new byte[95] { 0x66, 0xCC, 0x02, 0x00, 0x5D, 0x5F, 0xB6, 0x32,
                 0x49, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2E, 0x00, 0x00, 0x00, 0x00, 0x4C,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x2E, 0x00, 0x00, 0x00, 0x00, 0x4C, 0x00, 0x2E, 0x00,
-                0x5F, 0xB6, 0x32, 0x49, 0x00, 0x00, 0x30, 0x70, 0x64, 0x00, 0x00, 0x80, 0x00, 0x00, 
-                0x00, 0x80, 0x00, 0x25, 0x00, 0x55, 0x00, 0x1E, 0x05, 0x00, 0x14, 0x5F, 0xB6, 0x2F, 
-                0x06, 0x00, 0x00, 0x03, 0x53, 0x02, 0x06, 0x04, 0x1F, 0x01, 0xEC, 0x01, 0x47, 0x00, 
-                0x94, 0x01, 0x1B, 0x05, 0xD8, 0xFF, 0x34, 0x05, 0x75, 0x06, 0xD5, 0xFF, 0xFF, 0x01, 
+                0x5F, 0xB6, 0x32, 0x49, 0x00, 0x00, 0x30, 0x70, 0x64, 0x00, 0x00, 0x80, 0x00, 0x00,
+                0x00, 0x80, 0x00, 0x25, 0x00, 0x55, 0x00, 0x1E, 0x05, 0x00, 0x14, 0x5F, 0xB6, 0x2F,
+                0x06, 0x00, 0x00, 0x03, 0x53, 0x02, 0x06, 0x04, 0x1F, 0x01, 0xEC, 0x01, 0x47, 0x00,
+                0x94, 0x01, 0x1B, 0x05, 0xD8, 0xFF, 0x34, 0x05, 0x75, 0x06, 0xD5, 0xFF, 0xFF, 0x01,
                 0x00, 0x10, 0x6A });
             _winConfigInfo.Show();
         }
@@ -1876,6 +1876,42 @@ namespace BrokenRail3MonitorViaWiFi
             {
                 AppendMessage("请先连接", DataLevel.Error);
             }
+        }
+
+        public void SendCommand(byte[] sendData)
+        {
+            if (_acceptSocket != null)
+            {
+                _acceptSocket.Send(sendData, SocketFlags.None);
+                AppendDataMsg(sendData);
+            }
+            else
+            {
+                AppendMessage("请先连接", DataLevel.Error);
+            }
+        }
+
+        private void miSetConfig_Click(object sender, RoutedEventArgs e)
+        {
+            SetConfigWindow winSetConfig = new SetConfigWindow();
+            winSetConfig.Show();
+        }
+
+        private void miSetTerminalNum_Click(object sender, RoutedEventArgs e)
+        {
+            CmdTNumWindow winSendCmd = new CmdTNumWindow();
+            winSendCmd.Show();
+        }
+
+        private void miDetailConfig_Click(object sender, RoutedEventArgs e)
+        {
+            CmdDetailConfigWindow winSendCmd = new CmdDetailConfigWindow();
+            winSendCmd.Show();
+        }
+
+        public ConfigInfoWindow GetConfigInfoWin()
+        {
+            return _winConfigInfo;
         }
     }
 }

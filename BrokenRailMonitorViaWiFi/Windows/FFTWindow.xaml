@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrokenRail3MonitorViaWiFi.Windows"
         xmlns:u="clr-namespace:BrokenRail3MonitorViaWiFi.UserControls"
+        Loaded="Window_Loaded"
         mc:Ignorable="d"
         Title="频谱" Height="450" Width="800">
     <Grid>
@@ -13,7 +14,7 @@
             <RowDefinition Height="394*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <CheckBox VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked">显示直流分量</CheckBox>
+            <CheckBox x:Name="ckbShowDC" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked">显示直流分量</CheckBox>
             <Label VerticalAlignment="Center" Padding="10 0">时间</Label>
             <Label x:Name="lblTime"></Label>
         </StackPanel>

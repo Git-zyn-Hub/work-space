@@ -39,15 +39,18 @@
                     <MenuItem x:Name="miGetAllDevicesSignalAmplitude" Header="获取所有终端信号幅值" Click="miGetAllDevicesSignalAmplitude_Click"></MenuItem>
                     <MenuItem x:Name="miRealTimeConfig" Header="实时时钟配置" Click="miRealTimeConfig_Click"></MenuItem>
                     <MenuItem x:Name="miEraseFlash" Header="擦除Flash" Click="miEraseFlash_Click"></MenuItem>-->
-                    <MenuItem x:Name="miGetConfigInfo" Header="获取配置信息" Click="miGetConfigInfo_Click"/>
+                    <MenuItem x:Name="miGetConfigInfo" Header="获取配置" Click="miGetConfigInfo_Click"/>
+                    <MenuItem x:Name="miSetConfig" Header="下发配置" Click="miSetConfig_Click" />
+                    <MenuItem x:Name="miSetTerminalNum" Header="设置终端号" Click="miSetTerminalNum_Click"/>
+                    <MenuItem x:Name="miDetailConfig" Header="详细信息配置" Click="miDetailConfig_Click"/>
                     <MenuItem x:Name="miSetTime" Header="对时" Click="miSetTime_Click"/>
                 </MenuItem>
                 <!--<MenuItem Header="历史" FontSize="15">-->
                 <!--<MenuItem x:Name="miGetHistory" Header="获取历史" Click="miGetHistory_Click"></MenuItem>
                 <MenuItem x:Name="miViewHistory" Header="回看历史" Click="miViewHistory_Click" FontSize="15"></MenuItem>
                 <MenuItem x:Name="miExportExcel" Header="导出Excel" Click="miExportExcel_Click" FontSize="15"></MenuItem>-->
-                <!--</MenuItem>-->
-                <MenuItem x:Name="miRealtimeInfo" Header="实时信息" FontSize="15" Click="miRealtimeInfo_Click"/>
+                <!--</MenuItem>
+                <MenuItem x:Name="miRealtimeInfo" Header="实时信息" FontSize="15" Click="miRealtimeInfo_Click"/>-->
             </Menu>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
                 <Ellipse x:Name="elpIndicator" Fill="LightGreen" Height="15" Width="15"></Ellipse>

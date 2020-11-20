@@ -1,4 +1,5 @@
-﻿using BrokenRail3MonitorViaWiFi.UserControls;
+﻿using BrokenRail3MonitorViaWiFi.Classes;
+using BrokenRail3MonitorViaWiFi.UserControls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,8 +33,8 @@ namespace BrokenRail3MonitorViaWiFi.Windows
                 byte[] oneData = new byte[512];
                 Array.Copy(data, i * 512 + 14, oneData, 0, 512);
                 _fftCharts[i].Data = oneData;
-                _fftCharts[i].Refresh();
                 stpContainer.Children.Add(_fftCharts[i]);
+                SetTime(data);
             }
         }
 
@@ -60,7 +61,19 @@ namespace BrokenRail3MonitorViaWiFi.Windows
                 byte[] oneData = new byte[512];
                 Array.Copy(data, i * 512 + 14, oneData, 0, 512);
                 _fftCharts[i].Data = oneData;
+                _fftCharts[i].Refresh();
+                SetTime(data);
             }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            ckbShowDC.IsChecked = true;
+        }
+
+        private void SetTime(byte[] data)
+        {
+            lblTime.Content = TimeStamp.GetDateTime(CalcIntFromBytes.CalcIntFrom4Bytes(data, 5)).ToString("yyyy/MM/dd h:mm:ss");
         }
     }
 }

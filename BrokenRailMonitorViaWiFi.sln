@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrokenRail3MonitorViaWiFi",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SurfacePlot", "SurfacePlot\SurfacePlot.csproj", "{689E5A33-6531-421B-8E76-87897F7D808D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FloatableUserControl", "FloatableUserControl\FloatableUserControl.csproj", "{F7963516-1CBF-4659-9F0A-38D3D9672A1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{689E5A33-6531-421B-8E76-87897F7D808D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{689E5A33-6531-421B-8E76-87897F7D808D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{689E5A33-6531-421B-8E76-87897F7D808D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7963516-1CBF-4659-9F0A-38D3D9672A1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7963516-1CBF-4659-9F0A-38D3D9672A1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7963516-1CBF-4659-9F0A-38D3D9672A1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7963516-1CBF-4659-9F0A-38D3D9672A1B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
