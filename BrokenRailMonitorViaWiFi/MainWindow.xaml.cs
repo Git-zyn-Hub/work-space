@@ -206,6 +206,7 @@ namespace BrokenRail3MonitorViaWiFi
                 if (_socket != null)
                 {
                     int accumulateNumber = 0;
+                    byte[] checkSumErrorArray = null;
                     while (true)
                     {
                         byte[] receivedBytes = new byte[5120];
@@ -334,11 +335,16 @@ namespace BrokenRail3MonitorViaWiFi
                                     sumLow = checksum & 0xff;
                                     if (sumHigh != actualReceive[actualReceive.Length - 2] || sumLow != actualReceive[actualReceive.Length - 1])
                                     {
+                                        checkSumErrorArray = actualReceive;
                                         this.Dispatcher.Invoke(new Action(() =>
                                         {
                                             this.dataShowUserCtrl.AddShowData("校验和出错", DataLevel.Error);
                                         }));
                                         continue;
+                                    }
+                                    else
+                                    {
+                                        checkSumErrorArray = null;
                                     }
                                 }
                                 else if (actualReceive[0] == 0x55 && actualReceive[1] == 0xaa)
@@ -355,6 +361,16 @@ namespace BrokenRail3MonitorViaWiFi
                                 }
                                 else
                                 {
+                                    if (checkSumErrorArray != null)
+                                    {
+                                        byte[] sumReceive = new byte[checkSumErrorArray.Length + actualReceive.Length];
+                                        checkSumErrorArray.CopyTo(sumReceive, 0);
+                                        actualReceive.CopyTo(sumReceive, checkSumErrorArray.Length);
+                                        actualReceive = new byte[sumReceive.Length];
+                                        sumReceive.CopyTo(actualReceive, 0);
+                                        AppendMessage("拆分组合", DataLevel.Warning);
+                                        goto handlePackage;
+                                    }
                                     this.Dispatcher.BeginInvoke(new Action(() =>
                                     {
                                         //string strReceiveBroken = encoding.GetString(actualReceive);
