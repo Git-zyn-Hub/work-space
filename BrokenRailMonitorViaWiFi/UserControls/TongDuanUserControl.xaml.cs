@@ -11,18 +11,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Visifire.Charts;
-using Visifire.Commons;
 
-namespace BrokenRail3MonitorViaWiFi.Windows
+namespace BrokenRail3MonitorViaWiFi.UserControls
 {
     /// <summary>
-    /// TongDuanWindow.xaml 的交互逻辑
+    /// TongDuanUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class TongDuanWindow : Window
+    public partial class TongDuanUserControl : UserControl
     {
-        public TongDuanWindow()
+        public TongDuanUserControl()
         {
             InitializeComponent();
         }
@@ -35,7 +35,20 @@ namespace BrokenRail3MonitorViaWiFi.Windows
             //移除水印
             if (root != null)
             {
-                root.Children.RemoveAt(10);
+                int hitCount = 0;
+                for (int i = 0; i < root.Children.Count; i++)
+                {
+                    StackPanel sp = root.Children[i] as StackPanel;
+                    if (sp != null)
+                    {
+                        hitCount++;
+                        if (hitCount == 3)
+                        {
+                            root.Children.RemoveAt(i);
+                            break;
+                        }
+                    }
+                }
             }
 
             //lineChart.HideIndicator();
@@ -46,7 +59,7 @@ namespace BrokenRail3MonitorViaWiFi.Windows
             int length = CalcIntFromBytes.CalcIntFrom2Bytes(data, 3);
             if (length == 153)
             {
-                lblTime.Content = TimeStamp.GetDateTime(CalcIntFromBytes.CalcIntFrom4Bytes(data, 5)).ToString("yyyy/MM/dd HH:mm:ss");
+                lblTime.Content = TimeStamp.GetDateTime(CalcIntFromBytes.CalcIntFrom4Bytes(data, 5)).ToString();
                 lblTemperature.Content = CalcIntFromBytes.CalcIntFrom2Bytes(data, 12);
                 masterControl.TerminalNumber = data[11];
                 SetRailsStatus(data[18]);

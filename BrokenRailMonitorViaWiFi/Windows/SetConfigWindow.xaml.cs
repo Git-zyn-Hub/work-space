@@ -38,7 +38,7 @@ namespace BrokenRail3MonitorViaWiFi.Windows
             ConfigInfoWindow winConfigInfo = MainWindow.GetInstance().GetConfigInfoWin();
             if (winConfigInfo != null && winConfigInfo.ucConfigInfo != null)
             {
-                终端编号 = winConfigInfo.ucConfigInfo.终端编号;
+                终端编号 = winConfigInfo.ucConfigInfo.终端编号 + 1;
                 发送超声波频率 = winConfigInfo.ucConfigInfo.发送超声波频率;
                 发送超声波长度 = winConfigInfo.ucConfigInfo.发送超声波长度;
                 接收判断门限 = winConfigInfo.ucConfigInfo.接收判断门限;
@@ -51,7 +51,7 @@ namespace BrokenRail3MonitorViaWiFi.Windows
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
             byte[] content = new byte[46];
-            content[0] = (byte)终端编号;
+            content[0] = (byte)(终端编号 - 1);
             content[18] = (byte)发送超声波频率;
             byte[] sendLength = CalcIntFromBytes.Calc2BytesFromInt(发送超声波长度);
             content[19] = sendLength[0];

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BrokenRail3MonitorViaWiFi" Closing="Window_Closing"
         xmlns:userCtrl="clr-namespace:BrokenRail3MonitorViaWiFi.UserControls"
+        xmlns:floatable="clr-namespace:FloatableUserControl;assembly=FloatableUserControl"
         mc:Ignorable="d" Loaded="Window_Loaded"
         Title="断轨监测" Height="600" Width="1024" MinHeight="450" MinWidth="450">
     <Window.Background>
@@ -16,67 +17,52 @@
     <Grid x:Name="gridMain">
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
-            <RowDefinition Height="100*"/>
-            <RowDefinition Height="100*"/>
             <RowDefinition Height="120*"/>
             <RowDefinition Height="3"/>
-            <RowDefinition Height="120*"/>
+            <RowDefinition Height="80*"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.Row="0">
-            <!--<Button x:Name="btnSet" HorizontalAlignment="Left" Width="70" Click="btnSet_Click" Height="30">设置</Button>-->
+        <DockPanel Grid.Row="0" Grid.ColumnSpan="3">
             <Menu x:Name="menu" Height="25" HorizontalAlignment="Left">
                 <MenuItem x:Name="miConnect" Header="连接" FontSize="15" Click="miConnect_Click"></MenuItem>
-                <!--<MenuItem Header="设备" FontSize="15">
-                    <MenuItem x:Name="miRefreshDevices" Header="刷新" FontSize="15" Click="miRefreshDevices_Click"></MenuItem>
-                    <MenuItem x:Name="miUpload" Header="上传" FontSize="15" Click="miUpload_Click"></MenuItem>
-                    <MenuItem x:Name="miDownload" Header="下载" FontSize="15" Click="miDownload_Click"></MenuItem>
-                </MenuItem>-->
+                <MenuItem x:Name="miView" Header="视图" FontSize="15" Click="miView_Click">
+                    <MenuItem x:Name="miTongDuan" Header="通断" FontSize="15" Click="miTongDuan_Click">
+                    </MenuItem>
+                    <MenuItem x:Name="miFFT" Header="频谱" FontSize="15" Click="miFFT_Click">
+                    </MenuItem>
+                    <MenuItem x:Name="miMessage" Header="消息" Click="miMessage_Click">
+                    </MenuItem>
+                </MenuItem>
                 <MenuItem x:Name="miCommand" Header="指令" FontSize="15">
-                    <!--<MenuItem x:Name="miRailInitial" Header="初始化" Click="miRailInitial_Click"></MenuItem>
-                    <MenuItem x:Name="miTimeBaseCorrect" Header="发射时基校准" Click="miTimeBaseCorrect_Click"></MenuItem>
-                    <MenuItem x:Name="miSubscribeAllRailInfo" Header="订阅所有终端铁轨信息" Click="miSubscribeAllRailInfo_Click"></MenuItem>
-                    <MenuItem x:Name="miGetOneSectionInfo" Header="获取某段铁轨信息" Click="miGetOneSectionInfo_Click"></MenuItem>
-                    <MenuItem x:Name="miGetAllDevicesSignalAmplitude" Header="获取所有终端信号幅值" Click="miGetAllDevicesSignalAmplitude_Click"></MenuItem>
-                    <MenuItem x:Name="miRealTimeConfig" Header="实时时钟配置" Click="miRealTimeConfig_Click"></MenuItem>
-                    <MenuItem x:Name="miEraseFlash" Header="擦除Flash" Click="miEraseFlash_Click"></MenuItem>-->
                     <MenuItem x:Name="miGetConfigInfo" Header="获取配置" Click="miGetConfigInfo_Click"/>
                     <MenuItem x:Name="miSetConfig" Header="下发配置" Click="miSetConfig_Click" />
                     <MenuItem x:Name="miSetTerminalNum" Header="设置终端号" Click="miSetTerminalNum_Click"/>
                     <MenuItem x:Name="miDetailConfig" Header="详细信息配置" Click="miDetailConfig_Click"/>
                     <MenuItem x:Name="miSetTime" Header="对时" Click="miSetTime_Click"/>
                 </MenuItem>
-                <!--<MenuItem Header="历史" FontSize="15">-->
-                <!--<MenuItem x:Name="miGetHistory" Header="获取历史" Click="miGetHistory_Click"></MenuItem>
-                <MenuItem x:Name="miViewHistory" Header="回看历史" Click="miViewHistory_Click" FontSize="15"></MenuItem>
-                <MenuItem x:Name="miExportExcel" Header="导出Excel" Click="miExportExcel_Click" FontSize="15"></MenuItem>-->
-                <!--</MenuItem>
-                <MenuItem x:Name="miRealtimeInfo" Header="实时信息" FontSize="15" Click="miRealtimeInfo_Click"/>-->
+                <!--<MenuItem x:Name="miRealtimeInfo" Header="实时信息" FontSize="15" Click="miRealtimeInfo_Click"/>-->
             </Menu>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
                 <Ellipse x:Name="elpIndicator" Fill="LightGreen" Height="15" Width="15"></Ellipse>
                 <Label x:Name="lblPackageCount" Foreground="White"></Label>
             </StackPanel>
         </DockPanel>
-        <userCtrl:ClientIDShowUserControl x:Name="clientIDShow" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top"></userCtrl:ClientIDShowUserControl>
-        <ScrollViewer x:Name="svContainer" Grid.Row="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Hidden">
-            <!--<StackPanel VerticalAlignment="Center" Height="36">-->
-            <StackPanel VerticalAlignment="Bottom">
-                <Canvas x:Name="cvsRail1" Height="36" Margin="20,0" HorizontalAlignment="Left">
-                </Canvas>
-                <Canvas x:Name="cvsDevices" Height="36" Margin="20,0">
-                </Canvas>
-                <Canvas x:Name="cvsRail2" Height="50" Margin="20,0">
-                </Canvas>
-            </StackPanel>
-            <!--</StackPanel>-->
-        </ScrollViewer>
-        <!--<TextBlock x:Name="txtReceive" Grid.Row="1"/>
-        <TextBox x:Name="txtSend" Grid.Row="2"></TextBox>
-        <Button x:Name="btnSend" Grid.Row="3" HorizontalAlignment="Right" Width="70" Height="30" Click="btnSend_Click">发送</Button>-->
-        <local:ModernProgressRing x:Name="modernProgressRing" Grid.RowSpan="6" IsActive="False" Width="100" Height="100" Panel.ZIndex="100"
-                                  Style="{StaticResource CircleProgressRingStyle}" >
-        </local:ModernProgressRing>
-        <GridSplitter Grid.Row="4" Background="AntiqueWhite" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
-        <local:DataShowUserControl x:Name="dataShowUserCtrl" Grid.Row="5"></local:DataShowUserControl>
+        <floatable:FloatableUserControl x:Name="fucMessage" StrTitle="消息" Grid.Row="3" Grid.ColumnSpan="3">
+        </floatable:FloatableUserControl>
+        <GridSplitter Grid.Row="2" Background="AntiqueWhite" VerticalAlignment="Center" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
+        <Grid Grid.Row="1" x:Name="gridFFTAndTongDuan">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <GridSplitter Grid.Column="1" Background="AntiqueWhite" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="3"></GridSplitter>
+            <floatable:FloatableUserControl x:Name="fucFFT" StrTitle="频谱" Grid.Column="2">
+            </floatable:FloatableUserControl>
+            <floatable:FloatableUserControl x:Name="fucTongDuan" StrTitle="通断">
+            </floatable:FloatableUserControl>
+        </Grid>
+        <!--<floatable:FloatableUserControl x:Name="fucMessage" StrTitle="消息" Grid.Row="3" Grid.ColumnSpan="3">
+            <local:DataShowUserControl x:Name="dataShowUserCtrl"></local:DataShowUserControl>
+        </floatable:FloatableUserControl>-->
     </Grid>
 </Window>

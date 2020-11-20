@@ -262,7 +262,7 @@ namespace BrokenRail3MonitorViaWiFi
                 excel.XLWorkbook workBook = new excel.XLWorkbook();
                 excel.IXLWorksheet workSheet = workBook.AddWorksheet("Sheet1");
 
-                workSheet.Column(1).Style.NumberFormat.Format = "yyyy/m/d h:mm:ss";
+                workSheet.Column(1).Style.NumberFormat.Format = "yyyy/m/d HH:mm:ss";
                 //设置第1列的宽度
                 workSheet.Column(1).Width = 18;
                 //设置第2到4列的宽度

@@ -21,7 +21,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -46,6 +46,10 @@
     <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>DLL\DocumentFormat.OpenXml.dll</HintPath>
+    </Reference>
+    <Reference Include="FloatableUserControl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\FloatableUserControl.dll</HintPath>
     </Reference>
     <Reference Include="MaterialDesignColors">
       <HintPath>DLL\MaterialDesignColors.dll</HintPath>
@@ -122,6 +126,12 @@
     </Compile>
     <Compile Include="UserControls\FFTChartUserControl.xaml.cs">
       <DependentUpon>FFTChartUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\FFTUserControl.xaml.cs">
+      <DependentUpon>FFTUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\TongDuanUserControl.xaml.cs">
+      <DependentUpon>TongDuanUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ValidationRules.cs" />
     <Compile Include="Windows\CmdDetailConfigWindow.xaml.cs">
@@ -214,6 +224,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\FFTChartUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\FFTUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\TongDuanUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

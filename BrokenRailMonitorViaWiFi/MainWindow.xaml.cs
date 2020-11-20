@@ -1,14 +1,17 @@
 ﻿using BrokenRail3MonitorViaWiFi.Classes;
+using BrokenRail3MonitorViaWiFi.UserControls;
 using BrokenRail3MonitorViaWiFi.Windows;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +27,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Xml;
+using Floatable = FloatableUserControl;
 
 namespace BrokenRail3MonitorViaWiFi
 {
@@ -32,43 +36,38 @@ namespace BrokenRail3MonitorViaWiFi
     /// </summary>
     public partial class MainWindow : Window
     {
-        private static readonly int MasterControlWidth = 26;
-        private static readonly int RailWidth = 104;
-        private static readonly int LeftOffset = 30;//主控添加应力之后，最左边的显示不全，所以Rail以及MasterControl整体右移。
-        //private Window _container;
-        private ScrollViewerThumbnail _svtThumbnail;
         private string _directoryName;
         private string _directoryHistoryName;
         private Socket _socketMain;
         private Socket _acceptSocket;
         private Thread _socketListeningThread;
-        private Thread _socketFileRecvThread;
         private List<MasterControl> _masterControlList = new List<MasterControl>();
         private List<Rail> _rail1List = new List<Rail>();
         private List<Rail> _rail2List = new List<Rail>();
         private DispatcherTimer _getAllRailInfoTimer = new DispatcherTimer();
         private DispatcherTimer _waitReceiveTimer = new DispatcherTimer();
-        private DispatcherTimer _multicastWaitReceiveTimer = new DispatcherTimer();
         private DispatcherTimer _timeToWaitTimer = new DispatcherTimer();
         private int _packageCount = 0;
         private int _receiveEmptyPackageCount = 0;
         private List<int> _socketRegister = new List<int>();
         private List<int> _4GPointIndex = new List<int>();
-        private Dictionary<int, bool> _terminalsReceiveFlag;
         private List<int> _sendTime = new List<int>();
         //private int _hit0xf4Count = 0;
         private List<string> _fileNameList = new List<string>();
         private bool _isConnect = false;
-        private String _serverIP = "103.44.145.248";
         //private const String _serverWeb = "f1880f0253.51mypc.cn";
         private const String _serverWeb = "terrytec.iok.la";
         private const int _fileReceivePort = 23955;
-        private bool _isSubscribingAllRailInfo = false;
         private Socket _socket;
         private static MainWindow _instance;
         private ConfigInfoWindow _winConfigInfo;
         private TongDuanWindow _winTongDuan;
         private FFTWindow _winFFT;
+
+        private FFTUserControl _ucFFT = new FFTUserControl(new byte[4122]);
+        private TongDuanUserControl _ucTongDuan = new TongDuanUserControl();
+        private List<Floatable.FloatableUserControl> _floatUserCtrlList = new List<Floatable.FloatableUserControl>();
+        private DataShowUserControl dataShowUserCtrl = new DataShowUserControl();
 
         public List<int> SocketRegister
         {
@@ -156,138 +155,6 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void devicesInitial()
         {
-            try
-            {
-                foreach (var item in MasterControlList)
-                {
-                    item.Dispose();
-                }
-                this.MasterControlList.Clear();
-                _4GPointIndex.Clear();
-                _sendTime.Clear();
-                string fileName = System.Environment.CurrentDirectory + @"\config.xml";
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(fileName);
-                XmlNodeList xnList = xmlDoc.SelectSingleNode("Devices").ChildNodes;
-                int nodeCount = xnList.Count;
-
-                if (this.cvsRail1.Children.Count != 0 || this.cvsRail2.Children.Count != 0 || this.cvsDevices.Children.Count != 0)
-                {
-                    this.cvsRail1.Children.Clear();
-                    this.cvsRail2.Children.Clear();
-                    this.cvsDevices.Children.Clear();
-                }
-
-                int i = 0;
-                int neighbourBigRemember = 0;
-                foreach (XmlNode device in xnList)
-                {
-                    XmlNode terminalNoNode = device.SelectSingleNode("TerminalNo");
-                    string innerTextTerminalNo = terminalNoNode.InnerText.Trim();
-                    int terminalNo = Convert.ToInt32(innerTextTerminalNo);
-                    MasterControl oneMasterControl = new MasterControl(this);
-                    oneMasterControl.lblNumber.Content = terminalNo;
-                    this.MasterControlList.Add(oneMasterControl);
-
-                    //根据终端号计算发射占用无线串口的时机
-                    int t = 4 + (terminalNo % 5) * 15;
-                    if (!FindIntInSendTime(t))
-                    {
-                        _sendTime.Add(t);
-                    }
-
-                    XmlNode is4GNode = device.SelectSingleNode("Is4G");
-                    string innerTextIs4G = is4GNode.InnerText.Trim();
-                    bool is4G = Convert.ToBoolean(innerTextIs4G);
-                    oneMasterControl.Is4G = is4G;
-                    if (is4G)
-                    {
-                        _4GPointIndex.Add(this.MasterControlList.Count - 1);
-                    }
-
-                    Rail rail1 = new Rail(terminalNo);
-                    Rail rail2 = new Rail(terminalNo);
-                    //rail1.WhichRail = RailNo.Rail1;
-                    //rail2.WhichRail = RailNo.Rail2;
-                    this._rail1List.Add(rail1);
-                    this._rail2List.Add(rail2);
-                    this.cvsDevices.Children.Add(this.MasterControlList[this.MasterControlList.Count - 1]);
-                    Canvas.SetLeft(this.MasterControlList[this.MasterControlList.Count - 1], (2 + RailWidth) * i + LeftOffset);
-                    if (i < nodeCount - 1)
-                    {
-                        this.cvsRail1.Children.Add(rail1);
-                        Canvas.SetLeft(rail1, (2 + RailWidth) * i + MasterControlWidth / 2 + 1 + LeftOffset);
-
-                        this.cvsRail2.Children.Add(rail2);
-                        Canvas.SetLeft(rail2, (2 + RailWidth) * i + MasterControlWidth / 2 + 1 + LeftOffset);
-                    }
-                    XmlNode neighbourSmallNode = device.SelectSingleNode("NeighbourSmall");
-                    string innerTextNeighbourSmall = neighbourSmallNode.InnerText.Trim();
-                    int neighbourSmall = Convert.ToInt32(innerTextNeighbourSmall);
-                    XmlNode isEndNode = device.SelectSingleNode("IsEnd");
-                    string innerTextIsEnd = isEndNode.InnerText.Trim();
-                    bool isEnd = Convert.ToBoolean(innerTextIsEnd);
-                    this.MasterControlList[this.MasterControlList.Count - 1].IsEnd = isEnd;
-
-                    //检查工程文档配置文件是否正确
-                    if (i == 0)
-                    {
-                        if (neighbourSmall != 0)
-                        {
-                            AppendMessage("第一个终端的NeighbourSmall标签未设置为0", DataLevel.Warning);
-                        }
-                    }
-                    else
-                    {
-                        if (MasterControlList[i - 1].TerminalNumber != neighbourSmall)
-                        {
-                            AppendMessage("终端" + terminalNo.ToString() + "的小相邻终端不匹配，请检查配置文件", DataLevel.Warning);
-                        }
-                        if (oneMasterControl.TerminalNumber != neighbourBigRemember)
-                        {
-                            AppendMessage("终端" + MasterControlList[i - 1].TerminalNumber.ToString() + "的大相邻终端不匹配，请检查配置文件", DataLevel.Warning);
-                        }
-                    }
-                    oneMasterControl.NeighbourSmall = neighbourSmall;
-                    if (i >= 1)
-                    {
-                        MasterControlList[i - 1].NeighbourBig = neighbourBigRemember;
-                    }
-                    XmlNode neighbourBigNode = device.SelectSingleNode("NeighbourBig");
-                    string innerTextNeighbourBig = neighbourBigNode.InnerText.Trim();
-                    if (!isEnd)
-                    {
-                        int neighbourBig = Convert.ToInt32(innerTextNeighbourBig);
-                        neighbourBigRemember = neighbourBig;
-                        oneMasterControl.NeighbourBig = neighbourBig;
-                    }
-
-                    if (isEnd)
-                    {
-                        oneMasterControl.NeighbourBig = 0xff;
-                        if (!(innerTextNeighbourBig == "ff" || innerTextNeighbourBig == "FF"))
-                        {
-                            AppendMessage("最末终端" + terminalNo.ToString() + "的大相邻终端不是ff，请检查配置文件", DataLevel.Warning);
-                        }
-                    }
-                    i++;
-                }
-                this.cvsRail1.Width = (2 + RailWidth) * nodeCount;
-
-                this._svtThumbnail = new ScrollViewerThumbnail(nodeCount - 1);
-                this._svtThumbnail.ScrollViewerTotalWidth = (2 + RailWidth) * nodeCount;
-                this._svtThumbnail.MouseClickedEvent += _svtThumbnail_MouseClickedEvent;
-                this.gridMain.Children.Add(_svtThumbnail);
-                this._svtThumbnail.SetValue(Grid.RowProperty, 2);
-                this._svtThumbnail.SetValue(VerticalAlignmentProperty, VerticalAlignment.Stretch);
-                this._svtThumbnail.SetValue(MarginProperty, new Thickness(20, 0, 20, 0));
-                //重新刷新之后需要清空Socket注册。
-                SocketRegister.Clear();
-            }
-            catch (Exception ee)
-            {
-                AppendMessage("设备初始化异常：" + ee.Message, DataLevel.Error);
-            }
         }
 
         public void AppendMessage(string msg, DataLevel level)
@@ -300,8 +167,6 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void _svtThumbnail_MouseClickedEvent()
         {
-            double offset = this._svtThumbnail.XPosition / this._svtThumbnail.CvsFollowMouseWidth * this._svtThumbnail.ScrollViewerTotalWidth;
-            this.svContainer.ScrollToHorizontalOffset(offset);
         }
 
         void MainWindow_Closed(object sender, EventArgs e)
@@ -379,10 +244,10 @@ namespace BrokenRail3MonitorViaWiFi
                         {
                             actualReceive[i] = receivedBytes[i];
                         }
-                        //处理断包
-                        //V519发满400字节之后会截断一下，在下一个400字节继续发送
-                        //long beforePlusRemainder = accumulateNumber % 400;
-                        duanBao:
+                    //处理断包
+                    //V519发满400字节之后会截断一下，在下一个400字节继续发送
+                    //long beforePlusRemainder = accumulateNumber % 400;
+                    duanBao:
                         accumulateNumber += numBytes;
                         int afterPlusRemainder = accumulateNumber % 400;
                         if (afterPlusRemainder == 0)
@@ -593,32 +458,13 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void handleRealtimeSpectrum(byte[] data)
         {
-            if (_winFFT == null)
-            {
-                _winFFT = new FFTWindow(data);
-                _winFFT.Closed += WinFFT_Closed; ;
-                _winFFT.Show();
-            }
-            else
-            {
-                _winFFT.SetData(data);
-            }
+            _ucFFT.SetData(data);
         }
 
 
         private void handleRealtimeAmpData(byte[] data)
         {
-            if (_winTongDuan == null)
-            {
-                _winTongDuan = new TongDuanWindow();
-                _winTongDuan.Closed += WinTongDuan_Closed;
-                _winTongDuan.Show();
-                _winTongDuan.SetData(data);
-            }
-            else
-            {
-                _winTongDuan.SetData(data);
-            }
+            _ucTongDuan.SetData(data);
         }
 
         private void handleGetConfig(byte[] data)
@@ -653,106 +499,15 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void setRail1State(int index, int onOff)
         {
-            if (onOff == 0)
-            {//通的
-                this._svtThumbnail.Normal(new int[1] { index }, 1);
-                Rail rail = this.cvsRail1.Children[index] as Rail;
-                rail.Normal();
-            }
-            else if (onOff == 7)
-            {//断的
-                int tNo = MasterControlList[index].TerminalNumber;
-                int tNextNo = MasterControlList[index + 1].TerminalNumber;
-
-                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨断开！", DataLevel.Error);
-                this._svtThumbnail.Error(new int[1] { index }, 1);
-                Rail rail = this.cvsRail1.Children[index] as Rail;
-                rail.Error();
-            }
-            else if (onOff == 9)
-            {//超时
-                int tNo = MasterControlList[index].TerminalNumber;
-                int tNextNo = MasterControlList[index + 1].TerminalNumber;
-
-                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨超时！", DataLevel.Timeout);
-                this._svtThumbnail.Timeout(new int[1] { index }, 1);
-                Rail rail = this.cvsRail1.Children[index] as Rail;
-                rail.Timeout();
-            }
-            else if (onOff == 0x0a)
-            {//持续干扰
-                int tNo = MasterControlList[index].TerminalNumber;
-                int tNextNo = MasterControlList[index + 1].TerminalNumber;
-
-                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的1号铁轨持续干扰！", DataLevel.ContinuousInterference);
-                this._svtThumbnail.ContinuousInterference(new int[1] { index }, 1);
-                Rail rail = this.cvsRail1.Children[index] as Rail;
-                rail.ContinuousInterference();
-            }
-            else
-            {
-                AppendMessage("收到未定义数据！", DataLevel.Error);
-            }
         }
 
         private void setRail2State(int index, int onOff)
         {
-            if (onOff == 0)
-            {//通的
-                this._svtThumbnail.Normal(new int[1] { index }, 2);
-                Rail rail = this.cvsRail2.Children[index] as Rail;
-                rail.Normal();
-            }
-            else if (onOff == 7)
-            {//断的
-                int tNo = MasterControlList[index].TerminalNumber;
-                int tNextNo = MasterControlList[index + 1].TerminalNumber;
-
-                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨断开！", DataLevel.Error);
-                this._svtThumbnail.Error(new int[1] { index }, 2);
-                Rail rail = this.cvsRail2.Children[index] as Rail;
-                rail.Error();
-            }
-            else if (onOff == 9)
-            {//超时
-                int tNo = MasterControlList[index].TerminalNumber;
-                int tNextNo = MasterControlList[index + 1].TerminalNumber;
-
-                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨超时！", DataLevel.Timeout);
-                this._svtThumbnail.Timeout(new int[1] { index }, 2);
-                Rail rail = this.cvsRail2.Children[index] as Rail;
-                rail.Timeout();
-            }
-            else if (onOff == 0x0a)
-            {//持续干扰
-                int tNo = MasterControlList[index].TerminalNumber;
-                int tNextNo = MasterControlList[index + 1].TerminalNumber;
-
-                this.dataShowUserCtrl.AddShowData(tNo.ToString() + "号终端与" + tNextNo.ToString() + "号终端之间的2号铁轨持续干扰！", DataLevel.ContinuousInterference);
-                this._svtThumbnail.ContinuousInterference(new int[1] { index }, 2);
-                Rail rail = this.cvsRail2.Children[index] as Rail;
-                rail.ContinuousInterference();
-            }
-            else
-            {
-                AppendMessage("收到未定义数据！", DataLevel.Error);
-            }
         }
 
         private void errorAllRails()
         {
-            foreach (var item in _rail1List)
-            {
-                item.Error();
-            }
-            foreach (var item in cvsRail2.Children)
-            {
-                Rail rail2 = item as Rail;
-                if (rail2 != null)
-                {
-                    rail2.Error();
-                }
-            }
+
         }
 
         private void handleBroadcastFileSize(byte[] data)
@@ -1037,92 +792,12 @@ namespace BrokenRail3MonitorViaWiFi
         }
         private void getAllRailInfoTimer_Tick(object sender, EventArgs e)
         {
-            try
-            {
-                this.WaitingRingEnable();
-                this.WaitReceiveTimer.Start();
 
-                if (_4GPointIndex.Count == 0)
-                {
-                    this.WaitingRingDisable();
-                    this.WaitReceiveTimer.Stop();
-
-                    AppendMessage("系统中不包含4G点，请检查config文档！", DataLevel.Error);
-                    _getAllRailInfoTimer.Stop();
-                    //this.miGetAllRailInfo.Header = "获取所有终端铁轨信息";
-                }
-                else
-                {
-                    for (int i = 0; i < _4GPointIndex.Count; i++)
-                    {
-                        Socket socket = this.MasterControlList[_4GPointIndex[i]].GetNearest4GTerminalSocket(true);
-                        byte[] sendData;
-                        if (i == _4GPointIndex.Count - 1)
-                        {
-                            //获取从1到ff的广播数据，当循环到最后一个的时候，目的地址不再是4G点的前一个终端，而是整个终端列表中的最后一个终端。
-                            sendData = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)this.MasterControlList[this.MasterControlList.Count - 1].TerminalNumber, (byte)CommandType.GetOneSectionInfo, new byte[2] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, 0 });
-                        }
-                        else
-                        {
-                            sendData = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)this.MasterControlList[_4GPointIndex[i + 1] - 1].TerminalNumber, (byte)CommandType.GetOneSectionInfo, new byte[2] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, 0 });
-                        }
-                        if (socket != null)
-                        {
-                            DecideDelayOrNot();
-                            socket.Send(sendData, SocketFlags.None);
-                            AppendDataMsg(sendData);
-                        }
-                        else
-                        {
-                            this.WaitingRingDisable();
-                            this.WaitReceiveTimer.Stop();
-
-                            AppendMessage("来自终端" + this.MasterControlList[_4GPointIndex[i]].TerminalNumber + "的消息：" + this.MasterControlList[_4GPointIndex[i]].Find4GErrorMsg, DataLevel.Error);
-                        }
-                    }
-                }
-            }
-            catch (Exception ee)
-            {
-                AppendMessage(ee.Message, DataLevel.Error);
-            }
         }
 
         private void miSubscribeAllRailInfo_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (!_isConnect)
-                {
-                    AppendMessage("请先连接！", DataLevel.Error);
-                    return;
-                }
-                byte[] sendData;
-                if (_isSubscribingAllRailInfo)
-                {
-                    sendData = SendDataPackage.PackageSendData((byte)this.clientIDShow.ClientID,
-                            (byte)0xff, (byte)CommandType.SubscribeAllRailInfo, new byte[1] { 0xff });
-                    //this.miSubscribeAllRailInfo.Header = "订阅所有终端铁轨信息";
-                    errorAllRails();
-                    _isSubscribingAllRailInfo = false;
-                }
-                else
-                {
-                    sendData = SendDataPackage.PackageSendData((byte)this.clientIDShow.ClientID,
-                            (byte)0xff, (byte)CommandType.SubscribeAllRailInfo, new byte[1] { 0 });
-                    //this.miSubscribeAllRailInfo.Header = "取消订阅所有终端铁轨信息";
-                    _isSubscribingAllRailInfo = true;
-                }
-                if (_socketMain != null)
-                {
-                    _socketMain.Send(sendData, SocketFlags.None);
-                    AppendDataMsg(sendData);
-                }
-            }
-            catch (Exception ee)
-            {
-                MessageBox.Show("" + ee.Message);
-            }
+
         }
 
         private void WaitReceiveTimer_Tick(object sender, EventArgs e)
@@ -1133,20 +808,6 @@ namespace BrokenRail3MonitorViaWiFi
         }
         private void multicastWaitReceiveTimer_Tick(object sender, EventArgs e)
         {
-            this._multicastWaitReceiveTimer.Stop();
-            string notReceiveNo = string.Empty;
-            foreach (var item in _terminalsReceiveFlag)
-            {
-                if (item.Value == false)
-                {
-                    notReceiveNo += (item.Key + "、");
-                }
-            }
-            if (notReceiveNo != string.Empty)
-            {
-                notReceiveNo = notReceiveNo.Substring(0, notReceiveNo.Length - 1);
-                AppendMessage("超过20秒未收到" + notReceiveNo + "号终端的数据，终端物理链路可能已断开！", DataLevel.Error);
-            }
         }
         //private void miGetAllDevicesSignalAmplitude_Click(object sender, RoutedEventArgs e)
         //{
@@ -1163,207 +824,9 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void miRealTimeConfig_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                DateTime dtNow = DateTime.Now;
-                int intYear = dtNow.Year;
-                string strYear = intYear.ToString();
-                strYear = strYear.Substring(2, 2);
-                byte year = Convert.ToByte(strYear);
-                byte month = (byte)dtNow.Month;
-                byte day = (byte)dtNow.Day;
-                byte hour = (byte)dtNow.Hour;
-                byte minute = (byte)dtNow.Minute;
-                byte second = (byte)dtNow.Second;
-                if (_4GPointIndex.Count == 0)
-                {
-                    AppendMessage("系统中不包含4G点，请检查config文档！", DataLevel.Error);
-                }
-                else
-                {
-                    for (int i = 0; i < _4GPointIndex.Count; i++)
-                    {
-                        Socket socket = this.MasterControlList[_4GPointIndex[i]].GetNearest4GTerminalSocket(true);
-                        byte[] sendData;
-                        if (i == _4GPointIndex.Count - 1)
-                        {
-                            //获取从1到ff的广播数据，当循环到最后一个的时候，目的地址不再是4G点的前一个终端，而是整个终端列表中的最后一个终端。
-                            sendData = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)this.MasterControlList[this.MasterControlList.Count - 1].TerminalNumber, 0x52, new byte[7] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, year, month, day, hour, minute, second });
-                        }
-                        else
-                        {
-                            sendData = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)this.MasterControlList[_4GPointIndex[i + 1] - 1].TerminalNumber, 0x52, new byte[7] { (byte)this.MasterControlList[_4GPointIndex[i]].TerminalNumber, year, month, day, hour, minute, second });
-                        }
-                        if (socket != null)
-                        {
-                            DecideDelayOrNot();
-                            socket.Send(sendData, SocketFlags.None);
-                            AppendDataMsg(sendData);
-                        }
-                        else
-                        {
-                            AppendMessage("来自终端" + this.MasterControlList[_4GPointIndex[i]].TerminalNumber + "的消息：" + this.MasterControlList[_4GPointIndex[i]].Find4GErrorMsg, DataLevel.Error);
-                        }
-                    }
-                }
-            }
-            catch (Exception ee)
-            {
-                AppendMessage(ee.Message, DataLevel.Error);
-            }
         }
         private void miGetOneSectionInfo_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                GetSectionWindow newGetSectionWin = new GetSectionWindow();
-                newGetSectionWin.MasterControlList = this.MasterControlList;
-                newGetSectionWin.Owner = this;
-                if (!newGetSectionWin.ShowDialog().Value)
-                {
-                    return;
-                }
-
-                this.WaitingRingEnable();
-                this.WaitReceiveTimer.Start();
-
-                List<int> include4GIndex = new List<int>();
-                for (int i = 0; i < _4GPointIndex.Count; i++)
-                {
-                    if (this.MasterControlList[_4GPointIndex[i]].TerminalNumber >= newGetSectionWin.TerminalSmall && this.MasterControlList[_4GPointIndex[i]].TerminalNumber <= newGetSectionWin.TerminalBig)
-                    {
-                        include4GIndex.Add(_4GPointIndex[i]);
-                    }
-                }
-                if (_4GPointIndex.Count == 0)
-                {
-                    this.WaitingRingDisable();
-                    this.WaitReceiveTimer.Stop();
-                    AppendMessage("系统中不包含4G点，请检查config文档！", DataLevel.Error);
-                    return;
-                }
-                else
-                {
-                    if (include4GIndex.Count == 0)
-                    {
-                        Socket socket = this.MasterControlList[_4GPointIndex[0]].GetNearest4GTerminalSocket(true);
-                        byte[] sendData = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)newGetSectionWin.TerminalSmall, 0 });
-
-                        if (socket != null)
-                        {
-                            DecideDelayOrNot();
-                            socket.Send(sendData, SocketFlags.None);
-                            AppendDataMsg(sendData);
-                        }
-                        else
-                        {
-                            this.WaitingRingDisable();
-                            this.WaitReceiveTimer.Stop();
-                            AppendMessage("来自终端" + this.MasterControlList[_4GPointIndex[0]].TerminalNumber + "的消息：" + this.MasterControlList[_4GPointIndex[0]].Find4GErrorMsg, DataLevel.Error);
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        if (newGetSectionWin.TerminalSmall == this.MasterControlList[include4GIndex[0]].TerminalNumber)
-                        {
-                            for (int i = 0; i < include4GIndex.Count; i++)
-                            {
-                                Socket socket = this.MasterControlList[include4GIndex[i]].GetNearest4GTerminalSocket(true);
-                                byte[] sendData;
-                                if (i == include4GIndex.Count - 1)
-                                {
-                                    sendData = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
-                                }
-                                else
-                                {
-                                    sendData = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)this.MasterControlList[include4GIndex[i + 1] - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
-                                }
-                                if (socket != null)
-                                {
-                                    DecideDelayOrNot();
-                                    socket.Send(sendData, SocketFlags.None);
-                                    AppendDataMsg(sendData);
-                                }
-                                else
-                                {
-                                    this.WaitingRingDisable();
-                                    this.WaitReceiveTimer.Stop();
-                                    AppendMessage("来自终端" + this.MasterControlList[include4GIndex[i]].TerminalNumber + "的消息：" + this.MasterControlList[include4GIndex[i]].Find4GErrorMsg, DataLevel.Error);
-                                    return;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            //多播段小终端号不是4G点的时候，需要去找小于小中端号的4G点。用其的Socket发送数据。
-                            int previous4GPointIndex = 0;
-                            for (int i = _4GPointIndex.Count - 1; i >= 0; i--)
-                            {
-                                if (_4GPointIndex[i] < include4GIndex[0])
-                                {
-                                    previous4GPointIndex = _4GPointIndex[i];
-                                    break;
-                                }
-                            }
-                            Socket socket = this.MasterControlList[previous4GPointIndex].GetNearest4GTerminalSocket(true);
-                            byte[] sendData;
-                            sendData = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)this.MasterControlList[include4GIndex[0] - 1].TerminalNumber, 0x55, new byte[2] { (byte)newGetSectionWin.TerminalSmall, 0 });
-
-                            if (socket != null)
-                            {
-                                DecideDelayOrNot();
-                                socket.Send(sendData, SocketFlags.None);
-                                AppendDataMsg(sendData);
-                            }
-                            else
-                            {
-                                this.WaitingRingDisable();
-                                this.WaitReceiveTimer.Stop();
-                                AppendMessage("来自终端" + this.MasterControlList[previous4GPointIndex].TerminalNumber + "的消息：" + this.MasterControlList[previous4GPointIndex].Find4GErrorMsg, DataLevel.Error);
-                                return;
-                            }
-                            for (int i = 0; i < include4GIndex.Count; i++)
-                            {
-                                Socket socketAnother = this.MasterControlList[include4GIndex[i]].GetNearest4GTerminalSocket(true);
-                                byte[] sendData1;
-                                if (i == include4GIndex.Count - 1)
-                                {
-                                    sendData1 = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)newGetSectionWin.TerminalBig, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
-                                }
-                                else
-                                {
-                                    sendData1 = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)this.MasterControlList[include4GIndex[i + 1] - 1].TerminalNumber, 0x55, new byte[2] { (byte)this.MasterControlList[include4GIndex[i]].TerminalNumber, 0 });
-                                }
-                                if (socketAnother != null)
-                                {
-                                    socketAnother.Send(sendData1, SocketFlags.None);
-                                    AppendDataMsg(sendData1);
-                                }
-                                else
-                                {
-                                    this.WaitingRingDisable();
-                                    this.WaitReceiveTimer.Stop();
-                                    AppendMessage("来自终端" + this.MasterControlList[include4GIndex[i]].TerminalNumber + "的消息：" + this.MasterControlList[include4GIndex[i]].Find4GErrorMsg, DataLevel.Error);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
-                int terminalStartIndex = FindMasterControlIndex(newGetSectionWin.TerminalSmall);
-                int terminalEndIndex = FindMasterControlIndex(newGetSectionWin.TerminalBig);
-                _terminalsReceiveFlag = new Dictionary<int, bool>();
-                for (int i = terminalStartIndex; i <= terminalEndIndex; i++)
-                {
-                    _terminalsReceiveFlag.Add(this.MasterControlList[i].TerminalNumber, false);
-                }
-                _multicastWaitReceiveTimer.Start();
-            }
-            catch (Exception ee)
-            {
-                AppendMessage(ee.Message, DataLevel.Error);
-            }
         }
 
         private void miViewHistory_Click(object sender, RoutedEventArgs e)
@@ -1444,44 +907,6 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void miEraseFlash_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                EraseFlashWindow newEraseFlashWin = new EraseFlashWindow(this.MasterControlList);
-                newEraseFlashWin.Owner = this;
-                if (!newEraseFlashWin.ShowDialog().Value)
-                {
-                    return;
-                }
-                if (_4GPointIndex.Count == 0)
-                {
-                    AppendMessage("系统中不包含4G点，请检查config文档！", DataLevel.Error);
-                }
-                else
-                {
-                    //默认使用第一个4G点发送数据。多播没有分段，如果改成每个终端都是4G点需要重写逻辑。
-                    Socket socket = this.MasterControlList[_4GPointIndex[0]].GetNearest4GTerminalSocket(true);
-
-                    byte[] sendData = SendDataPackage.PackageSendData((byte)clientIDShow.ClientID, (byte)newEraseFlashWin.TerminalBig, 0x56, new byte[5] {
-                    (byte)newEraseFlashWin.TerminalSmall,
-                    (byte)((newEraseFlashWin.StartSectorNo & 0xff00)>>8), (byte)(newEraseFlashWin.StartSectorNo&0xff),
-                    (byte)((newEraseFlashWin.EndSectorNo&0xff00)>>8), (byte)(newEraseFlashWin.EndSectorNo&0xff) });
-                    if (socket != null)
-                    {
-                        DecideDelayOrNot();
-                        socket.Send(sendData, SocketFlags.None);
-                        AppendDataMsg(sendData);
-                    }
-                    else
-                    {
-                        AppendMessage("来自终端" + this.MasterControlList[_4GPointIndex[0]].TerminalNumber + "的消息：" + this.MasterControlList[_4GPointIndex[0]].Find4GErrorMsg, DataLevel.Error);
-                    }
-                }
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
         }
         private void checkDirectory()
         {
@@ -1598,20 +1023,10 @@ namespace BrokenRail3MonitorViaWiFi
 
         public void WaitingRingEnable()
         {
-            this.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                this.modernProgressRing.IsActive = true;
-                this.gridMain.IsEnabled = false;
-            }));
         }
 
         public void WaitingRingDisable()
         {
-            this.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                this.modernProgressRing.IsActive = false;
-                this.gridMain.IsEnabled = true;
-            }));
         }
         private void Window_Closing(object sender, CancelEventArgs e)
         {
@@ -1636,93 +1051,10 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void miUpload_Click(object sender, RoutedEventArgs e)
         {
-            if (!_isConnect)
-            {
-                AppendMessage("请先连接！", DataLevel.Error);
-                return;
-            }
-            byte[] sendData;
-            sendData = SendDataPackage.PackageSendData((byte)this.clientIDShow.ClientID,
-                    (byte)0xff, (byte)CommandType.UploadConfig, new byte[0]);
-            if (_socketMain != null)
-            {
-                _socketMain.Send(sendData, SocketFlags.None);
-                AppendDataMsg(sendData);
-            }
-            else
-            {
-            }
-
-            IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse(_serverIP), _fileReceivePort);
-            TcpClient client = new TcpClient();
-            client.Connect(deviceIP);
-
-            AppendMessage("Start sending file...", DataLevel.Normal);
-            NetworkStream stream = client.GetStream();
-
-            //创建文件流  
-            string filePath = Environment.CurrentDirectory + "//config.xml";
-            FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-
-            byte[] fileBuffer = new byte[1030];
-            //每次传输1KB  
-
-            int bytesRead;
-            int totalBytes = 0;
-
-            //将文件流转写入网络流  
-            try
-            {
-                do
-                {
-                    //Thread.Sleep(10);//模拟远程传输视觉效果,暂停10秒  
-                    bytesRead = fs.Read(fileBuffer, 0, fileBuffer.Length);
-                    stream.Write(fileBuffer, 0, bytesRead);
-                    totalBytes += bytesRead;
-                    AppendMessage(string.Format("sending {0} bytes", bytesRead), DataLevel.Normal);
-                } while (bytesRead > 0);
-                AppendMessage(string.Format("Total {0} bytes sent ,Done!", totalBytes), DataLevel.Error);
-            }
-            catch (Exception ex)
-            {
-                AppendMessage(ex.Message, DataLevel.Error);
-            }
-            finally
-            {
-                stream.Dispose();
-                fs.Dispose();
-                client.Close();
-                //listener.Stop();
-            }
         }
 
         private void miDownload_Click(object sender, RoutedEventArgs e)
         {
-            if (!_isConnect)
-            {
-                AppendMessage("请先连接！", DataLevel.Error);
-                return;
-            }
-            byte[] sendData;
-            sendData = SendDataPackage.PackageSendData((byte)this.clientIDShow.ClientID,
-                    (byte)0xff, (byte)CommandType.RequestConfig, new byte[] { 0x48, 0x5f });
-            if (_socketMain != null)
-            {
-                _socketMain.Send(sendData, SocketFlags.None);
-                AppendDataMsg(sendData);
-            }
-            else
-            {
-            }
-            Thread.Sleep(100);
-
-            IPEndPoint deviceIP = new IPEndPoint(IPAddress.Parse(_serverIP), _fileReceivePort);
-            Socket socket = new Socket(deviceIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Connect(deviceIP);
-
-
-            _socketFileRecvThread = new Thread(new ParameterizedThreadStart(socketRecvFileListening));
-            _socketFileRecvThread.Start(socket);
         }
 
         int totalBytes = 0;
@@ -1815,7 +1147,76 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //devicesInitial();
+            try
+            {
+                //显示版本信息
+                string version = "  v" + GetCurrentApplicationVersion();
+                this.Title += version;
+                fucTongDuan.Closed += FucTongDuan_Closed;
+                fucFFT.Closed += FucFFT_Closed;
+                fucMessage.Closed += FucMessage_Closed;
+
+                fucTongDuan.GridContainer.Children.Add(_ucTongDuan);
+                fucFFT.GridContainer.Children.Add(_ucFFT);
+                fucMessage.GridContainer.Children.Add(dataShowUserCtrl);
+
+                _ucTongDuan.MouseLeftButtonDown += UcTongDuan_MouseLeftButtonDown;
+                _ucFFT.MouseLeftButtonDown += UcFFT_MouseLeftButtonDown;
+                dataShowUserCtrl.MouseLeftButtonDown += DataShowUserCtrl_MouseLeftButtonDown;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        private void DataShowUserCtrl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            fucMessage.FocusTitleRect();
+        }
+
+        private void UcFFT_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            fucFFT.FocusTitleRect();
+        }
+
+        private void UcTongDuan_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            fucTongDuan.FocusTitleRect();
+        }
+
+        private void FucMessage_Closed()
+        {
+            if (!_floatUserCtrlList.Contains(fucMessage))
+            {
+                _floatUserCtrlList.Add(fucMessage);
+            }
+        }
+
+        private void FucFFT_Closed()
+        {
+            if (!_floatUserCtrlList.Contains(fucFFT))
+            {
+                _floatUserCtrlList.Add(fucFFT);
+            }
+        }
+
+        private void FucTongDuan_Closed()
+        {
+            if (!_floatUserCtrlList.Contains(fucTongDuan))
+            {
+                _floatUserCtrlList.Add(fucTongDuan);
+            }
+        }
+
+        private string GetCurrentApplicationVersion()
+        {
+
+            Assembly asm = Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(asm.Location);
+            string versionStr = string.Format(" {0}.{1}.{2}", fvi.ProductMajorPart, fvi.ProductMinorPart, fvi.ProductBuildPart);
+            return versionStr;
         }
 
         private void miRealtimeInfo_Click(object sender, RoutedEventArgs e)
@@ -1912,6 +1313,56 @@ namespace BrokenRail3MonitorViaWiFi
         public ConfigInfoWindow GetConfigInfoWin()
         {
             return _winConfigInfo;
+        }
+
+        private void miView_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void miTongDuan_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in _floatUserCtrlList)
+            {
+                if (item.Name == "fucTongDuan")
+                {
+                    item.AddControlAndSetGrid();
+                    item.State = Floatable.UserControlState.Dock;
+                    _floatUserCtrlList.Remove(item);
+                    break;
+                }
+            }
+            fucTongDuan.FocusTitleRect();
+        }
+
+        private void miFFT_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in _floatUserCtrlList)
+            {
+                if (item.Name == "fucFFT")
+                {
+                    item.AddControlAndSetGrid();
+                    item.State = Floatable.UserControlState.Dock;
+                    _floatUserCtrlList.Remove(item);
+                    break;
+                }
+            }
+            fucFFT.FocusTitleRect();
+        }
+
+        private void miMessage_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in _floatUserCtrlList)
+            {
+                if (item.Name == "fucMessage")
+                {
+                    item.AddControlAndSetGrid();
+                    item.State = Floatable.UserControlState.Dock;
+                    _floatUserCtrlList.Remove(item);
+                    break;
+                }
+            }
+            fucMessage.FocusTitleRect();
         }
     }
 }

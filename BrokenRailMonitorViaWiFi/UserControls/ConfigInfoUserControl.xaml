@@ -24,6 +24,8 @@
         </Style>
         <root:CurrentTimeConverter x:Key="converterCurrentTime"/>
         <root:Second2TimeConverter x:Key="converterSecond2Time"/>
+        <root:TerminalNumConverter x:Key="terminalNumConverter"/>
+        <root:VersionConverter x:Key="versionConverter"/>
     </UserControl.Resources>
     <Border  BorderThickness="1" BorderBrush="Black">
         <Grid ShowGridLines="True">
@@ -49,7 +51,7 @@
             <Label Style="{StaticResource labelStyle}" Grid.Row="0" Grid.Column="1">当前系统时间</Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="0" Grid.Column="2">CPU型号</Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="0" Grid.Column="3">FPGA型号</Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="0" Grid.Column="4">主频</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="0" Grid.Column="4">主频(MHz)</Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="0" Grid.Column="5">CPU固件版本</Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="0" Grid.Column="6">
                 <StackPanel>
@@ -57,23 +59,38 @@
                     <Label Style="{StaticResource labelStyle}">版本</Label>
                 </StackPanel>
             </Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="0" Grid.Column="7">存储空间合计</Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="0">存储空间剩余</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="0" Grid.Column="7">
+                <StackPanel>
+                    <Label Style="{StaticResource labelStyle}">存储空间</Label>
+                    <Label Style="{StaticResource labelStyle}">合计(MB)</Label>
+                </StackPanel>
+            </Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="0">
+                <StackPanel>
+                    <Label Style="{StaticResource labelStyle}">存储空间</Label>
+                    <Label Style="{StaticResource labelStyle}">剩余(MB)</Label>
+                </StackPanel>
+            </Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="1">
                 <StackPanel>
-                    <Label Style="{StaticResource labelStyle}">发送超声</Label>
-                    <Label Style="{StaticResource labelStyle}">波频率</Label>
+                    <Label Style="{StaticResource labelStyle}">发送超声波</Label>
+                    <Label Style="{StaticResource labelStyle}">频率(KHz)</Label>
                 </StackPanel>
             </Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="2">
                 <StackPanel>
-                    <Label Style="{StaticResource labelStyle}">发送超声</Label>
-                    <Label Style="{StaticResource labelStyle}">波长度</Label>
+                    <Label Style="{StaticResource labelStyle}">发送超声波</Label>
+                    <Label Style="{StaticResource labelStyle}">长度(ms)</Label>
                 </StackPanel>
             </Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="3">接收判断门限</Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="4">测试间隔</Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="5">信息上报频率</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="4">测试间隔(s)</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="5">
+                <StackPanel>
+                    <Label Style="{StaticResource labelStyle}">信息上报</Label>
+                    <Label Style="{StaticResource labelStyle}">频率(m)</Label>
+                </StackPanel>
+            </Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="6">系统重启次数</Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="2" Grid.Column="7">上次重启时间</Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="0">
@@ -88,16 +105,16 @@
                     <Label Style="{StaticResource labelStyle}">的编号</Label>
                 </StackPanel>
             </Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="2">对时间隔</Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="3">12V电压</Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="4">5V电压</Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="5">3.3V电压</Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="6">1.5V电压</Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="7">12V电流</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="2">对时间隔(h)</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="3">12V电压(V)</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="4">5V电压(V)</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="5">3.3V电压(V)</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="6">1.5V电压(V)</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="7">12V电流(mA)</Label>
 
 
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"
-                       Grid.Row="1" Grid.Column="0" Text="{Binding Path=终端编号 }"></TextBlock>
+                       Grid.Row="1" Grid.Column="0" Text="{Binding Path=终端编号,Converter={StaticResource terminalNumConverter}}"></TextBlock>
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"
                        Grid.Row="1" Grid.Column="1" Text="{Binding Path=当前系统时间,
                        Converter={StaticResource converterCurrentTime}}"></TextBlock>
@@ -108,9 +125,9 @@
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"
                        Grid.Row="1" Grid.Column="4" Text="{Binding Path=主频 }"></TextBlock>
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"
-                       Grid.Row="1" Grid.Column="5" Text="{Binding Path=CPU固件版本 }"></TextBlock>
+                       Grid.Row="1" Grid.Column="5" Text="{Binding Path=CPU固件版本,Converter={StaticResource versionConverter}}"></TextBlock>
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"
-                       Grid.Row="1" Grid.Column="6" Text="{Binding Path=FPGA固件版本 }"></TextBlock>
+                       Grid.Row="1" Grid.Column="6" Text="{Binding Path=FPGA固件版本,Converter={StaticResource versionConverter}}"></TextBlock>
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"
                        Grid.Row="1" Grid.Column="7" Text="{Binding Path=存储空间合计 }"></TextBlock>
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"

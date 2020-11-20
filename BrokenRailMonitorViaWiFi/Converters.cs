@@ -66,7 +66,7 @@ namespace BrokenRail3MonitorViaWiFi
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             int timeStamp = (int)value;
-            return TimeStamp.GetDateTime(timeStamp).ToString("yyyy/MM/dd h:mm:ss");
+            return TimeStamp.GetDateTime(timeStamp).ToString("yyyy/MM/dd HH:mm:ss");
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -120,6 +120,45 @@ namespace BrokenRail3MonitorViaWiFi
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class TerminalNumConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (int)value + 1;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (int)value - 1;
+        }
+    }
+
+    public class VersionConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int version = (int)value;
+            StringBuilder result = new StringBuilder();
+            int mainV = version / 100;
+            int remainBehindMainV = version - mainV * 100;
+            int secondV = remainBehindMainV / 10;
+            int thirdV = remainBehindMainV - secondV * 10;
+            result.Append("v");
+            result.Append(mainV.ToString());
+            result.Append(".");
+            result.Append(secondV.ToString());
+            result.Append(".");
+            result.Append(thirdV.ToString());
+
+            return result.ToString();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

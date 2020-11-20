@@ -21,7 +21,7 @@
                 <chart:Axis></chart:Axis>
             </chart:Chart.AxesY>
             <chart:Chart.AxesX>
-                <chart:Axis/>
+                <chart:Axis Suffix="k"/>
             </chart:Chart.AxesX>
         </chart:Chart>
     </Grid>

@@ -80,6 +80,7 @@ namespace BrokenRail3MonitorViaWiFi.UserControls
             fftSeries.RenderAs = RenderAs.Column;
             fftSeries.MarkerEnabled = false;
             fftSeries.XValueType = ChartValueTypes.Numeric;
+            fftSeries.ToolTipText = "#XValue;#YValue";
             fftSeries.LegendText = "信号";
             DataPoint dpFFTPoint;
             for (int k = startIndex; k < 512; k += 4)

@@ -1,5 +1,4 @@
 ﻿using BrokenRail3MonitorViaWiFi.Classes;
-using BrokenRail3MonitorViaWiFi.UserControls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,18 +11,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace BrokenRail3MonitorViaWiFi.Windows
+namespace BrokenRail3MonitorViaWiFi.UserControls
 {
     /// <summary>
-    /// FFTWindow.xaml 的交互逻辑
+    /// FFTUserControl.xaml 的交互逻辑
     /// </summary>
-    public partial class FFTWindow : Window
+    public partial class FFTUserControl : UserControl
     {
         private static readonly int CHART_COUNT = 8;
         private FFTChartUserControl[] _fftCharts = new FFTChartUserControl[CHART_COUNT];
-        public FFTWindow(byte[] data)
+        public FFTUserControl(byte[] data)
         {
             InitializeComponent();
             for (int i = 0; i < CHART_COUNT; i++)
@@ -37,6 +37,7 @@ namespace BrokenRail3MonitorViaWiFi.Windows
                 SetTime(data);
             }
         }
+
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {

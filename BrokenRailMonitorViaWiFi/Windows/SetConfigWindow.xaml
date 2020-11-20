@@ -13,6 +13,7 @@
             <Setter Property="Margin" Value="5"/>
         </Style>
         <root:MultiBool2OneBoolConverter x:Key="multiBool2OneBoolConverter"/>
+        <root:TerminalNumConverter x:Key="terminalNumConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>

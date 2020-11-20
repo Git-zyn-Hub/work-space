@@ -266,35 +266,6 @@ namespace BrokenRail3MonitorViaWiFi
         }
         private void miGetPointRailInfo_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (_mainWin != null)
-                {
-                    _mainWin.WaitingRingEnable();
-                    _mainWin.WaitReceiveTimer.Start();
-                }
-                byte[] sendData = SendDataPackage.PackageSendData((byte)_mainWin.clientIDShow.ClientID, (byte)_terminalNumber, (byte)CommandType.GetPointRailInfo, new byte[2] { 0, 0 });
-                Socket socketGet = GetNearest4GTerminalSocket(true);
-                if (socketGet != null)
-                {
-                    _mainWin.DecideDelayOrNot();
-                    socketGet.Send(sendData, SocketFlags.None);
-                    AppendDataMsg(sendData);
-                }
-                else
-                {
-                    if (_mainWin != null)
-                    {
-                        _mainWin.WaitingRingDisable();
-                        _mainWin.WaitReceiveTimer.Stop();
-                    }
-                    _mainWin.AppendMessage(Find4GErrorMsg, DataLevel.Error);
-                }
-            }
-            catch (Exception ee)
-            {
-                _mainWin.AppendMessage(ee.Message, DataLevel.Error);
-            }
         }
 
         //private void miGetPointSignalAmplitude_Click(object sender, RoutedEventArgs e)
@@ -319,201 +290,24 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void miConfigInitialInfo_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                InitialInfoConfigWindow newInitialInfoConfigWin = new InitialInfoConfigWindow();
-
-                if (_mainWin != null)
-                {
-                    newInitialInfoConfigWin.Owner = _mainWin;
-                    //初始化默认的终端号。
-                    newInitialInfoConfigWin.TerminalNo = this._terminalNumber;
-                    int index = _mainWin.FindMasterControlIndex(this._terminalNumber);
-                    if (index == 0)
-                    {
-                        newInitialInfoConfigWin.NeighbourSmallSecondary = 0;
-                        newInitialInfoConfigWin.NeighbourSmall = 0;
-                    }
-                    else if (index == 1)
-                    {
-                        newInitialInfoConfigWin.NeighbourSmallSecondary = 0;
-                        newInitialInfoConfigWin.NeighbourSmall = _mainWin.MasterControlList[0].TerminalNumber;
-                    }
-                    else
-                    {
-                        newInitialInfoConfigWin.NeighbourSmallSecondary = _mainWin.MasterControlList[index - 2].TerminalNumber;
-                        newInitialInfoConfigWin.NeighbourSmall = _mainWin.MasterControlList[index - 1].TerminalNumber;
-                    }
-                    if (index == _mainWin.MasterControlList.Count - 2)
-                    {
-                        newInitialInfoConfigWin.NeighbourBig = _mainWin.MasterControlList[_mainWin.MasterControlList.Count - 1].TerminalNumber;
-                        newInitialInfoConfigWin.NeighbourBigSecondary = 0xff;
-                    }
-                    else if (index == _mainWin.MasterControlList.Count - 1)
-                    {
-                        newInitialInfoConfigWin.NeighbourBig = 0xff;
-                        newInitialInfoConfigWin.NeighbourBigSecondary = 0xff;
-                    }
-                    else
-                    {
-                        newInitialInfoConfigWin.NeighbourBig = _mainWin.MasterControlList[index + 1].TerminalNumber;
-                        newInitialInfoConfigWin.NeighbourBigSecondary = _mainWin.MasterControlList[index + 2].TerminalNumber;
-                    }
-                }
-                if (!newInitialInfoConfigWin.ShowDialog().Value)
-                {
-                    return;
-                }
-
-                byte[] sendData = SendDataPackage.PackageSendData((byte)_mainWin.clientIDShow.ClientID, (byte)_terminalNumber, (byte)CommandType.ConfigInitialInfo, new byte[6] { (byte)newInitialInfoConfigWin.TerminalNo,
-                    (byte)newInitialInfoConfigWin.NeighbourSmallSecondary, (byte)newInitialInfoConfigWin.NeighbourSmall,
-                    (byte)newInitialInfoConfigWin.NeighbourBig, (byte)newInitialInfoConfigWin.NeighbourBigSecondary,0x00 });
-                Socket socketGet = GetNearest4GTerminalSocket(true);
-                if (socketGet != null)
-                {
-                    _mainWin.DecideDelayOrNot();
-                    socketGet.Send(sendData, SocketFlags.None);
-                    AppendDataMsg(sendData);
-                }
-                else
-                {
-                    _mainWin.AppendMessage(Find4GErrorMsg, DataLevel.Error);
-                }
-            }
-            catch (Exception ee)
-            {
-                _mainWin.AppendMessage(ee.Message, DataLevel.Error);
-            }
+           
         }
 
         private void miReadPointInfo_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (_mainWin != null)
-                {
-                    _mainWin.WaitingRingEnable();
-                    _mainWin.WaitReceiveTimer.Start();
-                }
-                byte[] sendData = SendDataPackage.PackageSendData((byte)_mainWin.clientIDShow.ClientID, (byte)_terminalNumber, (byte)CommandType.ReadPointInfo, new byte[1] { (byte)_terminalNumber });
-                Socket socketGet = GetNearest4GTerminalSocket(true);
-                if (socketGet != null)
-                {
-                    _mainWin.DecideDelayOrNot();
-                    socketGet.Send(sendData, SocketFlags.None);
-                    AppendDataMsg(sendData);
-                }
-                else
-                {
-                    if (_mainWin != null)
-                    {
-                        _mainWin.WaitingRingDisable();
-                        _mainWin.WaitReceiveTimer.Stop();
-                    }
-                    _mainWin.AppendMessage(Find4GErrorMsg, DataLevel.Error);
-                }
-            }
-            catch (Exception ee)
-            {
-                _mainWin.AppendMessage(ee.Message, DataLevel.Error);
-            }
+           
         }
 
         private void miSignalSendConfig_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                SignalSendConfigWindow newSignalSendConfigWin = new SignalSendConfigWindow();
-
-                if (_mainWin != null)
-                {
-                    newSignalSendConfigWin.Owner = _mainWin;
-                }
-                if (!newSignalSendConfigWin.ShowDialog().Value)
-                {
-                    return;
-                }
-                byte[] sendData = SendDataPackage.PackageSendData((byte)_mainWin.clientIDShow.ClientID, (byte)_terminalNumber, 0xf4,
-                    new byte[4] { (byte)newSignalSendConfigWin.SendInterval,(byte)newSignalSendConfigWin.SendTimeOpportunity,
-                                      (byte)newSignalSendConfigWin.NeighbourSmallOpportunity,(byte)newSignalSendConfigWin.NeighbourBigOpportunity  });
-                Socket socketGet = GetNearest4GTerminalSocket(true);
-                if (socketGet != null)
-                {
-                    _mainWin.DecideDelayOrNot();
-                    socketGet.Send(sendData, SocketFlags.None);
-                }
-                else
-                {
-                    MessageBox.Show(Find4GErrorMsg);
-                }
-            }
-            catch (Exception ee)
-            {
-                MessageBox.Show(ee.Message);
-            }
         }
 
         private void miThresholdSetting_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                ThresholdSettingWindow newThresholdSettingWin = new ThresholdSettingWindow();
-
-                if (_mainWin != null)
-                {
-                    newThresholdSettingWin.Owner = _mainWin;
-                }
-                if (!newThresholdSettingWin.ShowDialog().Value)
-                {
-                    return;
-                }
-                byte[] sendData = SendDataPackage.PackageSendData((byte)_mainWin.clientIDShow.ClientID, (byte)_terminalNumber, (byte)CommandType.ThresholdSetting,
-                    new byte[2] { (byte)newThresholdSettingWin.ThresholdRail1, (byte)newThresholdSettingWin.ThresholdRail2 });
-                Socket socketGet = GetNearest4GTerminalSocket(true);
-                if (socketGet != null)
-                {
-                    _mainWin.DecideDelayOrNot();
-                    socketGet.Send(sendData, SocketFlags.None);
-                    AppendDataMsg(sendData);
-                }
-                else
-                {
-                    _mainWin.AppendMessage(Find4GErrorMsg, DataLevel.Error);
-                }
-            }
-            catch (Exception ee)
-            {
-                _mainWin.AppendMessage(ee.Message, DataLevel.Error);
-            }
         }
 
         private void miGetHistory_Click(object sender, RoutedEventArgs e)
         {
-            GetHistoryWindow newGetHistoryWin = new GetHistoryWindow();
-            if (_mainWin != null)
-            {
-                newGetHistoryWin.Owner = this._mainWin;
-            }
-            if (!newGetHistoryWin.ShowDialog().Value)
-            {
-                return;
-            }
-            byte[] sendData = SendDataPackage.PackageSendData((byte)_mainWin.clientIDShow.ClientID, (byte)_terminalNumber, (byte)CommandType.GetHistory,
-                new byte[12] { (byte)newGetHistoryWin.YearStart, (byte)newGetHistoryWin.MonthStart, (byte)newGetHistoryWin.DayStart,
-                               (byte)newGetHistoryWin.HourStart,(byte)newGetHistoryWin.MinuteStart,(byte)newGetHistoryWin.SecondStart,
-                               (byte)newGetHistoryWin.YearEnd,(byte)newGetHistoryWin.MonthEnd,(byte)newGetHistoryWin.DayEnd,
-                               (byte)newGetHistoryWin.HourEnd,(byte)newGetHistoryWin.MinuteEnd,(byte)newGetHistoryWin.SecondEnd });
-            Socket socketGet = GetNearest4GTerminalSocket(true);
-            if (socketGet != null)
-            {
-                _mainWin.DecideDelayOrNot();
-                socketGet.Send(sendData, SocketFlags.None);
-                AppendDataMsg(sendData);
-            }
-            else
-            {
-                _mainWin.AppendMessage(Find4GErrorMsg, DataLevel.Error);
-            }
         }
 
         public Socket GetNearest4GTerminalSocket(bool isForward)
@@ -638,10 +432,10 @@ namespace BrokenRail3MonitorViaWiFi
             {
                 sb.Append(sendData[i].ToString("x2"));
             }
-            this.Dispatcher.Invoke(new Action(() =>
-            {
-                _mainWin.dataShowUserCtrl.AddShowData("发送数据  (长度：" + sendData.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
-            }));
+            //this.Dispatcher.Invoke(new Action(() =>
+            //{
+            //    _mainWin.dataShowUserCtrl.AddShowData("发送数据  (长度：" + sendData.Length.ToString() + ")  " + sb.ToString(), DataLevel.Default);
+            //}));
         }
         public void Online()
         {
