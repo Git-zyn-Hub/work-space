@@ -42,6 +42,7 @@
                 <!--<MenuItem x:Name="miRealtimeInfo" Header="实时信息" FontSize="15" Click="miRealtimeInfo_Click"/>-->
             </Menu>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                <Label x:Name="lblRealTime" Foreground="White" Content="{Binding RealTime}" FontWeight="Bold"></Label>
                 <Ellipse x:Name="elpIndicator" Fill="LightGreen" Height="15" Width="15"></Ellipse>
                 <Label x:Name="lblPackageCount" Foreground="White"></Label>
             </StackPanel>

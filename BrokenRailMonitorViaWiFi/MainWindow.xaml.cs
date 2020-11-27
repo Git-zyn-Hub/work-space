@@ -34,7 +34,7 @@ namespace BrokenRail3MonitorViaWiFi
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private string _directoryName;
         private string _directoryHistoryName;
@@ -47,6 +47,7 @@ namespace BrokenRail3MonitorViaWiFi
         private DispatcherTimer _getAllRailInfoTimer = new DispatcherTimer();
         private DispatcherTimer _waitReceiveTimer = new DispatcherTimer();
         private DispatcherTimer _timeToWaitTimer = new DispatcherTimer();
+        private DispatcherTimer _realTimeRefreshTimer = new DispatcherTimer();
         private int _packageCount = 0;
         private int _receiveEmptyPackageCount = 0;
         private List<int> _socketRegister = new List<int>();
@@ -68,7 +69,7 @@ namespace BrokenRail3MonitorViaWiFi
         private TongDuanUserControl _ucTongDuan = new TongDuanUserControl();
         private List<Floatable.FloatableUserControl> _floatUserCtrlList = new List<Floatable.FloatableUserControl>();
         private DataShowUserControl dataShowUserCtrl = new DataShowUserControl();
-
+        private string _realTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
         public List<int> SocketRegister
         {
             get
@@ -110,6 +111,16 @@ namespace BrokenRail3MonitorViaWiFi
             }
         }
 
+        public string RealTime
+        {
+            get => _realTime;
+            set
+            {
+                _realTime = value;
+                OnPropertyChanged("RealTime");
+            }
+        }
+
         //public SerialPort SerialPort
         //{
         //    get { return _serialPort1; }
@@ -134,8 +145,18 @@ namespace BrokenRail3MonitorViaWiFi
             //_multicastWaitReceiveTimer.Tick += multicastWaitReceiveTimer_Tick;
             //_multicastWaitReceiveTimer.Interval = new TimeSpan(0, 0, 20);
             //_waitingRingThread = new Thread(waitingRingEnable);
+            _realTimeRefreshTimer.Tick += RealTimeRefreshTimer_Tick;
+            _realTimeRefreshTimer.Interval = new TimeSpan(0, 0, 1);
+            _realTimeRefreshTimer.Start();
             _instance = this;
+            DataContext = this;
         }
+
+        private void RealTimeRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            RealTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+        }
+
         private void WinFFT_Closed(object sender, EventArgs e)
         {
             _winFFT = null;
@@ -1382,5 +1403,16 @@ namespace BrokenRail3MonitorViaWiFi
             }
             fucMessage.FocusTitleRect();
         }
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(string name)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged.Invoke(this, new PropertyChangedEventArgs(name));
+            }
+        }
+        #endregion
     }
 }
