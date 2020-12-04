@@ -69,6 +69,7 @@ namespace BrokenRail3MonitorViaWiFi
         private TongDuanUserControl _ucTongDuan = new TongDuanUserControl();
         private List<Floatable.FloatableUserControl> _floatUserCtrlList = new List<Floatable.FloatableUserControl>();
         private DataShowUserControl dataShowUserCtrl = new DataShowUserControl();
+        private DebugMsgUserControl _msgUserControl = new DebugMsgUserControl();
         private string _realTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
         public List<int> SocketRegister
         {
@@ -228,9 +229,12 @@ namespace BrokenRail3MonitorViaWiFi
                 {
                     int accumulateNumber = 0;
                     byte[] checkSumErrorArray = null;
+                    int hitLevel = 0;
                     while (true)
                     {
+                        Thread.Sleep(100);
                         byte[] receivedBytes = new byte[5120];
+                        int rightStartIndex = 0;
                         int numBytes = _socket.Receive(receivedBytes, SocketFlags.None);
                         //判断Socket连接是否断开
                         if (numBytes == 0)
@@ -267,6 +271,22 @@ namespace BrokenRail3MonitorViaWiFi
                         for (int i = 0; i < numBytes; i++)
                         {
                             actualReceive[i] = receivedBytes[i];
+                            if (hitLevel == 0 && receivedBytes[i] == 0x66)
+                            {
+                                hitLevel = 1;
+                            }
+                            else if (hitLevel == 1 && receivedBytes[i] == 0xcc)
+                            {
+                                hitLevel = 2;
+                                if (rightStartIndex == 0)
+                                {
+                                    rightStartIndex = accumulateNumber + i - 1;
+                                }
+                            }
+                            else
+                            {
+                                hitLevel = 0;
+                            }
                         }
                     //处理断包
                     //V519发满400字节之后会截断一下，在下一个400字节继续发送
@@ -306,11 +326,30 @@ namespace BrokenRail3MonitorViaWiFi
 
                     handlePackage: ASCIIEncoding encoding = new ASCIIEncoding();
                         string strReceive = encoding.GetString(actualReceive);
-                        if (strReceive.Length > 5)
+                        if (strReceive.Length > 0)
                         {
                             //检查校验和
                             try
                             {
+                                if (rightStartIndex != 0)
+                                {
+                                    //处理粘包的情况。并且第一个字节不是枕头
+                                    int unhandledLength = actualReceive.Length - rightStartIndex;
+                                    byte[] packagePrevious = new byte[rightStartIndex];
+                                    packageUnhandled = new byte[unhandledLength];
+                                    for (int j = 0; j < rightStartIndex; j++)
+                                    {
+                                        packagePrevious[j] = actualReceive[j];
+                                    }
+                                    for (int i = 0; i < unhandledLength; i++)
+                                    {
+                                        packageUnhandled[i] = actualReceive[rightStartIndex + i];
+                                    }
+                                    actualReceive = new byte[rightStartIndex];
+                                    packagePrevious.CopyTo(actualReceive, 0);
+                                    rightStartIndex = 0;
+                                    goto handlePackage;
+                                }
                                 if (actualReceive[0] == 0x66 && actualReceive[1] == 0xcc)
                                 {
                                     StringBuilder sb = new StringBuilder(500);
@@ -367,6 +406,39 @@ namespace BrokenRail3MonitorViaWiFi
                                     {
                                         checkSumErrorArray = null;
                                     }
+                                    switch (actualReceive[2])
+                                    {
+                                        //获取配置
+                                        case 0x02:
+                                            {
+                                                this.Dispatcher.Invoke(new Action(() =>
+                                                {
+                                                    handleGetConfig(actualReceive);
+                                                }));
+                                            }
+                                            break;
+                                        //实时通断数据
+                                        case 0xA0:
+                                            {
+                                                this.Dispatcher.Invoke(new Action(() =>
+                                                {
+                                                    handleRealtimeAmpData(actualReceive);
+                                                }));
+                                            }
+                                            break;
+                                        //实时频谱信息
+                                        case 0xA1:
+                                            {
+                                                this.Dispatcher.Invoke(new Action(() =>
+                                                {
+                                                    handleRealtimeSpectrum(actualReceive);
+                                                }));
+                                            }
+                                            break;
+                                        default:
+                                            AppendMessage("收到未知数据！", DataLevel.Error);
+                                            break;
+                                    }
                                 }
                                 else if (actualReceive[0] == 0x55 && actualReceive[1] == 0xaa)
                                 {
@@ -392,7 +464,7 @@ namespace BrokenRail3MonitorViaWiFi
                                         AppendMessage("拆分组合", DataLevel.Warning);
                                         goto handlePackage;
                                     }
-                                    this.Dispatcher.BeginInvoke(new Action(() =>
+                                    this.Dispatcher.Invoke(new Action(() =>
                                     {
                                         //string strReceiveBroken = encoding.GetString(actualReceive);
                                         StringBuilder sb = new StringBuilder(500);
@@ -400,68 +472,29 @@ namespace BrokenRail3MonitorViaWiFi
                                         {
                                             sb.Append(actualReceive[i].ToString("x2"));
                                         }
-                                        this.dataShowUserCtrl.AddShowData("收到拆分的错误包  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Warning);
+                                        //this.dataShowUserCtrl.AddShowData("收到拆分的错误包  (长度：" + actualReceive.Length.ToString() + ")  " + sb.ToString(), DataLevel.Warning);
+                                        _msgUserControl.AppendMsg(System.Text.Encoding.GetEncoding("gb2312").GetString(actualReceive));
                                     }));
-                                    continue;
+                                    //continue;
+                                }
+                                if (packageUnhandled.Length != 0)
+                                {
+                                    actualReceive = new byte[packageUnhandled.Length];
+                                    packageUnhandled.CopyTo(actualReceive, 0);
+                                    packageUnhandled = new byte[0];
+                                    goto handlePackage;
                                 }
                             }
                             catch (Exception ee)
                             {
                                 AppendMessage("检查校验和异常：" + ee.Message, DataLevel.Error);
                             }
-                            if (actualReceive[0] == 0x66 && actualReceive[1] == 0xcc)
-                            {
-                                switch (actualReceive[2])
-                                {
-                                    //获取配置
-                                    case 0x02:
-                                        {
-                                            this.Dispatcher.Invoke(new Action(() =>
-                                            {
-                                                handleGetConfig(actualReceive);
-                                            }));
-                                        }
-                                        break;
-                                    //实时通断数据
-                                    case 0xA0:
-                                        {
-                                            this.Dispatcher.Invoke(new Action(() =>
-                                            {
-                                                handleRealtimeAmpData(actualReceive);
-                                            }));
-                                        }
-                                        break;
-                                    //实时频谱信息
-                                    case 0xA1:
-                                        {
-                                            this.Dispatcher.Invoke(new Action(() =>
-                                            {
-                                                handleRealtimeSpectrum(actualReceive);
-                                            }));
-                                        }
-                                        break;
-                                    default:
-                                        AppendMessage("收到未知数据！", DataLevel.Error);
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                AppendMessage("收到的数据帧头不对！", DataLevel.Error);
-                            }
-                            if (packageUnhandled.Length != 0)
-                            {
-                                actualReceive = new byte[packageUnhandled.Length];
-                                packageUnhandled.CopyTo(actualReceive, 0);
-                                packageUnhandled = new byte[0];
-                                goto handlePackage;
-                            }
                         }
                         else
                         {
                             this.Dispatcher.Invoke(new Action(() =>
                             {
-                                this.dataShowUserCtrl.AddShowData("接收数据长度小于6  " + strReceive, DataLevel.Warning);
+                                this.dataShowUserCtrl.AddShowData("接收数据长度小于0  " + strReceive, DataLevel.Warning);
                             }));
                         }
                     }
@@ -1194,19 +1227,37 @@ namespace BrokenRail3MonitorViaWiFi
                 fucTongDuan.Closed += FucTongDuan_Closed;
                 fucFFT.Closed += FucFFT_Closed;
                 fucMessage.Closed += FucMessage_Closed;
+                fucDebugMsg.Closed += FucDebugMsg_Closed;
 
                 fucTongDuan.GridContainer.Children.Add(_ucTongDuan);
                 fucFFT.GridContainer.Children.Add(_ucFFT);
                 fucMessage.GridContainer.Children.Add(dataShowUserCtrl);
+                fucDebugMsg.GridContainer.Children.Add(_msgUserControl);
+
+                //fucMessage.GridContainer.Background = new SolidColorBrush(Colors.White);
 
                 _ucTongDuan.MouseLeftButtonDown += UcTongDuan_MouseLeftButtonDown;
                 _ucFFT.MouseLeftButtonDown += UcFFT_MouseLeftButtonDown;
                 dataShowUserCtrl.MouseLeftButtonDown += DataShowUserCtrl_MouseLeftButtonDown;
+                _msgUserControl.MouseLeftButtonDown += MsgUserControl_MouseLeftButtonDown;
             }
             catch (Exception)
             {
 
                 throw;
+            }
+        }
+
+        private void MsgUserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            fucDebugMsg.FocusTitleRect();
+        }
+
+        private void FucDebugMsg_Closed()
+        {
+            if (!_floatUserCtrlList.Contains(fucDebugMsg))
+            {
+                _floatUserCtrlList.Add(fucDebugMsg);
             }
         }
 

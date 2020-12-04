@@ -39,8 +39,9 @@ namespace BrokenRail3MonitorViaWiFi.Windows
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
             byte[] content = new byte[2];
-            content[0] = (byte)((CmdContent & 0xff00) >> 8);
-            content[1] = (byte)(CmdContent & 0xff);
+            int sendTerminalNo = CmdContent - 1;
+            content[0] = (byte)((sendTerminalNo & 0xff00) >> 8);
+            content[1] = (byte)(sendTerminalNo & 0xff);
             byte[] sendData = SendDataPackage.PackageSendData(Command3Type.SendCmd, ConfigType.SET_TNum, 2, content);
             MainWindow.GetInstance().SendCommand(sendData);
         }

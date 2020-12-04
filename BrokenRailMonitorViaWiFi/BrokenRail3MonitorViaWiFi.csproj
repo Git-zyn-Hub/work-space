@@ -124,6 +124,9 @@
     <Compile Include="UserControls\ConfigInfoUserControl.xaml.cs">
       <DependentUpon>ConfigInfoUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\DebugMsgUserControl.xaml.cs">
+      <DependentUpon>DebugMsgUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\FFTChartUserControl.xaml.cs">
       <DependentUpon>FFTChartUserControl.xaml</DependentUpon>
     </Compile>
@@ -220,6 +223,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\ConfigInfoUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\DebugMsgUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -47,8 +47,18 @@
                 <Label x:Name="lblPackageCount" Foreground="White"></Label>
             </StackPanel>
         </DockPanel>
-        <floatable:FloatableUserControl x:Name="fucMessage" StrTitle="消息" Grid.Row="3" Grid.ColumnSpan="3">
-        </floatable:FloatableUserControl>
+        <Grid Grid.Row="3" x:Name="gridDebugAndMessage">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="3"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <GridSplitter Grid.Column="1" Background="AntiqueWhite" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="3"></GridSplitter>
+            <floatable:FloatableUserControl x:Name="fucMessage" StrTitle="消息" Grid.ColumnSpan="1">
+            </floatable:FloatableUserControl>
+            <floatable:FloatableUserControl x:Name="fucDebugMsg" StrTitle="调试信息" Grid.Column="2">
+            </floatable:FloatableUserControl>
+        </Grid>
         <GridSplitter Grid.Row="2" Background="AntiqueWhite" VerticalAlignment="Center" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Height="3"></GridSplitter>
         <Grid Grid.Row="1" x:Name="gridFFTAndTongDuan">
             <Grid.ColumnDefinitions>
