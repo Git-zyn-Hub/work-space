@@ -25,7 +25,6 @@
         <root:CurrentTimeConverter x:Key="converterCurrentTime"/>
         <root:Second2TimeConverter x:Key="converterSecond2Time"/>
         <root:TerminalNumConverter x:Key="terminalNumConverter"/>
-        <root:VersionConverter x:Key="versionConverter"/>
     </UserControl.Resources>
     <Border  BorderThickness="1" BorderBrush="Black">
         <Grid ShowGridLines="True">
@@ -125,9 +124,9 @@
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"
                        Grid.Row="1" Grid.Column="4" Text="{Binding Path=主频 }"></TextBlock>
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"
-                       Grid.Row="1" Grid.Column="5" Text="{Binding Path=CPU固件版本,Converter={StaticResource versionConverter}}"></TextBlock>
+                       Grid.Row="1" Grid.Column="5" Text="{Binding Path=CPU固件版本}"></TextBlock>
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"
-                       Grid.Row="1" Grid.Column="6" Text="{Binding Path=FPGA固件版本,Converter={StaticResource versionConverter}}"></TextBlock>
+                       Grid.Row="1" Grid.Column="6" Text="{Binding Path=FPGA固件版本}"></TextBlock>
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"
                        Grid.Row="1" Grid.Column="7" Text="{Binding Path=存储空间合计 }"></TextBlock>
             <TextBlock Style="{StaticResource textBlockStyle}" TextWrapping="Wrap"

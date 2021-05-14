@@ -32,13 +32,14 @@ namespace BrokenRail3MonitorViaWiFi.Windows
             int length = (data[33] << 8) + data[34];
             if (length == 46)
             {
+                VersionConverter vConverter = new VersionConverter();
                 ucConfigInfo.终端编号 = data[35];
                 ucConfigInfo.当前系统时间 = CalcIntFromBytes.CalcIntFrom4Bytes(data, 36);
                 ucConfigInfo.CPU型号 = data[40];
                 ucConfigInfo.FPGA型号 = data[41];
                 ucConfigInfo.主频 = data[42];
-                ucConfigInfo.CPU固件版本 = data[43];
-                ucConfigInfo.FPGA固件版本 = data[44];
+                ucConfigInfo.CPU固件版本 = vConverter.Convert(data[43], null, null, null).ToString();
+                ucConfigInfo.FPGA固件版本 = vConverter.Convert(data[44], null, null, null).ToString();
                 ucConfigInfo.存储空间合计 = CalcIntFromBytes.CalcIntFrom4Bytes(data, 45);
                 ucConfigInfo.存储空间剩余 = CalcIntFromBytes.CalcIntFrom4Bytes(data, 49);
                 ucConfigInfo.发送超声波频率 = data[53];
@@ -56,6 +57,35 @@ namespace BrokenRail3MonitorViaWiFi.Windows
                 ucConfigInfo.电压3_3V = CalcIntFromBytes.CalcIntFrom2Bytes(data, 75) / 100.0;
                 ucConfigInfo.电压1_5V = CalcIntFromBytes.CalcIntFrom2Bytes(data, 77) / 100.0;
                 ucConfigInfo.电流12V = CalcIntFromBytes.CalcIntFrom2Bytes(data, 79);
+                ucConfigInfo.NotifyChanged();
+                MainWindow.GetInstance().UCConfigInfo = ucConfigInfo;
+            }
+            else if (length == 48)
+            {
+                ucConfigInfo.终端编号 = data[35];
+                ucConfigInfo.当前系统时间 = CalcIntFromBytes.CalcIntFrom4Bytes(data, 36);
+                ucConfigInfo.CPU型号 = data[40];
+                ucConfigInfo.FPGA型号 = data[41];
+                ucConfigInfo.主频 = data[42];
+                ucConfigInfo.CPU固件版本 = data[43].ToString() + "." + (data[44] / 10).ToString() + "." + (data[44] % 10).ToString();
+                ucConfigInfo.FPGA固件版本 = data[45].ToString() + "." + (data[46] / 10).ToString() + "." + (data[46] % 10).ToString();
+                ucConfigInfo.存储空间合计 = CalcIntFromBytes.CalcIntFrom4Bytes(data, 47);
+                ucConfigInfo.存储空间剩余 = CalcIntFromBytes.CalcIntFrom4Bytes(data, 51);
+                ucConfigInfo.发送超声波频率 = data[55];
+                ucConfigInfo.发送超声波长度 = CalcIntFromBytes.CalcIntFrom2Bytes(data, 56);
+                ucConfigInfo.接收判断门限 = data[58];
+                ucConfigInfo.测试间隔 = data[59];
+                ucConfigInfo.信息上报频率 = data[60];
+                ucConfigInfo.系统重启次数 = CalcIntFromBytes.CalcIntFrom2Bytes(data, 61);
+                ucConfigInfo.上次重启时间 = CalcIntFromBytes.CalcIntFrom4Bytes(data, 63);
+                ucConfigInfo.连续工作时间长度 = CalcIntFromBytes.CalcIntFrom4Bytes(data, 67);
+                ucConfigInfo.详细信息的编号 = data[71];
+                ucConfigInfo.对时间隔 = data[72];
+                ucConfigInfo.电压12V = CalcIntFromBytes.CalcIntFrom2Bytes(data, 73) / 100.0;
+                ucConfigInfo.电压5V = CalcIntFromBytes.CalcIntFrom2Bytes(data, 75) / 100.0;
+                ucConfigInfo.电压3_3V = CalcIntFromBytes.CalcIntFrom2Bytes(data, 77) / 100.0;
+                ucConfigInfo.电压1_5V = CalcIntFromBytes.CalcIntFrom2Bytes(data, 79) / 100.0;
+                ucConfigInfo.电流12V = CalcIntFromBytes.CalcIntFrom2Bytes(data, 81);
                 ucConfigInfo.NotifyChanged();
                 MainWindow.GetInstance().UCConfigInfo = ucConfigInfo;
             }

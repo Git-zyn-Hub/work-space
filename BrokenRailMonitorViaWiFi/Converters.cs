@@ -142,7 +142,7 @@ namespace BrokenRail3MonitorViaWiFi
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            int version = (int)value;
+            int version = int.Parse(value.ToString());
             StringBuilder result = new StringBuilder();
             int mainV = version / 100;
             int remainBehindMainV = version - mainV * 100;

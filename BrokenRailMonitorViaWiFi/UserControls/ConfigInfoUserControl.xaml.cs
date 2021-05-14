@@ -33,8 +33,8 @@ namespace BrokenRail3MonitorViaWiFi.UserControls
         public int CPU型号 { get; set; }
         public int FPGA型号 { get; set; }
         public int 主频 { get; set; }
-        public int CPU固件版本 { get; set; }
-        public int FPGA固件版本 { get; set; }
+        public string CPU固件版本 { get; set; }
+        public string FPGA固件版本 { get; set; }
         public int 存储空间合计 { get; set; }
         public int 存储空间剩余 { get; set; }
         public int 发送超声波频率 { get; set; }
