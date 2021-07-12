@@ -648,11 +648,15 @@ namespace BrokenRail3MonitorViaWiFi
         {
             try
             {
-                IPEndPoint hostIP = new IPEndPoint(IPAddress.Parse("192.168.0.201"), 8234);
-                _socketMain = new Socket(hostIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                _socketMain.Bind(hostIP);
-                _socketMain.Listen(500);
-                _acceptSocket = _socketMain.Accept();
+                //IPEndPoint hostIP = new IPEndPoint(IPAddress.Parse("192.168.0.201"), 8234);
+                //_socketMain = new Socket(hostIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                //_socketMain.Bind(hostIP);
+                //_socketMain.Listen(500);
+                //_acceptSocket = _socketMain.Accept();
+
+                IPEndPoint hostIP = new IPEndPoint(IPAddress.Parse("192.168.4.1"), 333);
+                _acceptSocket = new Socket(hostIP.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                _acceptSocket.Connect(hostIP);
 
                 _socketListeningThread = new Thread(new ParameterizedThreadStart(socketListening));
                 _socketListeningThread.Start(_acceptSocket);
