@@ -511,20 +511,24 @@ namespace BrokenRail3MonitorViaWiFi
                 {
                     case 10053:
                     case 10054:
-                        this.Dispatcher.Invoke(new Action(() =>
-                        {
-                            connectCloseHandle(_socket);
-                        }));
                         break;
                     default:
                         AppendMessage("发生未处理异常！", DataLevel.Error);
                         break;
                 }
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    connectCloseHandle(_socket);
+                }));
             }
             catch (Exception ee)
             {
                 //socketDisconnect();
                 AppendMessage("Socket监听线程异常：" + ee.Message, DataLevel.Error);
+                this.Dispatcher.Invoke(new Action(() =>
+                {
+                    connectCloseHandle(_socket);
+                }));
             }
         }
 
@@ -665,6 +669,7 @@ namespace BrokenRail3MonitorViaWiFi
                 this.miConnect.Header = "已连接";
                 this.miConnect.Background = new SolidColorBrush(Colors.LightGreen);
                 this.miConnect.IsEnabled = false;
+                this.miDisconnect.IsEnabled = true;
             }
             catch (Exception ee)
             {
@@ -697,6 +702,7 @@ namespace BrokenRail3MonitorViaWiFi
                     {
                         this.miConnect.Header = "已连接";
                         this.miConnect.Background = new SolidColorBrush(Colors.LightGreen);
+                        this.miDisconnect.IsEnabled = true;
                     }));
 
                     _socketListeningThread = new Thread(new ParameterizedThreadStart(socketListening));
@@ -798,17 +804,22 @@ namespace BrokenRail3MonitorViaWiFi
 
         private void closeSocket()
         {
-            _socketMain.Close();
-            //_socketAcceptThread.Abort();
-            //CloseAcceptSocket();
-            _socketMain = null;
-            _acceptSocket.Close();
-            _acceptSocket = null;
+            if (_socketMain != null)
+            {
+                _socketMain.Close();
+                _socketMain = null;
+            }
+            if (_acceptSocket != null)
+            {
+                _acceptSocket.Close();
+                _acceptSocket = null;
+            }
             this.Dispatcher.Invoke(new Action(() =>
             {
                 this.miConnect.Header = "连接";
                 this.miConnect.IsEnabled = true;
                 this.miConnect.Background = new SolidColorBrush((this.miCommand.Background as SolidColorBrush).Color);
+                this.miDisconnect.IsEnabled = false;
             }));
         }
         //private void miRailInitial_Click(object sender, RoutedEventArgs e)
@@ -1328,7 +1339,7 @@ namespace BrokenRail3MonitorViaWiFi
             _winConfigInfo.SetData(new byte[97] { 0x66, 0xCC, 0x02, 0x00, 0x5f, 0x5F, 0xB6, 0x32,
                 0x49, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2E, 0x00, 0x00, 0x00, 0x00, 0x4C,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x2E, 0x00, 0x00, 0x00, 0x00, 0x4C, 0x00, 0x30, 0x00,
-                0x5F, 0xB6, 0x32, 0x49, 0x00, 0x00, 0x30, 0x70, 0x70, 0x64, 0x63, 0x00, 0x00, 0x80, 
+                0x5F, 0xB6, 0x32, 0x49, 0x00, 0x00, 0x30, 0x70, 0x70, 0x64, 0x63, 0x00, 0x00, 0x80,
                 0x00, 0x00, 0x00, 0x80, 0x00, 0x25, 0x00, 0x55, 0x00, 0x1E, 0x05, 0x00, 0x14, 0x5F,
                 0xB6, 0x2F, 0x06, 0x00, 0x00, 0x03, 0x53, 0x02, 0x06, 0x04, 0x1F, 0x01, 0xEC, 0x01,
                 0x47, 0x00, 0x94, 0x01, 0x1B, 0x05, 0xD8, 0xFF, 0x34, 0x05, 0x75, 0x06, 0xD5, 0xFF,
@@ -1339,16 +1350,21 @@ namespace BrokenRail3MonitorViaWiFi
         private void miGetConfigInfo_Click(object sender, RoutedEventArgs e)
         {
             byte[] sendData = SendDataPackage.PackageSendData(Command3Type.SendCmd, ConfigType.GET_CONFIG, 1, new byte[1] { 0 });
-            if (_acceptSocket != null)
+
+            try
             {
-                _acceptSocket.Send(sendData, SocketFlags.None);
-                AppendDataMsg(sendData);
-                AppendMessage("获取系统配置信息", DataLevel.Default);
+                if (_acceptSocket != null)
+                {
+                    _acceptSocket.Send(sendData, SocketFlags.None);
+                    AppendDataMsg(sendData);
+                    AppendMessage("获取系统配置信息", DataLevel.Default);
+                }
+                else
+                {
+                    AppendMessage("请先连接", DataLevel.Error);
+                }
             }
-            else
-            {
-                AppendMessage("请先连接", DataLevel.Error);
-            }
+            catch (Exception ee) { AppendMessage(ee.Message, DataLevel.Error); }
         }
 
         private void miSetTime_Click(object sender, RoutedEventArgs e)
@@ -1361,28 +1377,41 @@ namespace BrokenRail3MonitorViaWiFi
             timeArray[3] = (byte)(stamp & 0xff);
 
             byte[] sendData = SendDataPackage.PackageSendData(Command3Type.SendCmd, ConfigType.SET_Time, 4, timeArray);
-            if (_acceptSocket != null)
+
+
+            try
             {
-                _acceptSocket.Send(sendData, SocketFlags.None);
-                AppendDataMsg(sendData);
-                AppendMessage("对时", DataLevel.Default);
+                if (_acceptSocket != null)
+                {
+                    _acceptSocket.Send(sendData, SocketFlags.None);
+                    AppendDataMsg(sendData);
+                    AppendMessage("对时", DataLevel.Default);
+                }
+                else
+                {
+                    AppendMessage("请先连接", DataLevel.Error);
+                }
             }
-            else
-            {
-                AppendMessage("请先连接", DataLevel.Error);
-            }
+            catch (Exception ee) { AppendMessage(ee.Message, DataLevel.Error); }
         }
 
         public void SendCommand(byte[] sendData)
         {
-            if (_acceptSocket != null)
+            try
             {
-                _acceptSocket.Send(sendData, SocketFlags.None);
-                AppendDataMsg(sendData);
+                if (_acceptSocket != null)
+                {
+                    _acceptSocket.Send(sendData, SocketFlags.None);
+                    AppendDataMsg(sendData);
+                }
+                else
+                {
+                    AppendMessage("请先连接", DataLevel.Error);
+                }
             }
-            else
+            catch (Exception ee)
             {
-                AppendMessage("请先连接", DataLevel.Error);
+                AppendMessage(ee.Message, DataLevel.Error);
             }
         }
 
@@ -1469,5 +1498,13 @@ namespace BrokenRail3MonitorViaWiFi
             }
         }
         #endregion
+
+        private void miDisconnect_Click(object sender, RoutedEventArgs e)
+        {
+            this.Dispatcher.Invoke(new Action(() =>
+            {
+                connectCloseHandle(_socket);
+            }));
+        }
     }
 }

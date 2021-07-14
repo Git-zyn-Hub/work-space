@@ -39,6 +39,7 @@
                     <MenuItem x:Name="miDetailConfig" Header="详细信息配置" Click="miDetailConfig_Click"/>
                     <MenuItem x:Name="miSetTime" Header="对时" Click="miSetTime_Click"/>
                 </MenuItem>
+                <MenuItem x:Name="miDisconnect" Header="断开" FontSize="15" Click="miDisconnect_Click" IsEnabled="False"></MenuItem>
                 <!--<MenuItem x:Name="miRealtimeInfo" Header="实时信息" FontSize="15" Click="miRealtimeInfo_Click"/>-->
             </Menu>
             <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
