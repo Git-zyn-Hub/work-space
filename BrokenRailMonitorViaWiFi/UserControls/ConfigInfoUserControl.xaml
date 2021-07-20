@@ -105,7 +105,7 @@
                 </StackPanel>
             </Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="2">对时间隔(h)</Label>
-            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="3">12V电压(V)</Label>
+            <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="3">24V电压(V)</Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="4">5V电压(V)</Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="5">3.3V电压(V)</Label>
             <Label Style="{StaticResource labelStyle}" Grid.Row="4" Grid.Column="6">1.5V电压(V)</Label>

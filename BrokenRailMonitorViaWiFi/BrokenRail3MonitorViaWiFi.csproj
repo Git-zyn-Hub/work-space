@@ -318,6 +318,7 @@
     <Resource Include="train_rail.ico" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Readme.txt" />
     <Resource Include="Resources\small_info_icon.png" />
     <Resource Include="config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

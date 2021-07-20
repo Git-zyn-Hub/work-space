@@ -290,14 +290,15 @@ namespace BrokenRail3MonitorViaWiFi
                         }
                     //处理断包
                     //V519发满400字节之后会截断一下，在下一个400字节继续发送
-                    //long beforePlusRemainder = accumulateNumber % 400;
+                    //WiFi发满1024字节之后会截断一下，在下一个1024字节继续发送
+                    //long beforePlusRemainder = accumulateNumber % 1024;
                     duanBao:
                         accumulateNumber += numBytes;
-                        int afterPlusRemainder = accumulateNumber % 400;
+                        int afterPlusRemainder = accumulateNumber % 1024;
                         if (afterPlusRemainder == 0)
                         {
-                            //等于0的时候说明接收的字段跨过400字节，再收一组数据。
-                            //有一种特殊情况，就是收到400字节的时候正好是一整包，这样进入判断的话就会将两个本来就应该分开的包连起来，这种情况没有处理。
+                            //等于0的时候说明接收的字段跨过1024字节，再收一组数据。
+                            //有一种特殊情况，就是收到1024字节的时候正好是一整包，这样进入判断的话就会将两个本来就应该分开的包连起来，这种情况没有处理。
                             receivedBytes = new byte[5120];
                             numBytes = _socket.Receive(receivedBytes, SocketFlags.None);
                             accumulateNumber += numBytes;
@@ -313,7 +314,7 @@ namespace BrokenRail3MonitorViaWiFi
                             sumReceive.CopyTo(actualReceive, 0);
                             //this.Dispatcher.BeginInvoke(new Action(() =>
                             //{
-                            //    this.dataShowUserCtrl.AddShowData("跨越400字节处理！", DataLevel.Warning);
+                            //    this.dataShowUserCtrl.AddShowData("跨越1024字节处理！", DataLevel.Warning);
                             //}));
                             goto duanBao;
                         }
@@ -1154,7 +1155,7 @@ namespace BrokenRail3MonitorViaWiFi
                 {
                     while (true)
                     {
-                        byte[] receivedBytes = new byte[400];
+                        byte[] receivedBytes = new byte[1024];
                         int numBytes = socket.Receive(receivedBytes, SocketFlags.None);
 
                         //判断Socket连接是否断开
